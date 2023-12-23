@@ -34,7 +34,7 @@ const Navbar = () => {
             tabIndex={0}
             className="menu font-semibold menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
           >
-            {navItems}
+            {navItems} 
           </ul>
         </div>
         <a className="btn btn-ghost text-xl">MixHub</a>
