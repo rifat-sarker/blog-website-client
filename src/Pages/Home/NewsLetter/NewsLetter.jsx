@@ -32,7 +32,7 @@ const NewsLetter = () => {
     <div className=" rounded-lg bg-sky-900 w-6xl py-32 h-auto my-24">
       <div className="rounded-lg w-1/2 mx-auto p-12 bg-slate-100">
         <div className="text-center my-4 font-semibold ">
-          <h2 className="text-3xl text-sky-900">
+          <h2 className="text-3xl mb- text-sky-900">
             Newsletter
           </h2>
           <p>Keep up our latest news and events. Subscribe our newsletter</p>
@@ -46,7 +46,7 @@ const NewsLetter = () => {
           label="Email Address"
           name="email"
           autoComplete="email"
-          autoFocus
+         
         />
         <Button
           type="submit"
