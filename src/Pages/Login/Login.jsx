@@ -9,10 +9,16 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { useContext } from "react";
+import { AuthContext } from "../../providers/AuthProvider";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 const defaultTheme = createTheme();
 
 const Login = () => {
+  const {signInUser} =  useContext(AuthContext)
   const handleLogin
    = (event) => {
     event.preventDefault();
@@ -21,6 +27,18 @@ const Login = () => {
     const password = form.password.value;
     const user = { email, password };
     console.log(user);
+
+    signInUser(email,password)
+    .then(result => {
+      console.log(result.user);
+      toast.success("login  successfully", {
+        duration: 2000,
+        position: "bottom-center",
+      });
+    })
+    .catch(error => {
+      console.log(error);
+    })
   };
 
   return (
@@ -90,6 +108,7 @@ const Login = () => {
                 Google
               </Button>
             </p>
+            <ToastContainer></ToastContainer>
           </Box>
         </Box>
       </Container>

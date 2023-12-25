@@ -9,21 +9,52 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../providers/AuthProvider";
+import "react-toastify/dist/ReactToastify.css";
+import Swal from "sweetalert2";
+
 
 const defaultTheme = createTheme();
 const SignUp = () => {
-    const handleSignUp
+  const { createUser } = useContext(AuthContext)
+  const [registerError , setRegisterError] = useState('')
 
-    = (event) => {
-     event.preventDefault();
-     const form = event.target;
-     const name = form.name.value;
-     const email = form.email.value;
-     const password = form.password.value;
-     const user = {name, email, password };
-     console.log(user);
-   };
+  const handleSignUp = event => {
+    event.preventDefault();
+    const form = event.target;
+    const name = form.name.value;
+    const email = form.email.value;
+    const password = form.password.value;
+    const user = { name, email, password };
+    console.log(user);
 
+    //clear
+    setRegisterError('')
+
+    // signup conditions
+    if(!/^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[0-9]).{6,}$/.test(password)){
+      setRegisterError('Enter min one special,capital,numeric and min 6 digits')
+      return;
+    }
+    
+  
+    
+    // create user 
+    createUser(email,password)
+    .then(result => {
+      console.log(result.user);
+      Swal.fire({
+        title: 'Success!',
+        text: 'Account created successfully',
+        icon: 'success',
+        confirmButtonText: 'ok'
+      })
+    })
+    .catch(error => {
+      console.log(error);
+    })
+  }
    
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -45,8 +76,7 @@ const SignUp = () => {
           </Typography>
           <Box
             component="form"
-            onSubmit={handleSignUp
-            }
+            onSubmit={handleSignUp}
             noValidate
             sx={{ mt: 1 }}
           >
@@ -97,6 +127,7 @@ const SignUp = () => {
             </Grid>
             <br />
           </Box>
+          {registerError && <p className="text-red-500">{registerError}</p>}
         </Box>
       </Container>
     </ThemeProvider>
