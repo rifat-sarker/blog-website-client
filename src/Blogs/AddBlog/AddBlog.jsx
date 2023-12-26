@@ -1,26 +1,44 @@
 
+import axios from "axios";
 import { useState } from "react";
+import Swal from "sweetalert2";
 
 const AddBlog = () => {
-    const [selectedValue, setSelectedValue] = useState('');
+    const [category, setCategory] = useState('');
 
         // Handler function for when the selection changes
         const handleSelectChange = (event) => {
-          setSelectedValue(event.target.value);
-          console.log(selectedValue);
+          setCategory(event.target.value);
+          console.log(category);
         };
 
   const handleAddBlog = (event) => {
     event.preventDefault();
     const form = event.target;
-    console.log(form.value);
     const title = form.title.value;
     const sdesc = form.sdesc.value;
     const ldesc = form.ldesc.value;
     const imageURL = form.imageURL.value;
     const date = form.date.value;
-    const newBlog ={title,sdesc,ldesc,imageURL,date,selectedValue}
+    const newBlog ={title,sdesc,ldesc,imageURL,date,category}
     console.log(newBlog);
+
+
+    //send data to the server
+    axios.post('http://localhost:5000/blog', newBlog)
+    .then(data => {
+      if(data.data.insertedId){
+        console.log(data.data);
+        console.log('data added to the database');
+        Swal.fire({
+          title: 'Success!',
+          text: 'New Blog added successfully',
+          icon: 'success',
+          confirmButtonText: 'ok'
+        })
+        form.reset();
+      }
+    })
     
   };
        
@@ -50,16 +68,16 @@ const AddBlog = () => {
             <select
               className="h-12 rounded-lg px-3"
               id="dropdown"
-              value={selectedValue}
+              value={category}
               onChange={handleSelectChange}
             >
               <option value="">Category</option>
               <option value="travel">Travel</option>
+              <option value="parenting">Parenting Tips</option>
               <option value="recipes">Recipes</option>
+              <option value="fashion">Fashion</option>
               <option value="motivation">Motivation</option>
               <option value="nutrition">Nutrition</option>
-              <option value="fashion">Fashion</option>
-              <option value="parenting">Parenting Tips</option>
               <option value="learning_trategies">Learning Strategies</option>
               <option value="software_development">Software Development</option>
             </select>

@@ -9,7 +9,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../../providers/AuthProvider";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -18,7 +18,25 @@ import "react-toastify/dist/ReactToastify.css";
 const defaultTheme = createTheme();
 
 const Login = () => {
-  const {signInUser} =  useContext(AuthContext)
+  const {signInUser,googleLogIn} =  useContext(AuthContext)
+  const [success, setSuccess] = useState("")
+  const [registerError, setRegisterError] = useState("")
+
+
+
+  //google login
+  const handleGoogleLogin = ()=> {
+    googleLogIn()
+    .then(result => {
+      console.log(result.user);
+      // navigate(location?.state ? location.state : "/");
+    })
+    .catch(error => {
+      console.log(error);
+    })
+  }
+  
+
   const handleLogin
    = (event) => {
     event.preventDefault();
@@ -28,6 +46,10 @@ const Login = () => {
     const user = { email, password };
     console.log(user);
 
+    //clear success and error
+    setSuccess('')
+    setRegisterError('')
+
     signInUser(email,password)
     .then(result => {
       console.log(result.user);
@@ -35,9 +57,14 @@ const Login = () => {
         duration: 2000,
         position: "bottom-center",
       });
+      form.reset();
     })
     .catch(error => {
       console.log(error);
+      toast.error('Wrong email or password',{
+        duration: 1000,
+        position: "top-center",
+      })
     })
   };
 
@@ -104,9 +131,10 @@ const Login = () => {
             <br />
             <p className="text-center">
               Login with {" "} 
-              <Button flexDirection variant="outlined">
+              <Button onClick={handleGoogleLogin} flexDirection variant="outlined">
                 Google
               </Button>
+              
             </p>
             <ToastContainer></ToastContainer>
           </Box>

@@ -1,5 +1,10 @@
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../../providers/AuthProvider";
+import image from '../../assets/user.png'
 const Navbar = () => {
+  const { user, logOut } = useContext(AuthContext);
+
   const navItems = (
     <>
       <Link to="/">
@@ -7,7 +12,7 @@ const Navbar = () => {
           <a>Home</a>
         </li>
       </Link>
-      <Link to='/addBlog'>
+      <Link to="/addBlog">
         <li>
           <a>Add Blog</a>
         </li>
@@ -29,6 +34,10 @@ const Navbar = () => {
       </Link>
     </>
   );
+
+  const signOut = () => {
+    logOut().then().catch();
+  };
   return (
     <div className="navbar text-slate-300 bg-base-100">
       <div className="navbar-start">
@@ -62,16 +71,26 @@ const Navbar = () => {
             src="https://i.ibb.co/4McbnBM/cropped-ico.png"
             alt=""
           />
-          <a  className="text-orange-500 btn btn-ghost text-xl">MixHub</a>
+          <a className="text-orange-500 btn btn-ghost text-xl">MixHub</a>
         </div>
       </div>
       <div className="navbar-center hidden lg:flex">
         <ul className=" menu menu-horizontal px-1">{navItems}</ul>
       </div>
       <div className=" navbar-end">
-        <Link className="btn  btn-ghost" to="/login">
-          Login
-        </Link>
+        {user ? (
+          <>
+          
+            <img className="w-10 rounded-full mr-4" src={user.photoURL?user.photoURL: `${image}` } alt="" />
+            <button className="font-bold" onClick={signOut}>
+              Log out
+            </button>
+          </>
+        ) : (
+          <Link to="/login">
+            <button className="font-bold">Login</button>
+          </Link>
+        )}
       </div>
     </div>
   );

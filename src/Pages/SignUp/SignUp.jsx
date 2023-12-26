@@ -50,6 +50,7 @@ const SignUp = () => {
         icon: 'success',
         confirmButtonText: 'ok'
       })
+      form.reset();
     })
     .catch(error => {
       console.log(error);
