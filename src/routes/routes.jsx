@@ -8,6 +8,7 @@ import AddBlog from "../Blogs/AddBlog/AddBlog";
 import ErrorPage from "../ErrorPage/ErrorPage";
 import AllBlog from "../Blogs/AllBlog/AllBlog";
 import BlogDetails from "../BlogDetails/BlogDetails";
+import RecentBlog from "../Pages/Home/RecentBlog/RecentBlog";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
         {
             path: '/blog/:id',
             element: <BlogDetails></BlogDetails>,
+        },
+        {
+            path: '/blog/:id',
+            element: <RecentBlog></RecentBlog>,
         },
     ]
   },

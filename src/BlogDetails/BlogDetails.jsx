@@ -19,7 +19,7 @@ const BlogDetails = () => {
   console.log(data.data);
   return (
     <div>
-      <div className="card w-96 bg-base-100 shadow-xl w-full">
+      <div className="card bg-base-100 shadow-xl w-full">
         <figure className="px-10 pt-10 ">
           <img
             src={data.data.imageURL}
