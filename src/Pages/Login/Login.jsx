@@ -13,6 +13,7 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../../providers/AuthProvider";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useLocation, useNavigate } from "react-router-dom";
 
 
 const defaultTheme = createTheme();
@@ -21,6 +22,8 @@ const Login = () => {
   const {signInUser,googleLogIn} =  useContext(AuthContext)
   const [success, setSuccess] = useState("")
   const [registerError, setRegisterError] = useState("")
+  const navigate = useNavigate();
+  const location = useLocation();
 
 
 
@@ -29,7 +32,7 @@ const Login = () => {
     googleLogIn()
     .then(result => {
       console.log(result.user);
-      // navigate(location?.state ? location.state : "/");
+      navigate(location?.state ? location.state : '/')
     })
     .catch(error => {
       console.log(error);
@@ -53,6 +56,7 @@ const Login = () => {
     signInUser(email,password)
     .then(result => {
       console.log(result.user);
+      navigate(location?.state ? location.state : "/");
       toast.success("login  successfully", {
         duration: 2000,
         position: "bottom-center",

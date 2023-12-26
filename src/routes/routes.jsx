@@ -9,6 +9,7 @@ import ErrorPage from "../ErrorPage/ErrorPage";
 import AllBlog from "../Blogs/AllBlog/AllBlog";
 import BlogDetails from "../BlogDetails/BlogDetails";
 import RecentBlog from "../Pages/Home/RecentBlog/RecentBlog";
+import PrivateRoute from "./PrivateRoute";
 
 const router = createBrowserRouter([
   {
@@ -22,7 +23,7 @@ const router = createBrowserRouter([
         },
         {
             path: 'addBlog',
-            element: <AddBlog></AddBlog>
+            element:<PrivateRoute><AddBlog></AddBlog></PrivateRoute>
         },
         {
             path: 'allBlog',
@@ -38,7 +39,7 @@ const router = createBrowserRouter([
         },
         {
             path: '/blog/:id',
-            element: <BlogDetails></BlogDetails>,
+            element: <PrivateRoute><BlogDetails></BlogDetails></PrivateRoute>,
         },
         {
             path: '/blog/:id',

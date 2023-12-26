@@ -13,12 +13,15 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../../providers/AuthProvider";
 import "react-toastify/dist/ReactToastify.css";
 import Swal from "sweetalert2";
+import { useLocation, useNavigate } from "react-router-dom";
 
 
 const defaultTheme = createTheme();
 const SignUp = () => {
   const { createUser } = useContext(AuthContext)
   const [registerError , setRegisterError] = useState('')
+  const navigate =useNavigate();
+  const location = useLocation();
 
   const handleSignUp = event => {
     event.preventDefault();
@@ -44,6 +47,7 @@ const SignUp = () => {
     createUser(email,password)
     .then(result => {
       console.log(result.user);
+      navigate(location?.state ? location.state : '/')
       Swal.fire({
         title: 'Success!',
         text: 'Account created successfully',

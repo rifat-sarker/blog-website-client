@@ -13,10 +13,19 @@ const BlogDetails = () => {
     },
   });
 
+  //skeletion
   if (isLoading) {
-    return <span className="loading loading-spinner text-primary"></span>;
+    return (
+      <div className="flex flex-col gap-4 w-52">
+        <div className="skeleton h-32 w-full"></div>
+        <div className="skeleton h-4 w-28"></div>
+        <div className="skeleton h-4 w-full"></div>
+        <div className="skeleton h-4 w-full"></div>
+      </div>
+    );
   }
-  console.log(data.data);
+  //   <span className="loading loading-spinner text-primary"></span>;
+
   return (
     <div>
       <div className="card bg-base-100 shadow-xl w-full">
@@ -38,8 +47,17 @@ const BlogDetails = () => {
 
       {/* comment section */}
       <div className="mt-12">
-        <textarea className="rounded-lg" name="comment" id="" cols="50" rows="5"></textarea><br />
-        <button className="btn btn-outline"><input type="submit" value="Comment" /></button>
+        <textarea
+          className="rounded-lg"
+          name="comment"
+          id=""
+          cols="50"
+          rows="5"
+        ></textarea>
+        <br />
+        <button className="btn btn-outline">
+          <input type="submit" value="Comment" />
+        </button>
       </div>
     </div>
   );
