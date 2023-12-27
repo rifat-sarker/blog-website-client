@@ -14,6 +14,7 @@ import { AuthContext } from "../../providers/AuthProvider";
 import "react-toastify/dist/ReactToastify.css";
 import Swal from "sweetalert2";
 import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 
 const defaultTheme = createTheme();
@@ -47,6 +48,17 @@ const SignUp = () => {
     createUser(email,password)
     .then(result => {
       console.log(result.user);
+
+      //user added to the database
+      const createdAt = result.user.metadata.creationTime;
+      const user = {email, createdAt}
+      axios.post('http://localhost:5000/user', user)
+      .then(data => {
+        if(data.data.insertedId){
+          console.log('data added to the database');
+        }
+      })
+      
       navigate(location?.state ? location.state : '/')
       Swal.fire({
         title: 'Success!',

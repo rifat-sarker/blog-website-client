@@ -6,10 +6,9 @@ const AllBlog = () => {
   const [blogs, setBlogs] = useState([]);
 
   const url = "http://localhost:5000/blog";
-  useEffect(() => {
+  useEffect(() => { 
     axios.get(url).then((res) => {
       setBlogs(res.data);
-      console.log(setBlogs);
     });
   }, []);
 

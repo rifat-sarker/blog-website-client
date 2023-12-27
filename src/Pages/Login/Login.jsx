@@ -14,62 +14,67 @@ import { AuthContext } from "../../providers/AuthProvider";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useLocation, useNavigate } from "react-router-dom";
-
+import axios from "axios";
 
 const defaultTheme = createTheme();
 
 const Login = () => {
-  const {signInUser,googleLogIn} =  useContext(AuthContext)
-  const [success, setSuccess] = useState("")
-  const [registerError, setRegisterError] = useState("")
+  const { signInUser, googleLogIn } = useContext(AuthContext);
+  const [success, setSuccess] = useState("");
+  const [registerError, setRegisterError] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
 
-
-
   //google login
-  const handleGoogleLogin = ()=> {
+  const handleGoogleLogin = () => {
     googleLogIn()
-    .then(result => {
-      console.log(result.user);
-      navigate(location?.state ? location.state : '/')
-    })
-    .catch(error => {
-      console.log(error);
-    })
-  }
-  
+      .then((result) => {
+        // console.log(result.user);
+        navigate(location?.state ? location.state : "/");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
-  const handleLogin
-   = (event) => {
+  const handleLogin = (event) => {
     event.preventDefault();
     const form = event.target;
     const email = form.email.value;
     const password = form.password.value;
-    const user = { email, password };
-    console.log(user);
 
     //clear success and error
-    setSuccess('')
-    setRegisterError('')
+    setSuccess("");
+    setRegisterError("");
 
-    signInUser(email,password)
-    .then(result => {
-      console.log(result.user);
-      navigate(location?.state ? location.state : "/");
-      toast.success("login  successfully", {
-        duration: 2000,
-        position: "bottom-center",
-      });
-      form.reset();
-    })
-    .catch(error => {
-      console.log(error);
-      toast.error('Wrong email or password',{
-        duration: 1000,
-        position: "top-center",
+    signInUser(email, password)
+      .then((result) => {
+        const loggedUser = result.user;
+        console.log(loggedUser);
+
+        //get token
+        const user = { email };
+        axios
+          .post("http://localhost:5000/jwt", user, { withCredentials: true })
+          .then((res) => {
+            console.log(res.data);
+            if(res.data){
+              navigate(location?.state ? location.state : "/");
+            }
+          });
+        toast.success("login  successfully", {
+          duration: 2000,
+          position: "bottom-center",
+        });
+        form.reset();
       })
-    })
+      .catch((error) => {
+        console.log(error);
+        toast.error("Wrong email or password", {
+          duration: 1000,
+          position: "top-center",
+        });
+      });
   };
 
   return (
@@ -92,8 +97,7 @@ const Login = () => {
           </Typography>
           <Box
             component="form"
-            onSubmit={handleLogin
-            }
+            onSubmit={handleLogin}
             noValidate
             sx={{ mt: 1 }}
           >
@@ -134,11 +138,14 @@ const Login = () => {
             </Grid>
             <br />
             <p className="text-center">
-              Login with {" "} 
-              <Button onClick={handleGoogleLogin} flexDirection variant="outlined">
+              Login with{" "}
+              <Button
+                onClick={handleGoogleLogin}
+                flexDirection
+                variant="outlined"
+              >
                 Google
               </Button>
-              
             </p>
             <ToastContainer></ToastContainer>
           </Box>
