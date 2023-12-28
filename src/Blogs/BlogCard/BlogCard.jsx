@@ -9,7 +9,7 @@ const BlogCard = ({ blog }) => {
 
 //send data to the server side
   const handleAddToWishlist =(blog)=>{
-    // console.log(blog);
+  
   
     axios.post('http://localhost:5000/wishlist', blog)
     .then(data =>{

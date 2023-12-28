@@ -8,7 +8,7 @@ import { AuthContext } from "../providers/AuthProvider";
 const Wishlist = () => {
     // const [wishlist, setWishlist] = useState([]);
     // const {user} = useContext(AuthContext)
-    // console.log(user);
+  
     // const url = `http://localhost:5000/wishlist?email=${user?.email}`
     // useEffect(()=>{
     //     axios.get(url,)
@@ -35,13 +35,15 @@ const Wishlist = () => {
       </div>
     );
   }
-
+console.log(data);
   return (
     <div className="grid md:grid-cols-2 lg:grid-cols-3 justify-items-center gap-12">
       {data.data.map((wishlist) => {
         const { _id, title, sdesc, imageURL, category } = wishlist;
         // console.log(Object.keys(wishlist).join(','));
+
         const handleDelete = (id) => {
+          console.log(id)
           Swal.fire({
             title: "Are you sure?",
             text: "You won't be able to revert this!",
