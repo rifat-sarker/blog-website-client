@@ -1,3 +1,4 @@
+import AboutUs from "../AboutUs/AboutUs";
 import Banner from "../Banner/Banner";
 import NewsLetter from "../NewsLetter/NewsLetter";
 import RecentBlog from "../RecentBlog/RecentBlog";
@@ -9,6 +10,7 @@ const Home = () => {
             <Banner></Banner>
             <RecentBlog></RecentBlog>
             <Team></Team>
+            <AboutUs></AboutUs>
             <NewsLetter></NewsLetter>
         </div>
     );
