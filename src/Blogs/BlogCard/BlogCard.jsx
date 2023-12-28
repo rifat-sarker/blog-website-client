@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
 
 
 const BlogCard = ({ blog }) => {
@@ -8,11 +9,19 @@ const BlogCard = ({ blog }) => {
 
 //send data to the server side
   const handleAddToWishlist =(blog)=>{
-    console.log(blog);
+    // console.log(blog);
   
     axios.post('http://localhost:5000/wishlist', blog)
     .then(data =>{
       console.log(data.data);
+      if(data.data.insertedId){
+        Swal.fire({
+          title: 'Success!',
+          text: 'Added to the wishlist successfully',
+          icon: 'success',
+          confirmButtonText: 'ok'
+        })
+      }
     })
   }
 

@@ -34,7 +34,7 @@ const BlogDetails = () => {
             src={data.data.imageURL}
             alt="Shoes"
             className="rounded-xl w-full"
-          />
+          />w
         </figure>
         <div className="card-body ">
           <h2 className="card-title text-3xl">{data.data.title}</h2>

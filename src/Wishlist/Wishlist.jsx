@@ -1,9 +1,24 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
+import { AuthContext } from "../providers/AuthProvider";
 
 const Wishlist = () => {
-  const { data,  isLoading } = useQuery({
-    queryKey: ["wishlist"],
+    // const [wishlist, setWishlist] = useState([]);
+    // const {user} = useContext(AuthContext)
+    // console.log(user);
+    // const url = `http://localhost:5000/wishlist?email=${user?.email}`
+    // useEffect(()=>{
+    //     axios.get(url,)
+    //     .then(res=>{
+    //         setWishlist(res.data)
+    //     })
+    // },[url])
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["userwishlist"],
     queryFn: () => {
       const url = `http://localhost:5000/wishlist`;
       const res = axios.get(url);
@@ -20,12 +35,41 @@ const Wishlist = () => {
       </div>
     );
   }
-  console.log(data.data);
+
   return (
     <div className="grid md:grid-cols-2 lg:grid-cols-3 justify-items-center gap-12">
       {data.data.map((wishlist) => {
-        const {title,sdesc,imageURL,category} =wishlist
+        const { _id, title, sdesc, imageURL, category } = wishlist;
         // console.log(Object.keys(wishlist).join(','));
+        const handleDelete = (id) => {
+          Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              console.log("deleted");
+              fetch(`http://localhost:5000/wishlist/${id}`, {
+                method: "DELETE",
+              })
+                .then((res) => res.json())
+                .then((data) => {
+                  console.log(data);
+                  if (data.deletedCount > 0) {
+                    Swal.fire({
+                      title: "Deleted!",
+                      text: "Your file has been deleted.",
+                      icon: "success",
+                    });
+                  }
+                });
+            }
+          });
+        };
         return (
           <div key={wishlist._id} className="card w-96 bg-base-100 shadow-xl">
             <figure>
@@ -42,8 +86,13 @@ const Wishlist = () => {
               </h2>
               <p>{sdesc}</p>
               <div className="card-actions my-4 gap-4 justify-start">
-                <div className=" btn btn-outline btn-info">Details</div>
-                <div className="btn btn-error btn-outline">Remove Wishlist</div>
+                <Link to={`/blog/${_id}`} className=" btn btn-outline btn-info">Details</Link>
+                <button
+                  onClick={() => handleDelete(_id)}
+                  className="btn btn-error btn-outline"
+                >
+                  Remove Wishlist
+                </button>
               </div>
             </div>
           </div>
