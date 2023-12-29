@@ -1,3 +1,4 @@
+import InfoIcon from '@mui/icons-material/Info';
 const AboutUs = () => {
   return (
     <div className=" rounded-lg justify-center items-center bg-base-100 lg:flex-row-reverse w-full shadow-xl my-24">
@@ -10,7 +11,7 @@ const AboutUs = () => {
           />
         </div>
         <div className="lg:w-3/4 space-y-6">
-          <small className="font-semibold">ABOUT US</small>
+          <small className="font-semibold"><InfoIcon></InfoIcon> ABOUT US</small>
           <h2 className="text-5xl font-bold">
             We inform, help and support the creative community
           </h2>

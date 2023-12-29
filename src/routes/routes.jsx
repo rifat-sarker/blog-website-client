@@ -49,7 +49,7 @@ const router = createBrowserRouter([
         },
         {
             path: '/wishlist',
-            element: <Wishlist></Wishlist>,
+            element:<PrivateRoute><Wishlist></Wishlist></PrivateRoute>,
         },
         {
             path: '/featuredBlog',

@@ -1,3 +1,4 @@
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 const Team = () => {
   return (
     <div className="mt-16 bg-neutral py-12 rounded-lg">
@@ -8,37 +9,37 @@ const Team = () => {
           <h2 className="text-2xl">Kimberly P</h2>
           <small>Founding editor</small>
           <p>@kimberlypower</p>
-          <p>kimberly@example.com</p>
+          <p><EmailOutlinedIcon className='mr-2'></EmailOutlinedIcon>kimberly@example.com</p>
         </div>
         <div>
           <h2 className="text-2xl">Martin H</h2>
           <small>Senior editor</small>
           <p>@martinhector</p>
-          <p>martin@example.com</p>
+          <p><EmailOutlinedIcon className='mr-2'></EmailOutlinedIcon>martin@example.com</p>
         </div>
         <div>
           <h2 className="text-2xl">Harvey S</h2>
           <small>Managing Partner</small>
           <p>@harveryspector</p>
-          <p>harvey@example.com</p>
+          <p><EmailOutlinedIcon className='mr-2'></EmailOutlinedIcon>harvey@example.com</p>
         </div>
         <div>
           <h2 className="text-2xl">Michael J </h2>
           <small>Marketing Head</small>
           <p>@michaeljosh</p>
-          <p>mike@example.com</p>
+          <p><EmailOutlinedIcon className='mr-2'></EmailOutlinedIcon>mike@example.com</p>
         </div>
         <div>
           <h2 className="text-2xl">Rachel Z</h2>
           <small>Digital Content Strategist</small>
           <p>@rachelzoe</p>
-          <p>rachel@example.com</p>
+          <p><EmailOutlinedIcon className='mr-2'></EmailOutlinedIcon>rachel@example.com</p>
         </div>
         <div>
           <h2 className="text-2xl">Donna P</h2>
           <small>Human Resource</small>
           <p>@donnapearson</p>
-          <p>donna@example.com</p>
+          <p><EmailOutlinedIcon className='mr-2'></EmailOutlinedIcon>donna@example.com</p>
         </div>
       </div>
     </div>
