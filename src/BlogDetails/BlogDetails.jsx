@@ -1,9 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import {  useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
 const BlogDetails = () => {
+
   const { id } = useParams();
+
+
   const { data, isLoading } = useQuery({
     queryKey: ["blog"],
     queryFn: () => {
@@ -13,6 +16,7 @@ const BlogDetails = () => {
     },
   });
 
+  // 
   //skeletion
   if (isLoading) {
     return (
@@ -25,6 +29,7 @@ const BlogDetails = () => {
     );
   }
   //   <span className="loading loading-spinner text-primary"></span>;
+
 
   return (
     <div>
@@ -43,21 +48,6 @@ const BlogDetails = () => {
             <p>{data.data.ldesc}</p>
           </div>
         </div>
-      </div>
-
-      {/* comment section */}
-      <div className="mt-12">
-        <textarea
-          className="rounded-lg"
-          name="comment"
-          id=""
-          cols="50"
-          rows="5"
-        ></textarea>
-        <br />
-        <button className="btn btn-outline">
-          <input type="submit" value="Comment" />
-        </button>
       </div>
     </div>
   );

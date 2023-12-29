@@ -1,17 +1,27 @@
 import axios from "axios";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
+import { AuthContext } from "../../providers/AuthProvider";
 
 
 const BlogCard = ({ blog }) => {
   const {_id, title, imageURL, sdesc, category } = blog;
-
+  const {user} = useContext(AuthContext)
+ 
 
 //send data to the server side
   const handleAddToWishlist =(blog)=>{
   
+  const wishlist = {
+    title,
+    imageURL,
+    sdesc,
+    category,
+    email:user.email
+  }
   
-    axios.post('http://localhost:5000/wishlist', blog)
+    axios.post('http://localhost:5000/wishlist', wishlist)
     .then(data =>{
       console.log(data.data);
       if(data.data.insertedId){

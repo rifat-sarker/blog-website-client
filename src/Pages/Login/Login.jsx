@@ -50,12 +50,12 @@ const Login = () => {
     signInUser(email, password)
       .then((result) => {
         const loggedUser = result.user;
-        console.log(loggedUser);
+        // console.log(loggedUser);
 
         //get token
         const user = { email };
         axios
-          .post("http://localhost:5000/jwt", user, { withCredentials: true })
+          .post("http://localhost:5000/jwt", user)
           .then((res) => {
             console.log(res.data);
             if(res.data){

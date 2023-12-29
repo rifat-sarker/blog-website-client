@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 
 const WishlistCard = ({wishlist}) => {
     const { _id, title, sdesc, imageURL, category } = wishlist;
-    console.log(wishlist);
+    // console.log(wishlist);
 
     const handleDelete = (_id) => {
         console.log(_id)

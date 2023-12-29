@@ -1,27 +1,30 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import Swal from "sweetalert2";
-import { AuthContext } from "../providers/AuthProvider";
 import WishlistCard from "./WishlistCard";
+import { useContext } from "react";
+import { AuthContext } from "../providers/AuthProvider";
 
 const Wishlist = () => {
     // const [wishlist, setWishlist] = useState([]);
     // const {user} = useContext(AuthContext)
-  
-    // const url = `http://localhost:5000/wishlist?email=${user?.email}`
-    // useEffect(()=>{
-    //     axios.get(url,)
-    //     .then(res=>{
-    //         setWishlist(res.data)
-    //     })
-    // },[url])
 
+  
+    // // console.log(user.email);
+  
+    // // const url = `http://localhost:5000/wishlist?email={user?.email}`
+    // // useEffect(()=>{
+    // //     axios.get(url, {withCredentials : true})
+    // //     .then(res=>{
+    // //         setWishlist(res.data)
+    // //     })
+    // // },[url])
+
+
+const {user} = useContext(AuthContext)
   const { data, isLoading } = useQuery({
     queryKey: ["userwishlist"],
     queryFn: () => {
-      const url = `http://localhost:5000/wishlist`;
+      const url = `http://localhost:5000/wishlist?email=${user?.email}`;
       const res = axios.get(url);
       return res;
     },
@@ -45,7 +48,6 @@ console.log(data);
         wishlist = {wishlist}
         ></WishlistCard>)
       }
-      
     </div>
   );
 };
