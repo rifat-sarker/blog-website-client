@@ -7,7 +7,7 @@ const AllBlog = () => {
   const [category, setCategory] = useState("all")
   const [searchTitle, setSearchTitle] = useState("");
 
-  const url = "http://localhost:5000/blog";
+  const url = "https://blog-website-server-blond.vercel.app/blog";
   useEffect(() => { 
     axios.get(url).then((res) => {
       setBlogs(res.data);

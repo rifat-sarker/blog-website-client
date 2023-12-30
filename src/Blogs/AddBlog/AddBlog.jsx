@@ -25,7 +25,7 @@ const AddBlog = () => {
 
 
     //send data to the server
-    axios.post('http://localhost:5000/blog', newBlog)
+    axios.post('https://blog-website-server-blond.vercel.app/blog', newBlog)
     .then(data => {
       if(data.data.insertedId){
         console.log(data.data);

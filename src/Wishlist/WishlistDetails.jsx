@@ -1,22 +1,23 @@
-import {  useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+
 import { useParams } from "react-router-dom";
 
-const BlogDetails = () => {
-
+const WishlistDetails = () => {
   const { id } = useParams();
 
-
   const { data, isLoading } = useQuery({
-    queryKey: ["blog"],
+    queryKey: ["id"],
     queryFn: () => {
-      const url = `https://blog-website-server-blond.vercel.app/blog/${id}`;
+      const url = `https://blog-website-server-blond.vercel.app/wishlist/${id}`;
       const res = axios.get(url);
       return res;
     },
   });
 
-  // 
+  // console.log(data);
+
+  
   //skeletion
   if (isLoading) {
     return (
@@ -28,8 +29,7 @@ const BlogDetails = () => {
       </div>
     );
   }
-  //   <span className="loading loading-spinner text-primary"></span>;
-
+  //
 
   return (
     <div>
@@ -39,7 +39,8 @@ const BlogDetails = () => {
             src={data.data.imageURL}
             alt="Shoes"
             className="rounded-xl w-full"
-          />w
+          />
+          w
         </figure>
         <div className="card-body ">
           <h2 className="card-title text-3xl">{data.data.title}</h2>
@@ -53,4 +54,4 @@ const BlogDetails = () => {
   );
 };
 
-export default BlogDetails;
+export default WishlistDetails;

@@ -7,7 +7,7 @@ const FeaturedBlog = () => {
   const { user } = useContext(AuthContext);
   const [blogs, setBlogs] = useState([]);
 
-  const url = "http://localhost:5000/blog";
+  const url = "https://blog-website-server-blond.vercel.app/blog";
 
   useEffect(() => {
     axios.get(url).then((res) => {
