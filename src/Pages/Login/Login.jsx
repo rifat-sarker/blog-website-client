@@ -55,7 +55,7 @@ const Login = () => {
         //get token
         const user = { email };
         axios
-          .post("https://blog-website-server-blond.vercel.app/jwt", user)
+          .post("http://localhost:5000/jwt", user)
           .then((res) => {
             console.log(res.data);
             if(res.data){

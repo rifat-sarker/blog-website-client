@@ -9,7 +9,7 @@ const WishlistDetails = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["id"],
     queryFn: () => {
-      const url = `https://blog-website-server-blond.vercel.app/wishlist/${id}`;
+      const url = `http://localhost:5000/wishlist/${id}`;
       const res = axios.get(url);
       return res;
     },

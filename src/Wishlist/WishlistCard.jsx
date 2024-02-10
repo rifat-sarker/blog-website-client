@@ -20,7 +20,7 @@ const WishlistCard = ({wishlist, mutate}) => {
     //     }).then((result) => {
     //       if (result.isConfirmed) {
     //         console.log("deleted");
-    //         fetch(`https://blog-website-server-blond.vercel.app/wishlist/${_id}`, {
+    //         fetch(`http://localhost:5000/wishlist/${_id}`, {
     //           method: "DELETE",
     //         })
     //           .then((res) => res.json())

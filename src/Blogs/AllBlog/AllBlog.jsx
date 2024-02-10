@@ -4,21 +4,18 @@ import BlogCard from "../BlogCard/BlogCard";
 
 const AllBlog = () => {
   const [blogs, setBlogs] = useState([]);
-  const [category, setCategory] = useState("all")
+  const [category, setCategory] = useState("all");
   const [searchTitle, setSearchTitle] = useState("");
 
-  const url = "https://blog-website-server-blond.vercel.app/blog";
-  useEffect(() => { 
+  const url = "http://localhost:5000/blog";
+  useEffect(() => {
     axios.get(url).then((res) => {
       setBlogs(res.data);
     });
   }, []);
 
-  const filteredBlogs = blogs
-  .filter((blog) => category === "all" || blog.category === category )
-  .filter((blog) =>
-    blog.title.toLowerCase().includes(searchTitle.toLowerCase())
-  );
+  const filteredBlogs = blogs.filter((blog) => category === "all" || blog.category === category).filter((blog) => blog.title.toLowerCase().includes(searchTitle.toLowerCase())
+    );
 
   return (
     <div>
@@ -38,7 +35,7 @@ const AllBlog = () => {
           <option value="motivation">Motivation</option>
         </select>
 
-        <input 
+        <input
           className="p-4 rounded-lg font-semibold"
           type="text"
           placeholder="Search by title"

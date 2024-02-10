@@ -22,7 +22,7 @@ const BlogCard = ({ blog }) => {
     email:user.email
   }
   console.log(wishlist);
-    axios.post('https://blog-website-server-blond.vercel.app/wishlist', wishlist)
+    axios.post('http://localhost:5000/wishlist', wishlist)
     .then(data =>{
       console.log(data.data);
       if(data.data.insertedId){

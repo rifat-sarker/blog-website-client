@@ -10,7 +10,7 @@ const Wishlist = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["userwishlist"],
     queryFn: () => {
-      const url = `https://blog-website-server-blond.vercel.app/wishlist?email=${user?.email}`;
+      const url = `http://localhost:5000/wishlist?email=${user?.email}`;
       const res = axios.get(url);
       return res;
     },
@@ -20,7 +20,7 @@ const Wishlist = () => {
   const { mutate } = useMutation({
     mutationKey: ["delete"],
     mutationFn: async(id) => {
-      const res = await axios.delete(`https://blog-website-server-blond.vercel.app/wishlist/${id}`);
+      const res = await axios.delete(`http://localhost:5000/wishlist/${id}`);
     },
     onSuccess: () => {
       Swal.fire({
