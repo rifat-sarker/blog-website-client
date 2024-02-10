@@ -10,9 +10,28 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import { Button } from "@mui/material";
+import { useState } from "react";
+
 
 const BlogDetails = () => {
   const { id } = useParams();
+  const [question] = useState('What is your favorite programming language?');
+  const [answers, setAnswers] = useState([
+    { option: 'JavaScript', votes: 0 },
+    { option: 'Python', votes: 0 },
+    { option: 'Java', votes: 0 },
+    { option: 'Ruby', votes: 0 },
+  ]);
+
+  // Function to handle vote submission
+  const handleVote = (selectedOption) => {
+    const updatedAnswers = answers.map(answer =>
+      answer.option === selectedOption
+        ? { ...answer, votes: answer.votes + 1 }
+        : answer
+    );
+    setAnswers(updatedAnswers);
+  };
 
   const { data, isLoading } = useQuery({
     queryKey: ["blog"],
@@ -24,7 +43,6 @@ const BlogDetails = () => {
   });
 
   // console.log(window.location.href);
-
   //
   //skeletion
   if (isLoading) {
@@ -48,7 +66,6 @@ const BlogDetails = () => {
             alt="Shoes"
             className="rounded-xl w-full"
           />
-          w
         </figure>
         <div className="card-body ">
           <h2 className="card-title text-3xl">{data.data.title}</h2>
@@ -89,6 +106,19 @@ const BlogDetails = () => {
                 </LinkedinShareButton>
               </Button>
             </div>
+
+            <div>
+      <h3>{question}</h3>
+      <ul>
+        {answers.map(answer => (
+          <li key={answer.option}>
+            <button className="btn" onClick={() => handleVote(answer.option)}>
+              {answer.option} ({answer.votes} votes)
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
           </div>
         </div>
       </div>

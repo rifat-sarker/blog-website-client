@@ -32,6 +32,11 @@ const Navbar = () => {
           <a>Wishlist</a>
         </li>
       </Link>
+      <Link to="/quizz_polls">
+        <li>
+          <a>Quizz and Polls</a>
+        </li>
+      </Link>
     </>
   );
 

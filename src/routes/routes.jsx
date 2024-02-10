@@ -13,6 +13,7 @@ import PrivateRoute from "./PrivateRoute";
 import Wishlist from "../Wishlist/Wishlist";
 import FeaturedBlog from "../FeaturedBlog/FeaturedBlog";
 import WishlistDetails from "../Wishlist/WishlistDetails";
+import QuizzPolls from "../QuizzPolls/QuizzPolls";
 
 const router = createBrowserRouter([
   {
@@ -59,6 +60,10 @@ const router = createBrowserRouter([
         {
             path: '/featuredBlog',
             element: <FeaturedBlog></FeaturedBlog>,
+        },
+        {
+            path: '/quizz_polls',
+            element: <QuizzPolls></QuizzPolls>
         },
     ]
   },
