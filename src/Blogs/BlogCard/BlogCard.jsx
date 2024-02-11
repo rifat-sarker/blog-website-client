@@ -7,7 +7,7 @@ import { AuthContext } from "../../providers/AuthProvider";
 
 const BlogCard = ({ blog }) => {
   const {_id, title, ldesc,  imageURL, sdesc, category } = blog;
-  const {user} = useContext(AuthContext)
+  const {user} = useContext(AuthContext) 
   // console.log(blog.ldesc);
 
 //send data to the server side
