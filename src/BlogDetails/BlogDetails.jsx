@@ -32,7 +32,7 @@ const BlogDetails = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["blog"],
     queryFn: () => {
-      const url = `http://localhost:5000/blog/${id}`;
+      const url = `https://blog-website-server-blond.vercel.app/blog/${id}`;
       const res = axios.get(url);
       return res;
     },

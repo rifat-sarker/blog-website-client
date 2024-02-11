@@ -52,7 +52,7 @@ const SignUp = () => {
       //user added to the database
       const createdAt = result.user.metadata.creationTime;
       const user = {email, createdAt}
-      axios.post('http://localhost:5000/user', user)
+      axios.post('https://blog-website-server-blond.vercel.app/user', user)
       .then(data => {
         if(data.data.insertedId){
           console.log('data added to the database');

@@ -8,7 +8,7 @@ const QuizPolls = () => {
   useEffect(() => {
     const fetchPollData = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/poll");
+        const response = await axios.get("https://blog-website-server-blond.vercel.app/api/poll");
         setQuestions(response.data.slice(0, 4));
       } catch (error) {
         console.error(" data:", error);
@@ -22,7 +22,7 @@ const QuizPolls = () => {
       const updatedQuestions = [...questions];
       updatedQuestions[questionIndex].votes[optionIndex]++;
       setQuestions(updatedQuestions);
-      await axios.post("http://localhost:5000/api/vote", {
+      await axios.post("https://blog-website-server-blond.vercel.app/api/vote", {
         questionIndex,
         optionIndex,
       });

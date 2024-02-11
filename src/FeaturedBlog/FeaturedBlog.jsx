@@ -6,8 +6,9 @@ import { AuthContext } from "../providers/AuthProvider";
 const FeaturedBlog = () => {
   const { user } = useContext(AuthContext);
   const [blogs, setBlogs] = useState([]);
+  // console.log(blogs);
 
-  const url = "http://localhost:5000/blog";
+  const url = "https://blog-website-server-blond.vercel.app/blog";
 
   useEffect(() => {
     axios.get(url).then((res) => {
@@ -30,6 +31,7 @@ const FeaturedBlog = () => {
       blog.title,
       user.email,
       <img
+        key={blog._id}
         className="btn-circle"
         src={user.photoURL}
         alt="Profile"
