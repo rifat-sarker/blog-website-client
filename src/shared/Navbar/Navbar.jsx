@@ -44,7 +44,7 @@ const Navbar = () => {
     logOut().then().catch();
   };
   return (
-    <div className="navbar text-slate-300 bg-base-100">
+    <div className="navbar bg-base-100">
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -70,13 +70,13 @@ const Navbar = () => {
             {navItems}
           </ul>
         </div>
-        <div className="flex">
+        <div className="flex items-center gap-4">
           <img
             className="w-12"
             src="https://i.ibb.co/4McbnBM/cropped-ico.png"
-            alt=""
+            alt="logo"
           />
-          <a className="text-orange-500 btn btn-ghost text-xl">MixHub</a>
+          <p className=" text-2xl font-bold">MixHub</p>
         </div>
       </div>
       <div className="navbar-center hidden lg:flex">

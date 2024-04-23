@@ -44,7 +44,7 @@ const AllBlog = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-6xl gap-14 justify-items-center">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto gap-20 justify-items-center">
         {filteredBlogs.map((blog) => (
           <BlogCard key={blog._id} blog={blog}></BlogCard>
         ))}

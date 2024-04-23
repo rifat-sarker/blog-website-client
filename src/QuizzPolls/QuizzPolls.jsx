@@ -32,30 +32,52 @@ const QuizPolls = () => {
   };
 
   return (
-    <div className="mt-12 grid mx-12 md:grid-cols-2 lg:grid-cols-2 gap-12">
-      {questions.map((q, index) => (
-        <div className="" key={index}>
-          <Typography variant="h5" sx={{ margin: "16px 0px", height: "80px" }}>
-            {q.question}
-          </Typography>
-          <Box className="space-y-4">
-            {q.options.map((option, optionIndex) => (
-              <div key={optionIndex}>
-                <Button
-                  variant="contained"
-                  onClick={() => handleVote(index, optionIndex)}
-                >
-                  {option} -{" "}
-                  <Typography sx={{ margin: "0px 6px" }}>
-                    ( {q.votes[optionIndex]} ) votes
-                  </Typography>
-                </Button>
-              </div>
-            ))}
+    <Box sx={{my: 10,}}>
+      <Typography variant="h3" textAlign={"center"} fontWeight={"bold"}>Votes</Typography>
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          gap: 10,
+          
+          padding: 4,
+        }}
+      >
+        {questions.map((q, index) => (
+          <Box sx={{ height: 300, width: 600 }} key={index}>
+            <Box>
+              <Typography variant="h5" sx={{}}>
+                {q.question}
+              </Typography>
+            </Box>
+            <Box sx={{}}>
+              {q.options.map((option, optionIndex) => (
+                <Box sx={{ my: 2 }} key={optionIndex}>
+                  <Button
+                    variant="outlined"
+                    sx={{
+                      bgcolor: "#d1d1d1",
+                      px: 4,
+                      py: "5px",
+                      color: "black",
+                      fontWeight: "bold",
+                      ":hover": { bgcolor: "#8dcc78" },
+                    }}
+                    onClick={() => handleVote(index, optionIndex)}
+                  >
+                    {option} -{" "}
+                    <Typography sx={{ margin: "0px 6px" }}>
+                      ( {q.votes[optionIndex]} ) votes
+                    </Typography>
+                  </Button>
+                </Box>
+              ))}
+            </Box>
           </Box>
-        </div>
-      ))}
-    </div>
+        ))}
+      </Box>
+    </Box>
   );
 };
 

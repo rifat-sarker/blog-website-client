@@ -29,7 +29,7 @@ const NewsLetter = () => {
 
 
   return (
-    <div className=" rounded-lg bg-sky-900 w-6xl py-32 h-auto my-24">
+    <div className=" rounded-lg ">
       <div className="rounded-lg w-1/2 mx-auto p-12 bg-slate-100">
         <div className="text-center my-4 font-semibold ">
           <h2 className="text-3xl mb- text-sky-900">
@@ -52,7 +52,14 @@ const NewsLetter = () => {
           type="submit"
           fullWidth
           variant="contained"
-          sx={{ mt: 3, mb: 2 }}
+          sx={{
+            mt: 3,
+            mb: 2,
+            bgcolor: "#d1d1d1",
+            color: "black",
+            fontWeight: "bold",
+            ":hover": { bgcolor: "#8dcc78" },
+          }}
         >
           Subscribe
         </Button>

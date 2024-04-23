@@ -53,12 +53,12 @@ const WishlistCard = ({wishlist, mutate}) => {
     <div className="card-body">
       <h2 className="card-title">
         {title}
-        <div className="badge badge-secondary">{category}</div>
+        <div className="badge bg-[#d1d1d1] py-3">{category}</div>
       </h2>
       <p>{sdesc}</p>
-      <div className="card-actions justify-end">
-        <button onClick={()=>mutate(_id)} className="btn">Remove</button>
-        <Link to={`/wishlist/${_id}`}><button className="btn">Details</button></Link>
+      <div className="card-actions mt-4">
+        <button onClick={()=>mutate(_id)} className="rounded-md bg-[#d1d1d1] hover:bg-[#8dcc78] px-6 py-2 font-semibold">Remove</button>
+        <Link to={`/wishlist/${_id}`}><button className="rounded-md bg-[#d1d1d1] hover:bg-[#8dcc78] px-6 py-2 font-semibold">Details</button></Link>
       </div>
     </div>
   </div>

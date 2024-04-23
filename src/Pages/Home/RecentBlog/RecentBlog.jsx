@@ -21,7 +21,7 @@ const RecentBlog = () => {
     <div className="mt-12">
       <h1 className="font-bold text-4xl text-center mb-12">Recent Blogs</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 max-w-6xl lg:grid-cols-3 gap-14 justify-items-center">
+      <div className="grid grid-cols-1 md:grid-cols-2 max-w-6xl lg:grid-cols-3 gap-20 mx-auto justify-items-center">
         {sorted.map((blog) => (
           <RecentBlogCard key={blog._id} blog={blog}></RecentBlogCard>
         ))}

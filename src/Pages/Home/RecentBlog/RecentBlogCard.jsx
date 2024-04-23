@@ -41,18 +41,18 @@ const RecentBlogCard = ({ blog }) => {
       <div className="card-body">
         <h2 className="card-title">
           {title}
-          <div className="badge badge-secondary">{category}</div>
+          <div className="badge bg-[#d1d1d1] py-3">{category}</div>
         </h2>
         <p>{sdesc}</p>
         <div className="card-actions mt-4">
-          <button onClick={()=>handleAddToWishlist(blog)} className="btn">Add to wishlist</button>
+          <button onClick={()=>handleAddToWishlist(blog)} className="rounded-md hover:bg-[#8dcc78] bg-[#d1d1d1] font-semibold px-6 py-2">Add to wishlist</button>
           <Link to={`/blog/${_id}`}>
-            <button className="btn">Details</button>
+            <button className="rounded-md bg-[#d1d1d1] hover:bg-[#8dcc78] px-6 py-2 font-semibold">Details</button>
           </Link>
         </div>
-        <button className="btn my-4  text-center btn-outline btn-info">
+        <a className="  p-2 mt-2">
           Publish date: {date}
-        </button>
+        </a>
 
       </div>
     </div>

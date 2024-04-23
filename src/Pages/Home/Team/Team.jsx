@@ -1,7 +1,7 @@
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 const Team = () => {
   return (
-    <div className="mt-16 bg-neutral py-12 rounded-lg">
+    <div className="mt-16 shadow-lg py-12 rounded-lg">
       <h1 className="text-4xl font-bold mb-8 text-center">Our Team</h1>
       <hr/>
       <div className="grid md:grid-cols-2 mt-8 lg:grid-cols-3 justify-items-center gap-12 ">

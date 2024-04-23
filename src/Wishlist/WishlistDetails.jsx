@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 import { useParams } from "react-router-dom";
+import ShareAndFeedback from "../ReUsable/Share&Feedback";
 
 const WishlistDetails = () => {
   const { id } = useParams();
@@ -47,6 +48,7 @@ const WishlistDetails = () => {
           <div className="space-y-5">
             <p>{data.data.sdesc}</p>
             <p>{data.data.ldesc}</p>
+            <ShareAndFeedback/>
           </div>
         </div>
       </div>
