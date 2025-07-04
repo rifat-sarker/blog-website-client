@@ -1,10 +1,58 @@
-# React + Vite
+# Mixhub Blog Website - Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Mixhub is a modern blog website where users can explore, wishlist, and share blogs from various categories like fashion, recipes, parenting, and travel.
 
-Currently, two official plugins are available:
+## 🚀 Live Demo
+[https://mixhub-blog-website.netlify.app](#) <!-- Add your live website link here -->
+
+## 🛠️ Tech Stack
+- React.js
+- React Router
+- Tailwind CSS
+- Firebase (Authentication & Hosting)
+- REST API
+
+## ✨ Features
+- 🔍 Browse blogs by categories: Fashion, Recipes, Parenting, Travel, etc.
+- ❤️ Wishlist blogs to read later.
+- 📤 Share blogs on Facebook, Instagram, and Twitter.
+- ⭐ Featured Blogs section for top-ranked posts.
+- 🕒 Recent Blogs section to showcase latest articles.
+- 🔎 Search functionality to quickly find blogs.
+- 📱 Fully responsive design for all devices.
+
+## 📂 Project Structure
+src/
+├── assets/
+├── components/
+├── pages/
+├── services/
+├── utils/
+└── App.jsx
 
 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+## 🧑‍💻 Getting Started
+
+### Prerequisites
+- Node.js
+- npm or yarn
+
+### Installation
+```bash
+git clone https://github.com/your-username/mixhub-client.git
+cd mixhub-client
+npm install
+npm run dev
+
+```
+## Environment Variables
+VITE_MAIN_URL="your main url"
+VITE_APIKEY="your_api_key"
+VITE_AUTHDOMAIN="your_auth_domain"
+VITE_PROJECTID="your_project_id"
+VITE_STORAGEBUCKET="your_storage_bucket"
+VITE_MESSAGINGSENDERID="your_sender_id"
+VITE_APPID="your_app_id"
+
