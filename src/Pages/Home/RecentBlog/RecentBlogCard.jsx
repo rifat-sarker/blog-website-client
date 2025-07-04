@@ -6,32 +6,31 @@ import { AuthContext } from "../../../providers/AuthProvider";
 
 const RecentBlogCard = ({ blog }) => {
   const { _id, title, imageURL, sdesc, category, date } = blog;
-  const {user} = useContext(AuthContext)
+  const { user } = useContext(AuthContext);
 
   //send data to the server side
-  const handleAddToWishlist =(blog)=>{
+  const handleAddToWishlist = (blog) => {
     // console.log(blog);
     const wishlist = {
       title,
       imageURL,
       sdesc,
       category,
-      email:user.email
-    }
-  
-    axios.post('https://blog-website-server-blond.vercel.app/wishlist', wishlist)
-    .then(data =>{
+      email: user.email,
+    };
+
+    axios.post(`${import.meta.env.VITE_MAIN_URL}/wishlist`, wishlist).then((data) => {
       console.log(data.data);
-      if(data.data.insertedId){
+      if (data.data.insertedId) {
         Swal.fire({
-          title: 'Success!',
-          text: 'Added to the wishlist successfully',
-          icon: 'success',
-          confirmButtonText: 'ok'
-        })
+          title: "Success!",
+          text: "Added to the wishlist successfully",
+          icon: "success",
+          confirmButtonText: "ok",
+        });
       }
-    })
-  }
+    });
+  };
 
   return (
     <div className="card w-96 bg-base-100 shadow-xl">
@@ -45,15 +44,19 @@ const RecentBlogCard = ({ blog }) => {
         </h2>
         <p>{sdesc}</p>
         <div className="card-actions mt-4">
-          <button onClick={()=>handleAddToWishlist(blog)} className="rounded-md hover:bg-[#8dcc78] bg-[#d1d1d1] font-semibold px-6 py-2">Add to wishlist</button>
+          <button
+            onClick={() => handleAddToWishlist(blog)}
+            className="rounded-md hover:bg-[#8dcc78] bg-[#d1d1d1] font-semibold px-6 py-2"
+          >
+            Add to wishlist
+          </button>
           <Link to={`/blog/${_id}`}>
-            <button className="rounded-md bg-[#d1d1d1] hover:bg-[#8dcc78] px-6 py-2 font-semibold">Details</button>
+            <button className="rounded-md bg-[#d1d1d1] hover:bg-[#8dcc78] px-6 py-2 font-semibold">
+              Details
+            </button>
           </Link>
         </div>
-        <a className="  p-2 mt-2">
-          Publish date: {date}
-        </a>
-
+        <a className="  p-2 mt-2">Publish date: {date}</a>
       </div>
     </div>
   );

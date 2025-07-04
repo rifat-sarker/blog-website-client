@@ -8,7 +8,7 @@ const QuizPolls = () => {
   useEffect(() => {
     const fetchPollData = async () => {
       try {
-        const response = await axios.get("https://blog-website-server-blond.vercel.app/api/poll");
+        const response = await axios.get(`${import.meta.env.VITE_MAIN_URL}/api/poll`);
         setQuestions(response.data.slice(0, 4));
       } catch (error) {
         console.error(" data:", error);
@@ -22,7 +22,7 @@ const QuizPolls = () => {
       const updatedQuestions = [...questions];
       updatedQuestions[questionIndex].votes[optionIndex]++;
       setQuestions(updatedQuestions);
-      await axios.post("https://blog-website-server-blond.vercel.app/api/vote", {
+      await axios.post(`${import.meta.env.VITE_MAIN_URL}/api/vote`, {
         questionIndex,
         optionIndex,
       });
@@ -32,15 +32,17 @@ const QuizPolls = () => {
   };
 
   return (
-    <Box sx={{my: 10,}}>
-      <Typography variant="h3" textAlign={"center"} fontWeight={"bold"}>Votes</Typography>
+    <Box sx={{ my: 10 }}>
+      <Typography variant="h3" textAlign={"center"} fontWeight={"bold"}>
+        Votes
+      </Typography>
       <Box
         sx={{
           display: "flex",
           flexWrap: "wrap",
           justifyContent: "center",
           gap: 10,
-          
+
           padding: 4,
         }}
       >

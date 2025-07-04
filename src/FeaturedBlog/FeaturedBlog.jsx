@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import MUIDataTable from "mui-datatables";
 import { AuthContext } from "../providers/AuthProvider";
@@ -8,7 +8,7 @@ const FeaturedBlog = () => {
   const [blogs, setBlogs] = useState([]);
   // console.log(blogs);
 
-  const url = "https://blog-website-server-blond.vercel.app/blog";
+  const url = `${import.meta.env.VITE_MAIN_URL}/blog`;
 
   useEffect(() => {
     axios.get(url).then((res) => {

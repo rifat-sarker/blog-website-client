@@ -1,20 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import ShareToMedia from "../ReUsable/Share&Feedback";
 import ShareAndFeedback from "../ReUsable/Share&Feedback";
 
 const BlogDetails = () => {
   const { id } = useParams();
+  // console.log(id);
 
   const { data, isLoading } = useQuery({
     queryKey: ["blog"],
     queryFn: () => {
-      const url = `https://blog-website-server-blond.vercel.app/blog/${id}`;
+      const url = `${import.meta.env.VITE_MAIN_URL}/blog/${id}`;
       const res = axios.get(url);
       return res;
     },
-  }); 
+  });
 
   // console.log(window.location.href);
   //
@@ -49,7 +49,7 @@ const BlogDetails = () => {
             <p>{data.data.ldesc}</p>
 
             {/* share on media and feedback sections */}
-            <ShareAndFeedback/>
+            <ShareAndFeedback />
           </div>
         </div>
       </div>

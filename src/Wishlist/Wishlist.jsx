@@ -10,7 +10,9 @@ const Wishlist = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["userwishlist"],
     queryFn: () => {
-      const url = `https://blog-website-server-blond.vercel.app/wishlist?email=${user?.email}`;
+      const url = `${import.meta.env.VITE_MAIN_URL}/wishlist?email=${
+        user?.email
+      }`;
       const res = axios.get(url);
       return res;
     },
@@ -19,17 +21,18 @@ const Wishlist = () => {
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationKey: ["delete"],
-    mutationFn: async(id) => {
-      const res = await axios.delete(`https://blog-website-server-blond.vercel.app/wishlist/${id}`);
+    mutationFn: async (id) => {
+      const res = await axios.delete(
+        `${import.meta.env.VITE_MAIN_URL}/wishlist/${id}`
+      );
     },
     onSuccess: () => {
       Swal.fire({
         title: "Deleted!",
         text: "Your file has been deleted.",
-        icon: "success"
+        icon: "success",
       });
       queryClient.invalidateQueries({ mutationKey: "delete" });
-
     },
   });
 

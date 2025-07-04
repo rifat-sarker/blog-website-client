@@ -5,7 +5,7 @@ import RecentBlogCard from "./RecentBlogCard";
 const RecentBlog = () => {
   const [blogs, setBlogs] = useState([]);
 
-  const url = "https://blog-website-server-blond.vercel.app/blog";
+  const url = `${import.meta.env.VITE_MAIN_URL}/blog`;
   useEffect(() => {
     axios.get(url).then((res) => {
       setBlogs(res.data);

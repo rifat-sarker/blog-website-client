@@ -16,15 +16,14 @@ import Swal from "sweetalert2";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-
 const defaultTheme = createTheme();
 const SignUp = () => {
-  const { createUser } = useContext(AuthContext)
-  const [registerError , setRegisterError] = useState('')
-  const navigate =useNavigate();
+  const { createUser } = useContext(AuthContext);
+  const [registerError, setRegisterError] = useState("");
+  const navigate = useNavigate();
   const location = useLocation();
 
-  const handleSignUp = event => {
+  const handleSignUp = (event) => {
     event.preventDefault();
     const form = event.target;
     const name = form.name.value;
@@ -34,45 +33,44 @@ const SignUp = () => {
     console.log(user);
 
     //clear
-    setRegisterError('')
+    setRegisterError("");
 
     // signup conditions
-    if(!/^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[0-9]).{6,}$/.test(password)){
-      setRegisterError('Enter min one special,capital,numeric and min 6 digits')
+    if (!/^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[0-9]).{6,}$/.test(password)) {
+      setRegisterError(
+        "Enter min one special,capital,numeric and min 6 digits"
+      );
       return;
     }
-    
-  
-    
-    // create user 
-    createUser(email,password)
-    .then(result => {
-      console.log(result.user);
 
-      //user added to the database
-      const createdAt = result.user.metadata.creationTime;
-      const user = {email, createdAt}
-      axios.post('https://blog-website-server-blond.vercel.app/user', user)
-      .then(data => {
-        if(data.data.insertedId){
-          console.log('data added to the database');
-        }
+    // create user
+    createUser(email, password)
+      .then((result) => {
+        console.log(result.user);
+
+        //user added to the database
+        const createdAt = result.user.metadata.creationTime;
+        const user = { email, createdAt };
+        axios.post(`${import.meta.env.VITE_MAIN_URL}/user`, user).then((data) => {
+          if (data.data.insertedId) {
+            console.log("data added to the database");
+          }
+        });
+
+        navigate(location?.state ? location.state : "/");
+        Swal.fire({
+          title: "Success!",
+          text: "Account created successfully",
+          icon: "success",
+          confirmButtonText: "ok",
+        });
+        form.reset();
       })
-      
-      navigate(location?.state ? location.state : '/')
-      Swal.fire({
-        title: 'Success!',
-        text: 'Account created successfully',
-        icon: 'success',
-        confirmButtonText: 'ok'
-      })
-      form.reset();
-    })
-    .catch(error => {
-      console.log(error);
-    })
-  }
-   
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
@@ -131,7 +129,14 @@ const SignUp = () => {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2, bgcolor: "#d1d1d1", color:"black", fontWeight:"bold", ":hover":{bgcolor: "#8dcc78"}}}
+              sx={{
+                mt: 3,
+                mb: 2,
+                bgcolor: "#d1d1d1",
+                color: "black",
+                fontWeight: "bold",
+                ":hover": { bgcolor: "#8dcc78" },
+              }}
             >
               Register
             </Button>

@@ -10,7 +10,7 @@ const WishlistDetails = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["id"],
     queryFn: () => {
-      const url = `https://blog-website-server-blond.vercel.app/wishlist/${id}`;
+      const url = `${import.meta.env.VITE_MAIN_URL}/wishlist/${id}`;
       const res = axios.get(url);
       return res;
     },
@@ -18,7 +18,6 @@ const WishlistDetails = () => {
 
   // console.log(data);
 
-  
   //skeletion
   if (isLoading) {
     return (
@@ -48,7 +47,7 @@ const WishlistDetails = () => {
           <div className="space-y-5">
             <p>{data.data.sdesc}</p>
             <p>{data.data.ldesc}</p>
-            <ShareAndFeedback/>
+            <ShareAndFeedback />
           </div>
         </div>
       </div>

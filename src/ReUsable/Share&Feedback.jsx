@@ -19,25 +19,23 @@ import { Checkbox, FormControlLabel, IconButton } from "@mui/material";
 import FeedbackIcon from "@mui/icons-material/Feedback";
 import { FeedbackDialog } from "mui-feedback-dialog";
 
-
 export default function ShareAndFeedback() {
-    const [dialogVisible, setDialogVisible] = useState(false);
-    const [noScreenshot, setNoScreenshot] = useState(false);
-    const [showList] = useState(false);
-    const [useInitialEmail] = useState(false);
-    const [useScreencapture, setUseScreencapture] = useState(false);
-    const [errorOnSubmit] = useState(false);
-    const [attachScreenshotOnOpen] = useState(false);
-    
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [noScreenshot, setNoScreenshot] = useState(false);
+  const [showList] = useState(false);
+  const [useInitialEmail] = useState(false);
+  const [useScreencapture, setUseScreencapture] = useState(false);
+  const [errorOnSubmit] = useState(false);
+  const [attachScreenshotOnOpen] = useState(false);
+
   const { data, isLoading } = useQuery({
     queryKey: ["blog"],
     queryFn: () => {
-      const url = `https://blog-website-server-blond.vercel.app/blog/${id}`;
+      const url = `${import.meta.env.VITE_MAIN_URL}/blog/${id}`;
       const res = axios.get(url);
       return res;
     },
   });
-
 
   const StyledRating = styled(Rating)({
     "& .MuiRating-iconFilled": {
@@ -107,88 +105,86 @@ export default function ShareAndFeedback() {
       </div>
       {/* rating */}
       <Box
-              className="flex flex-col  items-center"
-              sx={{
-                "& > legend": { mt: 2 },
-              }}
-            >
-              <Typography variant="h6" component="legend">
-                Rate this Blog!
-              </Typography>
-              <StyledRating
-                name="customized-color"
-                defaultValue={2}
-                getLabelText={(value) =>
-                  `${value} Heart${value !== 1 ? "s" : ""}`
-                }
-                precision={0.5}
-                icon={<FavoriteIcon fontSize="large" />}
-                emptyIcon={<FavoriteBorderIcon fontSize="large" />}
-              />
-            </Box>
+        className="flex flex-col  items-center"
+        sx={{
+          "& > legend": { mt: 2 },
+        }}
+      >
+        <Typography variant="h6" component="legend">
+          Rate this Blog!
+        </Typography>
+        <StyledRating
+          name="customized-color"
+          defaultValue={2}
+          getLabelText={(value) => `${value} Heart${value !== 1 ? "s" : ""}`}
+          precision={0.5}
+          icon={<FavoriteIcon fontSize="large" />}
+          emptyIcon={<FavoriteBorderIcon fontSize="large" />}
+        />
+      </Box>
 
-            {/* feedback section */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                flexDirection: "column",
-              }}
-            >
-              <h1 className="text-3xl">Share Your Thoughts!</h1>
-              <h2>click the button for feedback</h2>
-              <IconButton onClick={() => setDialogVisible(true)} size="medium">
-                <FeedbackIcon sx={{ color: "slategray" }} fontSize="large" />
-              </IconButton>
-              <FeedbackDialog
-                open={dialogVisible}
-                initialEmail={useInitialEmail ? "some@mail.de" : undefined}
-                onClose={() => setDialogVisible(false)}
-                onSubmit={onSubmit}
-                {...{ noScreenshot, useScreencapture, attachScreenshotOnOpen }}
+      {/* feedback section */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          flexDirection: "column",
+        }}
+      >
+        <h1 className="text-3xl">Share Your Thoughts!</h1>
+        <h2>click the button for feedback</h2>
+        <IconButton onClick={() => setDialogVisible(true)} size="medium">
+          <FeedbackIcon sx={{ color: "slategray" }} fontSize="large" />
+        </IconButton>
+        <FeedbackDialog
+          open={dialogVisible}
+          initialEmail={useInitialEmail ? "some@mail.de" : undefined}
+          onClose={() => setDialogVisible(false)}
+          onSubmit={onSubmit}
+          {...{ noScreenshot, useScreencapture, attachScreenshotOnOpen }}
+        />
+        <div>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={noScreenshot}
+                onChange={(e) => setNoScreenshot(e.target.checked)}
+                name="noScreenshot"
+                color="primary"
               />
-              <div>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={noScreenshot}
-                      onChange={(e) => setNoScreenshot(e.target.checked)}
-                      name="noScreenshot"
-                      color="primary"
-                    />
-                  }
-                  label={"noScreenshot"}
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={useScreencapture}
-                      onChange={(e) => setUseScreencapture(e.target.checked)}
-                      name="useScreencapture"
-                      color="primary"
-                    />
-                  }
-                  label={"useScreencapture"}
-                />
-              </div>
-              {showList && (
-                <div
-                  style={{
-                    height: 300,
-                    overflow: "auto",
-                    marginTop: 16,
-                    minWidth: "50%",
-                    textAlign: "center",
-                  }}
-                >
-                  {Array(100)
-                    .fill(0)
-                    .map((_v, idx) => (
-                      <div key={idx}>Testcontent for Scrolling {idx}</div>
-                    ))}
-                </div>
-              )}
-            </div>
+            }
+            label={"noScreenshot"}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={useScreencapture}
+                onChange={(e) => setUseScreencapture(e.target.checked)}
+                name="useScreencapture"
+                color="primary"
+              />
+            }
+            label={"useScreencapture"}
+          />
+        </div>
+        {showList && (
+          <div
+            style={{
+              height: 300,
+              overflow: "auto",
+              marginTop: 16,
+              minWidth: "50%",
+              textAlign: "center",
+            }}
+          >
+            {Array(100)
+              .fill(0)
+              .map((_v, idx) => (
+                <div key={idx}>Testcontent for Scrolling {idx}</div>
+              ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

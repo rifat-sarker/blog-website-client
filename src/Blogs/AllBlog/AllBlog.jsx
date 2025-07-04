@@ -7,14 +7,18 @@ const AllBlog = () => {
   const [category, setCategory] = useState("all");
   const [searchTitle, setSearchTitle] = useState("");
 
-  const url = "https://blog-website-server-blond.vercel.app/blog";
+  const url = `${import.meta.env.VITE_MAIN_URL}/blog`;
   useEffect(() => {
     axios.get(url).then((res) => {
       setBlogs(res.data);
+      // console.log(res.data);
     });
   }, []);
 
-  const filteredBlogs = blogs.filter((blog) => category === "all" || blog.category === category).filter((blog) => blog.title.toLowerCase().includes(searchTitle.toLowerCase())
+  const filteredBlogs = blogs
+    .filter((blog) => category === "all" || blog.category === category)
+    .filter((blog) =>
+      blog.title.toLowerCase().includes(searchTitle.toLowerCase())
     );
 
   return (
