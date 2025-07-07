@@ -10,7 +10,7 @@ const BlogDetails = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["blog"],
     queryFn: () => {
-      const url = `${import.meta.env.VITE_MAIN_URL}/blog/${id}`;
+      const url = `${import.meta.env.VITE_MAIN_URL}/blogs/${id}`;
       const res = axios.get(url);
       return res;
     },

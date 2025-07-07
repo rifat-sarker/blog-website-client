@@ -8,7 +8,7 @@ const FeaturedBlog = () => {
   const [blogs, setBlogs] = useState([]);
   // console.log(blogs);
 
-  const url = `${import.meta.env.VITE_MAIN_URL}/blog`;
+  const url = `${import.meta.env.VITE_MAIN_URL}/blogs`;
 
   useEffect(() => {
     axios.get(url).then((res) => {

@@ -7,7 +7,7 @@ const AllBlog = () => {
   const [category, setCategory] = useState("all");
   const [searchTitle, setSearchTitle] = useState("");
 
-  const url = `${import.meta.env.VITE_MAIN_URL}/blog`;
+  const url = `${import.meta.env.VITE_MAIN_URL}/blogs`;
   useEffect(() => {
     axios.get(url).then((res) => {
       setBlogs(res.data);
