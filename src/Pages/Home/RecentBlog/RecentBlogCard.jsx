@@ -19,17 +19,19 @@ const RecentBlogCard = ({ blog }) => {
       email: user.email,
     };
 
-    axios.post(`${import.meta.env.VITE_MAIN_URL}/wishlist`, wishlist).then((data) => {
-      console.log(data.data);
-      if (data.data.insertedId) {
-        Swal.fire({
-          title: "Success!",
-          text: "Added to the wishlist successfully",
-          icon: "success",
-          confirmButtonText: "ok",
-        });
-      }
-    });
+    axios
+      .post(`${import.meta.env.VITE_MAIN_URL}/wishlist`, wishlist)
+      .then((data) => {
+        console.log(data.data);
+        if (data.data.insertedId) {
+          Swal.fire({
+            title: "Success!",
+            text: "Added to the wishlist successfully",
+            icon: "success",
+            confirmButtonText: "ok",
+          });
+        }
+      });
   };
 
   return (

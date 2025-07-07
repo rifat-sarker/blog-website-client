@@ -6,7 +6,7 @@ import { AuthContext } from "../providers/AuthProvider";
 const FeaturedBlog = () => {
   const { user } = useContext(AuthContext);
   const [blogs, setBlogs] = useState([]);
-  // console.log(blogs);
+  console.log(user);
 
   const url = `${import.meta.env.VITE_MAIN_URL}/blogs`;
 
