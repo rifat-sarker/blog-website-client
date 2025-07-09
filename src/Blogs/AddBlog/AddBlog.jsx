@@ -17,14 +17,14 @@ const AddBlog = () => {
     const title = form.title.value;
     const sdesc = form.sdesc.value;
     const ldesc = form.ldesc.value;
-    const imageURL = form.imageURL.value;
+    const image = form.imageURL.value;
     const date = form.date.value;
-    const newBlog = { title, sdesc, ldesc, imageURL, date, category };
+    const newBlog = { title, sdesc, ldesc, image, date, category };
     console.log(newBlog);
 
     //send data to the server
-    axios.post("h/blog", newBlog).then((data) => {
-      if (data.data.insertedId) {
+    axios.post(`${import.meta.env.VITE_MAIN_URL}/blogs`, newBlog).then((data) => {
+      if (data.data._id) {
         console.log(data.data);
         console.log("data added to the database");
         Swal.fire({
