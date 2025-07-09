@@ -5,25 +5,26 @@ import Swal from "sweetalert2";
 import { AuthContext } from "../../../providers/AuthProvider";
 
 const RecentBlogCard = ({ blog }) => {
-  const { _id, title, imageURL, sdesc, category, date } = blog;
+  const { _id, title, ldesc, imageURL, sdesc, category,date } = blog;
   const { user } = useContext(AuthContext);
 
   //send data to the server side
-  const handleAddToWishlist = (blog) => {
+  const handleAddToWishlist = () => {
     // console.log(blog);
     const wishlist = {
       title,
       imageURL,
       sdesc,
+      ldesc,
       category,
+      date,
       email: user.email,
     };
-
     axios
       .post(`${import.meta.env.VITE_MAIN_URL}/wishlist`, wishlist)
       .then((data) => {
         console.log(data.data);
-        if (data.data.insertedId) {
+        if (data.data._id) {
           Swal.fire({
             title: "Success!",
             text: "Added to the wishlist successfully",
