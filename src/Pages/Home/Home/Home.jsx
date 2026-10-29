@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { editorialService } from "../../../services/api";
+import { editorialService, getLocalized } from "../../../services/api";
 import { useLanguage } from "../../../context/LanguageContext";
 import { ArrowUpRight, Clock, Bookmark, Radio, ChevronRight, PenLine, Sparkles } from "lucide-react";
 
 const Home = () => {
-  const { t } = useLanguage();
+  const { t, currentLang } = useLanguage();
   const [articles, setArticles] = useState([]);
   const [wireItems, setWireItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -65,39 +65,41 @@ const Home = () => {
             <article className="lg:col-span-8 space-y-6 lg:pr-8 lg:border-r border-[#e8e4dc]">
               {leadStory.kicker && (
                 <div className="font-mono text-xs uppercase tracking-widest text-[#5e5a54]">
-                  {leadStory.kicker}
+                  {getLocalized(leadStory.kicker, currentLang)}
                 </div>
               )}
 
               <Link to={`/blog/${leadStory._id || leadStory.id}`} className="group block">
                 <h2 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-normal text-[#141414] leading-[1.08] tracking-tight group-hover:underline">
-                  {leadStory.title}
+                  {getLocalized(leadStory.title, currentLang)}
                 </h2>
               </Link>
 
               <div className="flex items-center gap-3 text-xs font-mono text-[#5e5a54] uppercase tracking-wider py-1 border-t border-b border-[#e8e4dc]">
-                <span className="font-bold text-[#141414]">{t("by")} {leadStory.author?.name || "Rifat Sarker"}</span>
+                <span className="font-bold text-[#141414]">
+                  {t("by")} {getLocalized(leadStory.author?.name, currentLang) || "Rifat Sarker"}
+                </span>
                 <span>•</span>
-                <span>{leadStory.author?.location || "Dhaka"}</span>
+                <span>{getLocalized(leadStory.author?.location, currentLang) || "Dhaka"}</span>
                 <span>•</span>
-                <span>{leadStory.readTime || "7 min read"}</span>
+                <span>{getLocalized(leadStory.readTime, currentLang) || "7 min read"}</span>
               </div>
 
               {/* Cover Image in Classical Frame */}
               <div className="relative border border-[#141414] p-1 bg-[#ffffff]">
                 <img
                   src={leadStory.image}
-                  alt={leadStory.title}
+                  alt={getLocalized(leadStory.title, currentLang)}
                   className="w-full h-80 sm:h-96 object-cover filter contrast-[1.05]"
                 />
                 <div className="p-2 text-right font-serif italic text-xs text-[#5e5a54] border-t border-[#e8e4dc]">
-                  Plate 01 — Documentary visual accompaniment for MixHub Dispatch.
+                  Plate 01 — {getLocalized(leadStory.title, currentLang)}
                 </div>
               </div>
 
               {/* Lede Paragraph with Drop Cap */}
               <p className="font-serif text-lg sm:text-xl text-[#2e2e2e] leading-relaxed drop-cap pt-2">
-                {leadStory.sdesc}
+                {getLocalized(leadStory.sdesc, currentLang)}
               </p>
 
               <div className="pt-2">
@@ -135,7 +137,7 @@ const Home = () => {
                         <span>{wire.timestamp}</span>
                       </div>
                       <Link to="/live-wire" className="block font-serif text-sm text-[#141414] leading-snug hover:underline">
-                        {wire.headline}
+                        {getLocalized(wire.headline, currentLang)}
                       </Link>
                     </div>
                   ))}
@@ -157,10 +159,12 @@ const Home = () => {
                   Colophon & Intent
                 </span>
                 <h4 className="font-serif text-lg font-bold text-[#141414]">
-                  A Sanctuary for Mindful Reading
+                  {currentLang === "bn" ? "শান্ত পাঠের জন্য ডিজিটাল আশ্রয়স্থল" : "A Sanctuary for Mindful Reading"}
                 </h4>
                 <p className="font-serif italic text-sm text-[#5e5a54] leading-relaxed">
-                  "We have banned algorithmic outrage, popups, and notification bell distractions. MixHub Dispatch is published on warm paper for those who cherish sustained contemplation."
+                  {currentLang === "bn"
+                    ? "আমরা বাণিজ্যিক বিজ্ঞাপন, পপ-আপ এবং নোটিফিকেশনের বিরক্তি সম্পূর্ণ নিষিদ্ধ করেছি। মিক্সহাব ডিসপ্যাচ মুদ্রিত কাগজের শান্ত আবহে তাদের জন্য তৈরি যারা গভীর চিন্তা ভালোবাসেন।"
+                    : '"We have banned algorithmic outrage, popups, and notification bell distractions. MixHub Dispatch is published on warm paper for those who cherish sustained contemplation."'}
                 </p>
                 <div className="font-mono text-xs text-[#141414] font-bold">
                   — The Editors
@@ -204,30 +208,30 @@ const Home = () => {
                   className={`space-y-4 ${idx > 0 ? "md:pl-8" : ""} pt-6 md:pt-0`}
                 >
                   <div className="flex items-center justify-between text-[11px] font-mono text-[#5e5a54] uppercase tracking-wider">
-                    <span className="text-[#b91c1c] font-bold">{story.category}</span>
-                    <span>{story.readTime}</span>
+                    <span className="text-[#b91c1c] font-bold">{getLocalized(story.category, currentLang)}</span>
+                    <span>{getLocalized(story.readTime, currentLang)}</span>
                   </div>
 
                   <Link to={`/blog/${story._id || story.id}`} className="group block">
                     <h4 className="font-serif text-2xl font-normal text-[#141414] leading-tight group-hover:underline">
-                      {story.title}
+                      {getLocalized(story.title, currentLang)}
                     </h4>
                   </Link>
 
                   <div className="relative border border-[#e8e4dc] p-0.5 bg-[#ffffff]">
                     <img
                       src={story.image}
-                      alt={story.title}
+                      alt={getLocalized(story.title, currentLang)}
                       className="w-full h-44 object-cover filter contrast-[1.02]"
                     />
                   </div>
 
                   <p className="font-serif text-sm text-[#5e5a54] leading-relaxed line-clamp-3">
-                    {story.sdesc}
+                    {getLocalized(story.sdesc, currentLang)}
                   </p>
 
                   <div className="pt-2 flex items-center justify-between text-xs font-mono text-[#5e5a54]">
-                    <span>{t("by")} {story.author?.name}</span>
+                    <span>{t("by")} {getLocalized(story.author?.name, currentLang)}</span>
                     <Link
                       to={`/blog/${story._id || story.id}`}
                       className="text-[#141414] font-bold hover:underline"
@@ -268,14 +272,14 @@ const Home = () => {
                       to={`/blog/${item._id || item.id}`}
                       className="font-serif text-lg text-[#141414] hover:underline"
                     >
-                      {item.title}
+                      {getLocalized(item.title, currentLang)}
                     </Link>
                   </div>
 
                   <div className="flex items-center gap-4 text-xs font-mono text-[#5e5a54] pl-12 sm:pl-0">
-                    <span>{item.author?.name}</span>
+                    <span>{getLocalized(item.author?.name, currentLang)}</span>
                     <span>•</span>
-                    <span>{item.readTime}</span>
+                    <span>{getLocalized(item.readTime, currentLang)}</span>
                   </div>
                 </div>
               ))}

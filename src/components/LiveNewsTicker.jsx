@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { editorialService } from "../services/api";
-import { Radio, ArrowUpRight, RefreshCw, X, ChevronRight } from "lucide-react";
+import { editorialService, getLocalized } from "../services/api";
+import { useLanguage } from "../context/LanguageContext";
+import { Radio, ArrowUpRight, RefreshCw, X, ChevronRight, FileText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const LiveNewsTicker = () => {
+  const { currentLang, t } = useLanguage();
   const [wireList, setWireList] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
@@ -31,11 +33,20 @@ const LiveNewsTicker = () => {
   }, [wireList]);
 
   const currentItem = wireList[currentIndex] || {
-    headline: "Connecting to real-time dispatch teleprinter...",
+    headline: {
+      en: "Connecting to real-time dispatch teleprinter...",
+      bn: "রিয়েল-টাইম টেলিপ্রিন্টারের সাথে সংযোগ স্থাপন করা হচ্ছে...",
+    },
     timestamp: "LIVE",
-    category: "WIRE",
+    category: { en: "WIRE", bn: "ওয়্যার" },
     location: "GLOBAL",
+    report: {
+      en: "Live telemetry stream active.",
+      bn: "সরাসরি টেলিমেট্রি সম্প্রচার সক্রিয়।",
+    },
   };
+
+  const currentHeadline = getLocalized(currentItem.headline, currentLang);
 
   return (
     <>
@@ -46,11 +57,11 @@ const LiveNewsTicker = () => {
           <div className="flex items-center gap-2 flex-shrink-0">
             <span className="w-2 h-2 rounded-full bg-[#b91c1c] animate-pulse" />
             <span className="font-mono font-bold tracking-widest text-[#b91c1c] text-[11px] uppercase">
-              The Wire
+              {t("theWire")}
             </span>
             <span className="text-[#8c867c] hidden sm:inline font-mono">/</span>
             <span className="font-mono text-[#5e5a54] text-[10px] uppercase hidden sm:inline">
-              Continuous Dispatches
+              {t("liveTelemetry")}
             </span>
           </div>
 
@@ -70,7 +81,7 @@ const LiveNewsTicker = () => {
                   {currentItem.location || "WIRE"} {currentItem.timestamp}
                 </span>
                 <span className="font-serif italic text-sm text-[#141414] truncate font-medium">
-                  {currentItem.headline}
+                  {currentHeadline}
                 </span>
               </motion.div>
             </AnimatePresence>
@@ -80,9 +91,9 @@ const LiveNewsTicker = () => {
           <div className="flex-shrink-0 flex items-center gap-2">
             <button
               onClick={() => setModalOpen(true)}
-              className="text-[11px] font-mono uppercase tracking-wider text-[#5e5a54] hover:text-[#141414] underline flex items-center gap-1"
+              className="text-[11px] font-mono uppercase tracking-wider text-[#5e5a54] hover:text-[#141414] underline flex items-center gap-1 font-bold"
             >
-              <span>View All ({wireList.length})</span>
+              <span>{currentLang === "bn" ? `সব দেখুন (${wireList.length})` : `View All (${wireList.length})`}</span>
             </button>
           </div>
         </div>
@@ -98,14 +109,16 @@ const LiveNewsTicker = () => {
                 <div className="flex items-center gap-2 mb-1">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#b91c1c] animate-pulse" />
                   <span className="font-mono text-xs uppercase tracking-widest font-bold text-[#b91c1c]">
-                    Teleprinter Log
+                    {currentLang === "bn" ? "টেলিপ্রিন্টার লগ" : "Teleprinter Log"}
                   </span>
                 </div>
                 <h3 className="font-serif text-2xl font-bold text-[#141414]">
-                  The Live Wire Bulletin
+                  {t("theWire")}
                 </h3>
                 <p className="font-serif italic text-xs text-[#5e5a54] mt-0.5">
-                  Continuous incoming dispatches from global technical and economic centers
+                  {currentLang === "bn"
+                    ? "বিশ্বব্যাপী প্রযুক্তি ও অবকাঠামো গবেষণা কেন্দ্রের সরাসরি সম্প্রচারিত বুলেটিন ও পূর্ণাঙ্গ রিপোর্ট।"
+                    : "Continuous incoming dispatches from global technical and economic centers."}
                 </p>
               </div>
 
@@ -127,27 +140,39 @@ const LiveNewsTicker = () => {
               </div>
             </div>
 
-            {/* Dispatches List */}
+            {/* Dispatches List with Full Reports */}
             <div className="p-6 overflow-y-auto divide-y divide-[#e8e4dc] space-y-4">
-              {wireList.map((item, idx) => (
-                <div key={item.id || idx} className="pt-4 first:pt-0 space-y-1">
-                  <div className="flex items-center justify-between text-[11px] font-mono text-[#5e5a54]">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-[#141414]">[{item.edition || `WIRE 0${idx + 1}`}]</span>
-                      <span className="bg-[#e8e4dc] px-1 py-0.5 uppercase tracking-wider text-[10px] text-[#141414]">
-                        {item.location || "GLOBAL"}
-                      </span>
-                      <span>•</span>
-                      <span>{item.category}</span>
-                    </div>
-                    <span>{item.timestamp}</span>
-                  </div>
+              {wireList.map((item, idx) => {
+                const localizedCategory = getLocalized(item.category, currentLang);
+                const localizedHeadline = getLocalized(item.headline, currentLang);
+                const localizedReport = getLocalized(item.report, currentLang);
 
-                  <h4 className="font-serif text-base font-semibold text-[#141414] leading-snug">
-                    {item.headline}
-                  </h4>
-                </div>
-              ))}
+                return (
+                  <div key={item.id || idx} className="pt-4 first:pt-0 space-y-2">
+                    <div className="flex items-center justify-between text-[11px] font-mono text-[#5e5a54]">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-[#141414]">[{item.edition || `WIRE 0${idx + 1}`}]</span>
+                        <span className="bg-[#e8e4dc] px-1 py-0.5 uppercase tracking-wider text-[10px] text-[#141414] font-bold">
+                          {item.location || "GLOBAL"}
+                        </span>
+                        <span>•</span>
+                        <span>{localizedCategory}</span>
+                      </div>
+                      <span>{item.timestamp}</span>
+                    </div>
+
+                    <h4 className="font-serif text-lg font-bold text-[#141414] leading-snug">
+                      {localizedHeadline}
+                    </h4>
+
+                    {localizedReport && (
+                      <p className="font-serif text-sm text-[#5e5a54] leading-relaxed bg-[#f4f1ea] p-3 border-l-2 border-[#141414]">
+                        {localizedReport}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             {/* Modal Footer */}

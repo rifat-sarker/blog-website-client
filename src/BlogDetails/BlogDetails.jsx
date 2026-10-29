@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { editorialService } from "../services/api";
+import { editorialService, getLocalized } from "../services/api";
 import { useLanguage } from "../context/LanguageContext";
 import { ArrowLeft, Bookmark, Check, Copy, Printer, Sparkles, MessageSquare, Send } from "lucide-react";
 import { motion, useScroll, useSpring } from "framer-motion";
 
 const BlogDetails = () => {
   const { id } = useParams();
-  const { t } = useLanguage();
+  const { t, currentLang } = useLanguage();
   const [article, setArticle] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
@@ -41,9 +41,11 @@ const BlogDetails = () => {
       setNotes([
         {
           id: "note-1",
-          author: "Fellow Reader",
-          date: "October 2026",
-          text: "The reflection on determinism vs stochastic complexity captured the dilemma facing modern infrastructure engineers.",
+          author: currentLang === "bn" ? "সহযাত্রী পাঠক" : "Fellow Reader",
+          date: currentLang === "bn" ? "অক্টোবর ২০২৬" : "October 2026",
+          text: currentLang === "bn"
+            ? "প্রবন্ধটির গভীর পর্যবেক্ষণ ও ঐতিহাসিক খতিয়ানের তুলনা আধুনিক সফটওয়্যার ইঞ্জিনিয়ারিংয়ের জন্য অত্যন্ত সময়োপযোগী।"
+            : "The reflection on determinism vs stochastic complexity captured the dilemma facing modern infrastructure engineers.",
         },
       ]);
     }
@@ -51,7 +53,7 @@ const BlogDetails = () => {
     return () => {
       isMounted = false;
     };
-  }, [id]);
+  }, [id, currentLang]);
 
   const handleSave = async () => {
     if (!article) return;
@@ -75,8 +77,8 @@ const BlogDetails = () => {
 
     const entry = {
       id: `n-${Date.now()}`,
-      author: "Reader",
-      date: "Just now",
+      author: currentLang === "bn" ? "পাঠক" : "Reader",
+      date: currentLang === "bn" ? "এইমাত্র" : "Just now",
       text: newNote.trim(),
     };
 
@@ -88,7 +90,7 @@ const BlogDetails = () => {
 
   if (isLoading) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-24 space-y-6 animate-pulse">
+      <div className="max-w-3xl mx-auto px-4 py-24 space-y-6 animate-pulse">
         <div className="h-4 w-32 bg-[#e8e4dc]" />
         <div className="h-12 w-full bg-[#e8e4dc]" />
         <div className="h-6 w-3/4 bg-[#e8e4dc]" />
@@ -99,8 +101,17 @@ const BlogDetails = () => {
 
   const { kicker, title, sdesc, ldesc, image, author, date, readTime, words, edition } = article || {};
 
+  const localizedTitle = getLocalized(title, currentLang);
+  const localizedKicker = getLocalized(kicker, currentLang);
+  const localizedSdesc = getLocalized(sdesc, currentLang);
+  const localizedLdesc = getLocalized(ldesc, currentLang);
+  const localizedAuthorName = getLocalized(author?.name, currentLang) || "Rifat Sarker";
+  const localizedAuthorLoc = getLocalized(author?.location, currentLang) || "Dhaka Bureau";
+  const localizedReadTime = getLocalized(readTime, currentLang) || "7 min read";
+  const localizedEdition = getLocalized(edition, currentLang) || "MixHub Dispatch";
+
   const formattedDate = date
-    ? new Date(date).toLocaleDateString("en-US", {
+    ? new Date(date).toLocaleDateString(currentLang === "bn" ? "bn-BD" : "en-US", {
         month: "long",
         day: "numeric",
         year: "numeric",
@@ -121,37 +132,37 @@ const BlogDetails = () => {
           <Link to="/" className="hover:text-[#141414] flex items-center gap-1.5 font-bold">
             <ArrowLeft className="w-3.5 h-3.5" /> {t("frontPage")}
           </Link>
-          <span>{edition || "MixHub Dispatch"}</span>
+          <span>{localizedEdition}</span>
         </div>
 
         {/* Article Masthead */}
         <header className="space-y-6 pb-8 border-b-2 border-[#141414]">
-          {kicker && (
+          {localizedKicker && (
             <div className="font-mono text-xs uppercase tracking-widest text-[#b91c1c] font-bold">
-              {kicker}
+              {localizedKicker}
             </div>
           )}
 
           <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-normal text-[#141414] leading-[1.1] tracking-tight">
-            {title}
+            {localizedTitle}
           </h1>
 
           <p className="font-serif italic text-lg sm:text-xl text-[#5e5a54] leading-relaxed">
-            {sdesc}
+            {localizedSdesc}
           </p>
 
           {/* Author Byline & Meta */}
           <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-[#e8e4dc] text-xs font-mono text-[#5e5a54] uppercase tracking-wider">
             <div>
-              <span className="font-bold text-[#141414]">{t("by")} {author?.name || "Rifat Sarker"}</span>
+              <span className="font-bold text-[#141414]">{t("by")} {localizedAuthorName}</span>
               <span className="mx-2">•</span>
-              <span>{author?.location || "Dhaka"}</span>
+              <span>{localizedAuthorLoc}</span>
               <span className="mx-2">•</span>
               <span>{formattedDate}</span>
             </div>
 
             <div className="flex items-center gap-3">
-              <span>{readTime || "6 min read"}</span>
+              <span>{localizedReadTime}</span>
               <span>•</span>
               <span>{words || 750} {t("words")}</span>
             </div>
@@ -195,7 +206,7 @@ const BlogDetails = () => {
           <figure className="mb-12 border border-[#141414] p-1 bg-[#ffffff]">
             <img
               src={image}
-              alt={title}
+              alt={localizedTitle}
               className="w-full max-h-[460px] object-cover filter contrast-[1.03]"
             />
             <figcaption className="p-3 text-right font-serif italic text-xs text-[#5e5a54] border-t border-[#e8e4dc]">
@@ -204,10 +215,10 @@ const BlogDetails = () => {
           </figure>
         )}
 
-        {/* Article Body Content: Crisp Serif Text Designed for Sustained Reading */}
+        {/* Article Body Content: Substantial, Full-Length Essay with Sections & Code */}
         <div className="font-serif text-[#141414] text-lg sm:text-[19px] leading-[1.85] space-y-6 pt-2">
-          {ldesc ? (
-            ldesc.split("\n\n").map((block, idx) => {
+          {localizedLdesc ? (
+            localizedLdesc.split("\n\n").map((block, idx) => {
               if (block.startsWith("### ")) {
                 return (
                   <h3
@@ -231,6 +242,7 @@ const BlogDetails = () => {
                   </div>
                 );
               }
+              // First paragraph gets the classical drop-cap styling
               return (
                 <p key={idx} className={idx === 0 ? "drop-cap" : ""}>
                   {block}
@@ -256,23 +268,23 @@ const BlogDetails = () => {
         <section className="mt-12 space-y-6">
           <div className="flex items-center justify-between border-b border-[#141414] pb-2">
             <h3 className="font-mono text-xs uppercase tracking-widest font-bold text-[#141414]">
-              Marginalia & Reader Notes ({notes.length})
+              {currentLang === "bn" ? `পাঠকের মন্তব্য ও টীকা (${notes.length})` : `Marginalia & Reader Notes (${notes.length})`}
             </h3>
             <span className="font-mono text-[11px] text-[#5e5a54]">
-              Reflections on this text
+              {currentLang === "bn" ? "প্রবন্ধের ওপর পাঠকদের পর্যবেক্ষণ" : "Reflections on this text"}
             </span>
           </div>
 
           {/* Form */}
           <form onSubmit={handleAddNote} className="border border-[#141414] p-4 bg-[#ffffff] space-y-3">
             <label className="block font-mono text-[11px] uppercase tracking-wider text-[#5e5a54]">
-              Add a Reflective Note to the Margin
+              {currentLang === "bn" ? "প্রবন্ধে আপনার মতামত ও পর্যবেক্ষণ যুক্ত করুন" : "Add a Reflective Note to the Margin"}
             </label>
             <textarea
               rows={3}
               value={newNote}
               onChange={(e) => setNewNote(e.target.value)}
-              placeholder="Contribute your architectural perspective or historical reference..."
+              placeholder={currentLang === "bn" ? "আপনার স্থাপত্যিক বা বুদ্ধিবৃত্তিক পর্যবেক্ষণ লিখুন..." : "Contribute your architectural perspective or historical reference..."}
               className="w-full bg-[#faf8f5] border border-[#e8e4dc] p-3 text-sm font-serif text-[#141414] placeholder-[#8c867c] focus:outline-none focus:border-[#141414] resize-none"
             />
             <div className="flex justify-end">
@@ -281,7 +293,7 @@ const BlogDetails = () => {
                 disabled={!newNote.trim()}
                 className="px-4 py-2 border border-[#141414] bg-[#141414] text-[#faf8f5] text-xs font-mono uppercase tracking-wider font-bold hover:bg-transparent hover:text-[#141414] transition-all disabled:opacity-40"
               >
-                Inscribe Note
+                {currentLang === "bn" ? "মন্তব্য লিপিবদ্ধ করুন" : "Inscribe Note"}
               </button>
             </div>
           </form>

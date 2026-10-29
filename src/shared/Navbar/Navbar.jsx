@@ -6,17 +6,16 @@ import {
   Search,
   Bookmark,
   PenLine,
-  Globe,
   Radio,
   Menu,
   X,
   LogOut,
-  User,
   Info,
   ChevronDown,
   BookOpen,
   Compass,
   Trophy,
+  Clock,
 } from "lucide-react";
 
 const Navbar = () => {
@@ -27,14 +26,14 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [guideModalOpen, setGuideModalOpen] = useState(false);
-  const [liveReaders, setLiveReaders] = useState(1428);
+  const [currentTime, setCurrentTime] = useState(new Date().toUTCString().slice(17, 22) + " GMT");
   const navigate = useNavigate();
 
-  // Subtle live reader count jitter to feel alive
+  // Real clock in GMT / UTC - 100% honest and genuine (No fake counters)
   useEffect(() => {
     const timer = setInterval(() => {
-      setLiveReaders((prev) => prev + Math.floor(Math.random() * 5) - 2);
-    }, 8000);
+      setCurrentTime(new Date().toUTCString().slice(17, 22) + " GMT");
+    }, 10000);
     return () => clearInterval(timer);
   }, []);
 
@@ -92,7 +91,7 @@ const Navbar = () => {
 
   return (
     <header className="w-full bg-[#faf8f5] border-b border-[#e8e4dc]">
-      {/* Top Folio Bar: Volume, Global Time, Live Readers & Language Selector */}
+      {/* Top Folio Bar: Volume, Global Time & Language Selector */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 border-b border-[#e8e4dc] flex flex-wrap items-center justify-between text-[11px] font-mono text-[#5e5a54] uppercase tracking-wider gap-2">
         <div className="flex items-center gap-3">
           <span className="font-bold text-[#141414]">{t("vol")}</span>
@@ -104,13 +103,13 @@ const Navbar = () => {
           </span>
         </div>
 
-        {/* Live Reader Pulse & Language & Auth */}
+        {/* Real-time Clock, Language & Auth */}
         <div className="flex items-center gap-4">
-          {/* Live Reader Telemetry */}
+          {/* Real Global Telemetry Time (100% Genuine) */}
           <div className="hidden lg:flex items-center gap-1.5 text-xs font-mono text-[#141414]">
             <span className="w-2 h-2 rounded-full bg-[#b91c1c] animate-pulse inline-block" />
-            <span className="font-bold">{liveReaders.toLocaleString()}</span>
-            <span className="text-[#5e5a54]">{t("readersNow")}</span>
+            <span className="font-bold">{currentTime}</span>
+            <span className="text-[#5e5a54]">Live Telemetry</span>
           </div>
 
           {/* Guide / Info Pill explaining options */}
@@ -127,19 +126,19 @@ const Navbar = () => {
           <div className="relative">
             <button
               onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-              className="flex items-center gap-1 px-2 py-0.5 border border-[#141414] bg-[#ffffff] hover:bg-[#f4f1ea] text-[#141414] transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1 border border-[#141414] bg-[#ffffff] hover:bg-[#f4f1ea] text-[#141414] transition-colors shadow-sm"
             >
               <span>{currentLangObj.flag}</span>
-              <span className="font-bold">{currentLangObj.nativeName}</span>
+              <span className="font-bold text-xs">{currentLangObj.nativeName}</span>
               <ChevronDown className="w-3 h-3 text-[#5e5a54]" />
             </button>
 
             {langDropdownOpen && (
-              <div className="absolute right-0 mt-1 w-44 bg-[#faf8f5] border-2 border-[#141414] shadow-2xl z-50 p-1 divide-y divide-[#e8e4dc]">
+              <div className="absolute right-0 mt-1 w-48 bg-[#faf8f5] border-2 border-[#141414] shadow-2xl z-50 p-1 divide-y divide-[#e8e4dc]">
                 <div className="p-2 text-[10px] font-mono uppercase tracking-widest text-[#5e5a54]">
                   Select Language (১০টি ভাষা)
                 </div>
-                <div className="max-h-60 overflow-y-auto">
+                <div className="max-h-64 overflow-y-auto">
                   {LANGUAGES.map((lang) => (
                     <button
                       key={lang.code}
@@ -147,7 +146,7 @@ const Navbar = () => {
                         setCurrentLang(lang.code);
                         setLangDropdownOpen(false);
                       }}
-                      className={`w-full text-left px-3 py-1.5 text-xs flex items-center justify-between hover:bg-[#141414] hover:text-[#faf8f5] transition-colors ${
+                      className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-[#141414] hover:text-[#faf8f5] transition-colors ${
                         currentLang === lang.code ? "bg-[#f4f1ea] font-bold" : ""
                       }`}
                     >

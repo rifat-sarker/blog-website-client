@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { editorialService } from "../../services/api";
+import { editorialService, getLocalized } from "../../services/api";
+import { useLanguage } from "../../context/LanguageContext";
 import { Search, X, ArrowUpRight } from "lucide-react";
 
 const SECTIONS = [
@@ -13,6 +14,7 @@ const SECTIONS = [
 ];
 
 const AllBlog = () => {
+  const { t, currentLang } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
 
@@ -44,16 +46,16 @@ const AllBlog = () => {
   const filtered = articles
     .filter((a) => {
       if (activeSection === "All Sections") return true;
-      return a.category?.toLowerCase() === activeSection.toLowerCase();
+      const cat = typeof a.category === "object" ? a.category.en : a.category;
+      return cat?.toLowerCase() === activeSection.toLowerCase();
     })
     .filter((a) => {
       if (!searchQuery.trim()) return true;
       const q = searchQuery.toLowerCase();
-      return (
-        a.title?.toLowerCase().includes(q) ||
-        a.sdesc?.toLowerCase().includes(q) ||
-        a.author?.name?.toLowerCase().includes(q)
-      );
+      const title = getLocalized(a.title, currentLang).toLowerCase();
+      const sdesc = getLocalized(a.sdesc, currentLang).toLowerCase();
+      const author = getLocalized(a.author?.name, currentLang).toLowerCase();
+      return title.includes(q) || sdesc.includes(q) || author.includes(q);
     });
 
   const clearFilters = () => {
@@ -68,14 +70,16 @@ const AllBlog = () => {
       <div className="border-b-2 border-[#141414] pb-6 mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <span className="font-mono text-xs uppercase tracking-widest text-[#b91c1c] font-bold block mb-1">
-            Complete Ledger
+            {currentLang === "bn" ? "সম্পূর্ণ প্রবন্ধ নির্ঘণ্ট" : "Complete Ledger"}
           </span>
           <h1 className="font-serif text-3xl sm:text-5xl font-normal text-[#141414]">
-            The Dispatch Archive
+            {t("archive")}
           </h1>
         </div>
         <p className="font-serif italic text-sm text-[#5e5a54] max-w-sm sm:text-right">
-          A permanent chronological index of published essays, architectural monographs, and critical inquiries.
+          {currentLang === "bn"
+            ? "প্রকাশিত সকল গবেষণা প্রবন্ধ, স্থাপত্য সমীক্ষা ও মননশীল চিন্তার কালানুক্রমিক সাধারণ সূচি।"
+            : "A permanent chronological index of published essays, architectural monographs, and critical inquiries."}
         </p>
       </div>
 
@@ -88,7 +92,7 @@ const AllBlog = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by keywords, title, author..."
+            placeholder={currentLang === "bn" ? "প্রবন্ধ বা লেখক খুঁজুন..." : "Search by keywords, title, author..."}
             className="w-full bg-[#faf8f5] border border-[#e8e4dc] pl-9 pr-8 py-2 text-xs font-serif text-[#141414] placeholder-[#8c867c] focus:outline-none focus:border-[#141414]"
           />
           {searchQuery && (
@@ -122,7 +126,9 @@ const AllBlog = () => {
       {/* Count Meta */}
       <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-[#5e5a54] mb-6 pb-2 border-b border-[#e8e4dc]">
         <span>
-          Showing {filtered.length} {filtered.length === 1 ? "Dispatch" : "Dispatches"}
+          {currentLang === "bn"
+            ? `${filtered.length}টি প্রবন্ধ প্রদর্শিত হচ্ছে`
+            : `Showing ${filtered.length} ${filtered.length === 1 ? "Dispatch" : "Dispatches"}`}
         </span>
         {(searchQuery || activeSection !== "All Sections") && (
           <button
@@ -150,31 +156,31 @@ const AllBlog = () => {
             >
               <div className="space-y-1.5 max-w-3xl">
                 <div className="flex items-center gap-3 text-[11px] font-mono text-[#5e5a54] uppercase tracking-wider">
-                  <span className="font-bold text-[#b91c1c]">[{item.category || "Essay"}]</span>
+                  <span className="font-bold text-[#b91c1c]">[{getLocalized(item.category, currentLang) || "Essay"}]</span>
                   <span>•</span>
-                  <span>{item.readTime || "5 min read"}</span>
+                  <span>{getLocalized(item.readTime, currentLang) || "5 min read"}</span>
                   <span>•</span>
-                  <span>{item.date ? new Date(item.date).toLocaleDateString() : "2026"}</span>
+                  <span>{item.date ? new Date(item.date).toLocaleDateString(currentLang === "bn" ? "bn-BD" : "en-US") : "2026"}</span>
                 </div>
 
                 <Link to={`/blog/${item._id || item.id}`} className="block">
                   <h3 className="font-serif text-2xl font-normal text-[#141414] group-hover:underline leading-tight">
-                    {item.title}
+                    {getLocalized(item.title, currentLang)}
                   </h3>
                 </Link>
 
                 <p className="font-serif text-sm text-[#5e5a54] leading-relaxed line-clamp-2">
-                  {item.sdesc}
+                  {getLocalized(item.sdesc, currentLang)}
                 </p>
               </div>
 
               <div className="flex items-center gap-4 text-xs font-mono text-[#5e5a54] uppercase tracking-wider flex-shrink-0 self-start md:self-center">
-                <span>By {item.author?.name || "Rifat Sarker"}</span>
+                <span>By {getLocalized(item.author?.name, currentLang) || "Rifat Sarker"}</span>
                 <Link
                   to={`/blog/${item._id || item.id}`}
                   className="inline-flex items-center gap-1 text-[#141414] font-bold hover:underline"
                 >
-                  Read <ArrowUpRight className="w-3.5 h-3.5" />
+                  {t("readEssay")} <ArrowUpRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </article>
