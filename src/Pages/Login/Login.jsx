@@ -1,186 +1,129 @@
 import { useContext, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../providers/AuthProvider";
-import { Layers, Mail, Lock, Sparkles, ArrowRight } from "lucide-react";
-import Swal from "sweetalert2";
+import { useLanguage } from "../../context/LanguageContext";
+import { Lock, Mail, ArrowRight, ShieldCheck, PenLine } from "lucide-react";
 
 const Login = () => {
-  const { signInUser, googleLogIn } = useContext(AuthContext);
+  const { signInUser, user } = useContext(AuthContext);
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location?.state || "/";
+  const from = location?.state || "/addBlog";
 
-  const handleGoogleLogin = () => {
-    googleLogIn()
-      .then(() => {
-        Swal.fire({
-          title: "Welcome back!",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        });
-        navigate(from, { replace: true });
-      })
-      .catch((error) => {
-        console.error(error);
-        Swal.fire({
-          title: "Sign in failed",
-          text: error.message,
-          icon: "error",
-        });
-      });
-  };
-
-  const handleLogin = (e) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
+    if (!email.trim()) return;
 
-    signInUser(email, password)
-      .then(() => {
-        Swal.fire({
-          title: "Welcome back!",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
-        });
-        navigate(from, { replace: true });
-      })
-      .catch((error) => {
-        console.error(error);
-        Swal.fire({
-          title: "Sign in failed",
-          text: error.message,
-          icon: "error",
-        });
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    setIsSubmitting(true);
+    await signInUser(email, password || "editorial_pass");
+    setIsSubmitting(false);
+    navigate(from, { replace: true });
   };
 
-  // Demo account filler for easy testing
-  const handleDemoFill = () => {
-    setEmail("guest.engineer@mixhub.dev");
-    setPassword("Engineering2026!");
+  const handleQuickAccredit = async () => {
+    setIsSubmitting(true);
+    await signInUser("rifat.sarker@mixhub.dev", "editorial_pass");
+    setIsSubmitting(false);
+    navigate(from, { replace: true });
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 bg-slate-900/80 border border-slate-800 rounded-3xl p-8 sm:p-10 shadow-2xl backdrop-blur-xl">
-        {/* Brand Header */}
-        <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-pink-500 p-0.5 mx-auto shadow-lg shadow-indigo-500/20">
-            <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
-              <Layers className="w-6 h-6 text-indigo-400" />
-            </div>
+    <div className="max-w-xl mx-auto px-4 py-16 sm:py-24">
+      <div className="border-2 border-[#141414] bg-[#ffffff] p-8 sm:p-12 shadow-xl space-y-8">
+        {/* Masthead Header */}
+        <div className="text-center space-y-2 border-b border-[#141414] pb-6">
+          <div className="w-8 h-8 mx-auto border border-[#b91c1c] text-[#b91c1c] font-serif font-bold flex items-center justify-center text-sm mb-2">
+            M
           </div>
-          <h2 className="text-2xl font-extrabold text-white tracking-tight">
-            Sign in to MixHub
-          </h2>
-          <p className="text-xs text-slate-400">
-            Access your reading shelf, save bookmarks, and publish articles
+          <span className="font-mono text-xs uppercase tracking-widest text-[#b91c1c] font-bold block">
+            Author Accreditation Desk
+          </span>
+          <h1 className="font-serif text-3xl font-normal text-[#141414]">
+            Sign In to Publish
+          </h1>
+          <p className="font-serif italic text-xs text-[#5e5a54] max-w-sm mx-auto">
+            To preserve editorial integrity and verify article authorship, only accredited writers may draft and publish manuscripts.
           </p>
         </div>
 
-        {/* Google 1-Click Login */}
-        <button
-          onClick={handleGoogleLogin}
-          type="button"
-          className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700/80 border border-slate-700/80 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-sm"
-        >
-          <svg className="w-4 h-4" viewBox="0 0 24 24">
-            <path
-              fill="#4285F4"
-              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-            />
-            <path
-              fill="#34A853"
-              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-            />
-            <path
-              fill="#FBBC05"
-              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-            />
-            <path
-              fill="#EA4335"
-              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-            />
-          </svg>
-          <span>Continue with Google</span>
-        </button>
-
-        <div className="relative flex items-center justify-center">
-          <div className="border-t border-slate-800 w-full" />
-          <span className="bg-slate-900 px-3 text-[11px] text-slate-500 uppercase font-mono">
-            or email
-          </span>
-        </div>
-
-        {/* Email/Password Form */}
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-300 font-mono">
-              Email Address
+        {/* Form */}
+        <form onSubmit={handleSignIn} className="space-y-5">
+          <div className="space-y-1.5">
+            <label className="block font-mono text-xs uppercase tracking-wider text-[#141414] font-bold">
+              Author Email Address
             </label>
-            <div className="relative flex items-center">
-              <Mail className="w-4 h-4 text-slate-500 absolute left-3.5" />
+            <div className="flex border border-[#141414] bg-[#faf8f5] p-2.5">
+              <Mail className="w-4 h-4 text-[#8c867c] mr-2 flex-shrink-0 mt-0.5" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                placeholder="developer@example.com"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                placeholder="author@mixhub.dev"
+                className="w-full bg-transparent font-serif text-sm text-[#141414] placeholder-[#8c867c] focus:outline-none"
               />
             </div>
           </div>
 
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-300 font-mono">
-              Password
-            </label>
-            <div className="relative flex items-center">
-              <Lock className="w-4 h-4 text-slate-500 absolute left-3.5" />
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="block font-mono text-xs uppercase tracking-wider text-[#141414] font-bold">
+                Passphrase
+              </label>
+              <span className="font-mono text-[10px] text-[#8c867c]">
+                Any key for local session
+              </span>
+            </div>
+            <div className="flex border border-[#141414] bg-[#faf8f5] p-2.5">
+              <Lock className="w-4 h-4 text-[#8c867c] mr-2 flex-shrink-0 mt-0.5" />
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
                 placeholder="••••••••••••"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                className="w-full bg-transparent font-serif text-sm text-[#141414] placeholder-[#8c867c] focus:outline-none"
               />
             </div>
           </div>
 
           <button
             type="submit"
-            disabled={isLoading}
-            className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-600/30 flex items-center justify-center gap-2 transition-all mt-2"
+            disabled={isSubmitting}
+            className="w-full py-3 border border-[#141414] bg-[#141414] text-[#faf8f5] font-mono text-xs uppercase tracking-widest font-bold hover:bg-[#2e2e2e] transition-colors flex items-center justify-center gap-2"
           >
-            {isLoading ? "Signing in..." : "Sign In to Account"}
-            <ArrowRight className="w-3.5 h-3.5" />
+            <PenLine className="w-3.5 h-3.5" />
+            <span>{isSubmitting ? "Verifying Credentials..." : "Authenticate as Author"}</span>
           </button>
         </form>
 
-        {/* Quick Demo Helper */}
-        <div className="pt-2 text-center">
+        {/* 1-Click Author Access Button */}
+        <div className="pt-4 border-t border-[#e8e4dc] space-y-3">
+          <div className="flex items-center justify-between text-xs font-mono text-[#5e5a54]">
+            <span>Fast Review Accreditation:</span>
+          </div>
+
           <button
             type="button"
-            onClick={handleDemoFill}
-            className="text-[11px] text-indigo-400 hover:text-indigo-300 font-mono underline"
+            onClick={handleQuickAccredit}
+            disabled={isSubmitting}
+            className="w-full py-2.5 border border-[#141414] bg-[#f4f1ea] hover:bg-[#e8e4dc] text-[#141414] font-mono text-xs uppercase tracking-wider font-bold transition-colors flex items-center justify-center gap-2"
           >
-            Quick demo credentials
+            <ShieldCheck className="w-4 h-4 text-[#b91c1c]" />
+            <span>1-Click Sign In as Rifat Sarker (Lead Editor)</span>
           </button>
         </div>
 
-        {/* Sign Up Link */}
-        <div className="text-center text-xs text-slate-400 pt-2 border-t border-slate-800">
-          Don't have an account yet?{" "}
-          <Link to="/signUp" className="text-indigo-400 hover:underline font-semibold">
-            Create account
+        {/* Return Link */}
+        <div className="text-center pt-2">
+          <Link
+            to="/"
+            className="font-mono text-xs uppercase tracking-wider text-[#5e5a54] hover:text-[#141414] underline"
+          >
+            ← Return to Front Page Without Signing In
           </Link>
         </div>
       </div>

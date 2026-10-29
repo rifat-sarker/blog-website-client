@@ -5,16 +5,16 @@ import LiveNewsTicker from "../components/LiveNewsTicker";
 
 const Root = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 transition-colors selection:bg-indigo-500/30 selection:text-indigo-200">
-      {/* Live 2026 Continuous News Ticker */}
+    <div className="min-h-screen flex flex-col bg-[#faf8f5] text-[#141414] font-sans selection:bg-[#141414] selection:text-[#faf8f5]">
+      {/* Live Continuous News Wire Ticker */}
       <LiveNewsTicker />
-      {/* Navigation Header */}
+      {/* Newspaper Masthead & Navigation */}
       <Navbar />
-      {/* Page Body */}
+      {/* Broadsheet Page Body */}
       <main className="flex-1">
         <Outlet />
       </main>
-      {/* Footer */}
+      {/* Colophon & Footer */}
       <Footer />
     </div>
   );

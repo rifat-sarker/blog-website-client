@@ -3,22 +3,17 @@ import { createContext, useContext, useEffect, useState } from "react";
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("mixhub_theme") || "dark";
-  });
+  const [theme, setTheme] = useState("light");
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-    localStorage.setItem("mixhub_theme", theme);
-  }, [theme]);
+    // Pure warm paper white editorial theme
+    document.documentElement.classList.remove("dark");
+    document.documentElement.removeAttribute("data-theme");
+    localStorage.removeItem("mixhub_theme");
+  }, []);
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+    // Kept for interface compatibility
   };
 
   return (
@@ -29,4 +24,3 @@ export const ThemeProvider = ({ children }) => {
 };
 
 export const useTheme = () => useContext(ThemeContext);
-

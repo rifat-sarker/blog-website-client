@@ -1,38 +1,20 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { blogService } from "../services/api";
-import { AuthContext } from "../providers/AuthProvider";
-import Swal from "sweetalert2";
-import {
-  Clock,
-  Calendar,
-  Bookmark,
-  Heart,
-  Share2,
-  Copy,
-  Check,
-  ArrowLeft,
-  Sparkles,
-  MessageSquare,
-  Send,
-  User,
-} from "lucide-react";
+import { editorialService } from "../services/api";
+import { useLanguage } from "../context/LanguageContext";
+import { ArrowLeft, Bookmark, Check, Copy, Printer, Sparkles, MessageSquare, Send } from "lucide-react";
 import { motion, useScroll, useSpring } from "framer-motion";
 
 const BlogDetails = () => {
   const { id } = useParams();
-  const { user } = useContext(AuthContext);
-
-  const [blog, setBlog] = useState(null);
+  const { t } = useLanguage();
+  const [article, setArticle] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [claps, setClaps] = useState(0);
-  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState("");
-  const [relatedBlogs, setRelatedBlogs] = useState([]);
+  const [notes, setNotes] = useState([]);
+  const [newNote, setNewNote] = useState("");
 
-  // Reading progress bar spring
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -43,36 +25,25 @@ const BlogDetails = () => {
   useEffect(() => {
     let isMounted = true;
     setIsLoading(true);
+    window.scrollTo({ top: 0, behavior: "instant" });
 
-    blogService.getBlogById(id).then((data) => {
+    editorialService.getArticleById(id).then((data) => {
       if (isMounted && data) {
-        setBlog(data);
-        setClaps(data.claps || 142);
+        setArticle(data);
         setIsLoading(false);
       }
     });
 
-    // Load related blogs
-    blogService.getAllBlogs().then((all) => {
-      if (isMounted) {
-        setRelatedBlogs(all.filter((b) => (b._id || b.id) !== id).slice(0, 3));
-      }
-    });
-
-    // Load comments from localStorage
-    const savedComments = JSON.parse(
-      localStorage.getItem(`mixhub_comments_${id}`) || "[]"
-    );
-    if (savedComments.length > 0) {
-      setComments(savedComments);
+    const savedNotes = JSON.parse(localStorage.getItem(`notes_${id}`) || "[]");
+    if (savedNotes.length > 0) {
+      setNotes(savedNotes);
     } else {
-      setComments([
+      setNotes([
         {
-          id: "c-1",
-          author: "Alex Morgan",
-          avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
-          text: "Phenomenal writeup. The distributed consensus explanation clarified doubts I had for months.",
-          date: "Yesterday",
+          id: "note-1",
+          author: "Fellow Reader",
+          date: "October 2026",
+          text: "The reflection on determinism vs stochastic complexity captured the dilemma facing modern infrastructure engineers.",
         },
       ]);
     }
@@ -82,75 +53,51 @@ const BlogDetails = () => {
     };
   }, [id]);
 
-  const handleClap = () => {
-    setClaps((prev) => prev + 1);
+  const handleSave = async () => {
+    if (!article) return;
+    await editorialService.saveArticle(article);
+    setIsSaved(true);
   };
 
-  const handleBookmark = async () => {
-    if (!user) {
-      Swal.fire({
-        title: "Sign In Required",
-        text: "Please sign in to save this story to your wishlist.",
-        icon: "info",
-        confirmButtonColor: "#4f46e5",
-      });
-      return;
-    }
-    await blogService.addToWishlist(blog, user.email);
-    setIsBookmarked(true);
-    Swal.fire({
-      title: "Story Saved",
-      text: "Added to your personal wishlist shelf.",
-      icon: "success",
-      timer: 1500,
-      showConfirmButton: false,
-    });
-  };
-
-  const handleCopyLink = () => {
+  const handleCopyCitation = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleAddComment = (e) => {
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleAddNote = (e) => {
     e.preventDefault();
-    if (!newComment.trim()) return;
+    if (!newNote.trim()) return;
 
     const entry = {
-      id: `c-${Date.now()}`,
-      author: user?.displayName || user?.email?.split("@")[0] || "Reader",
-      avatar: user?.photoURL || null,
-      text: newComment.trim(),
+      id: `n-${Date.now()}`,
+      author: "Reader",
       date: "Just now",
+      text: newNote.trim(),
     };
 
-    const updated = [entry, ...comments];
-    setComments(updated);
-    localStorage.setItem(`mixhub_comments_${id}`, JSON.stringify(updated));
-    setNewComment("");
+    const updated = [entry, ...notes];
+    setNotes(updated);
+    localStorage.setItem(`notes_${id}`, JSON.stringify(updated));
+    setNewNote("");
   };
 
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-20 space-y-6">
-        <div className="h-6 w-32 rounded bg-slate-800 animate-pulse" />
-        <div className="h-12 w-3/4 rounded bg-slate-800 animate-pulse" />
-        <div className="h-96 rounded-2xl bg-slate-800 animate-pulse" />
-        <div className="space-y-3 pt-6">
-          <div className="h-4 w-full bg-slate-800 rounded animate-pulse" />
-          <div className="h-4 w-5/6 bg-slate-800 rounded animate-pulse" />
-          <div className="h-4 w-4/6 bg-slate-800 rounded animate-pulse" />
-        </div>
+      <div className="max-w-2xl mx-auto px-4 py-24 space-y-6 animate-pulse">
+        <div className="h-4 w-32 bg-[#e8e4dc]" />
+        <div className="h-12 w-full bg-[#e8e4dc]" />
+        <div className="h-6 w-3/4 bg-[#e8e4dc]" />
+        <div className="h-72 w-full bg-[#e8e4dc]" />
       </div>
     );
   }
 
-  const { title, sdesc, ldesc, imageURL, image, category, date, author } = blog || {};
-  const displayImage =
-    imageURL || image || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80";
-
-  const readTime = `${Math.max(3, Math.ceil((ldesc || sdesc || "").split(" ").length / 180))} min read`;
+  const { kicker, title, sdesc, ldesc, image, author, date, readTime, words, edition } = article || {};
 
   const formattedDate = date
     ? new Date(date).toLocaleDateString("en-US", {
@@ -162,243 +109,199 @@ const BlogDetails = () => {
 
   return (
     <>
-      {/* Scroll Reading Progress Bar Fixed at Top */}
+      {/* Quiet Top Reading Progress Bar */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-pink-500 to-amber-400 origin-left z-50"
+        className="fixed top-0 left-0 right-0 h-1 bg-[#141414] origin-left z-50"
         style={{ scaleX }}
       />
 
-      <article className="py-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Back Link */}
-        <Link
-          to="/allBlog"
-          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white mb-8 transition-colors"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" /> Back to Archive
-        </Link>
+      <main className="py-12 sm:py-16 max-w-3xl mx-auto px-4 sm:px-6">
+        {/* Navigation Breadcrumb */}
+        <div className="flex items-center justify-between pb-6 mb-8 border-b border-[#e8e4dc] text-xs font-mono uppercase tracking-wider text-[#5e5a54]">
+          <Link to="/" className="hover:text-[#141414] flex items-center gap-1.5 font-bold">
+            <ArrowLeft className="w-3.5 h-3.5" /> {t("frontPage")}
+          </Link>
+          <span>{edition || "MixHub Dispatch"}</span>
+        </div>
 
-        {/* Header Metadata */}
-        <div className="space-y-4 mb-8">
-          <div className="flex items-center gap-2">
-            <span className="badge badge-sm bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono text-[11px] uppercase">
-              {category?.replace("_", " ") || "Deep Dive"}
-            </span>
-            <span className="text-xs text-slate-500">•</span>
-            <span className="text-xs text-slate-400 font-mono flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5 text-indigo-400" /> {readTime}
-            </span>
-          </div>
+        {/* Article Masthead */}
+        <header className="space-y-6 pb-8 border-b-2 border-[#141414]">
+          {kicker && (
+            <div className="font-mono text-xs uppercase tracking-widest text-[#b91c1c] font-bold">
+              {kicker}
+            </div>
+          )}
 
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
+          <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-normal text-[#141414] leading-[1.1] tracking-tight">
             {title}
           </h1>
 
-          <p className="text-lg text-slate-300 leading-relaxed font-normal">
+          <p className="font-serif italic text-lg sm:text-xl text-[#5e5a54] leading-relaxed">
             {sdesc}
           </p>
 
-          {/* Author Card & Actions Bar */}
-          <div className="pt-4 border-t border-b border-slate-800/80 py-4 flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <img
-                src={author?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"}
-                alt={author?.name || "Author"}
-                className="w-10 h-10 rounded-full object-cover ring-2 ring-indigo-500/30"
-              />
-              <div>
-                <p className="text-sm font-bold text-white">
-                  {author?.name || "Rifat Sarker"}
-                </p>
-                <div className="flex items-center gap-2 text-xs text-slate-400">
-                  <span>{author?.role || "Staff Engineer"}</span>
-                  <span>•</span>
-                  <span>{formattedDate}</span>
-                </div>
-              </div>
+          {/* Author Byline & Meta */}
+          <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-[#e8e4dc] text-xs font-mono text-[#5e5a54] uppercase tracking-wider">
+            <div>
+              <span className="font-bold text-[#141414]">{t("by")} {author?.name || "Rifat Sarker"}</span>
+              <span className="mx-2">•</span>
+              <span>{author?.location || "Dhaka"}</span>
+              <span className="mx-2">•</span>
+              <span>{formattedDate}</span>
             </div>
 
-            {/* Actions: Claps + Bookmark + Share */}
-            <div className="flex items-center gap-2">
-              {/* Claps */}
-              <button
-                onClick={handleClap}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-slate-300 hover:text-pink-400 hover:border-pink-500/30 transition-all text-xs font-semibold"
-                title="Clap / Like this article"
-              >
-                <Heart className="w-4 h-4 text-pink-500 fill-pink-500/20" />
-                <span>{claps}</span>
-              </button>
-
-              {/* Bookmark */}
-              <button
-                onClick={handleBookmark}
-                className={`p-2 rounded-full border text-xs transition-all ${
-                  isBookmarked
-                    ? "bg-indigo-600 text-white border-indigo-500"
-                    : "bg-slate-900 text-slate-300 hover:text-white border-slate-800 hover:border-slate-700"
-                }`}
-                title="Save to Wishlist"
-              >
-                <Bookmark className={`w-4 h-4 ${isBookmarked ? "fill-current" : ""}`} />
-              </button>
-
-              {/* Copy Link */}
-              <button
-                onClick={handleCopyLink}
-                className="p-2 rounded-full bg-slate-900 text-slate-300 hover:text-white border border-slate-800 hover:border-slate-700 transition-all"
-                title="Copy Article Link"
-              >
-                {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-              </button>
+            <div className="flex items-center gap-3">
+              <span>{readTime || "6 min read"}</span>
+              <span>•</span>
+              <span>{words || 750} {t("words")}</span>
             </div>
           </div>
+        </header>
+
+        {/* Quiet Reading Action Bar */}
+        <div className="py-3 border-b border-[#e8e4dc] mb-10 flex items-center justify-between text-xs font-mono text-[#5e5a54] uppercase tracking-wider">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleSave}
+              className={`flex items-center gap-1.5 hover:text-[#141414] transition-colors ${
+                isSaved ? "text-[#b91c1c] font-bold" : ""
+              }`}
+            >
+              <Bookmark className={`w-3.5 h-3.5 ${isSaved ? "fill-current" : ""}`} />
+              <span>{isSaved ? t("saved") : t("saveToShelf")}</span>
+            </button>
+
+            <button
+              onClick={handleCopyCitation}
+              className="flex items-center gap-1.5 hover:text-[#141414] transition-colors"
+            >
+              {copied ? <Check className="w-3.5 h-3.5 text-[#141414]" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copied ? t("copied") : t("copyLink")}</span>
+            </button>
+          </div>
+
+          <button
+            onClick={handlePrint}
+            className="hidden sm:flex items-center gap-1.5 hover:text-[#141414] transition-colors"
+            title="Clean Paper Print"
+          >
+            <Printer className="w-3.5 h-3.5" />
+            <span>{t("print")}</span>
+          </button>
         </div>
 
-        {/* Hero Image */}
-        <div className="rounded-3xl overflow-hidden border border-slate-800 shadow-2xl mb-12 bg-slate-900">
-          <img
-            src={displayImage}
-            alt={title}
-            className="w-full max-h-[500px] object-cover"
-          />
-        </div>
+        {/* Editorial Image Plate */}
+        {image && (
+          <figure className="mb-12 border border-[#141414] p-1 bg-[#ffffff]">
+            <img
+              src={image}
+              alt={title}
+              className="w-full max-h-[460px] object-cover filter contrast-[1.03]"
+            />
+            <figcaption className="p-3 text-right font-serif italic text-xs text-[#5e5a54] border-t border-[#e8e4dc]">
+              Archival Plate • Documentary visual accompaniment for MixHub Dispatch.
+            </figcaption>
+          </figure>
+        )}
 
-        {/* Article Body Content */}
-        <div className="prose prose-invert prose-indigo max-w-none space-y-6 text-slate-300 leading-relaxed text-base sm:text-lg">
+        {/* Article Body Content: Crisp Serif Text Designed for Sustained Reading */}
+        <div className="font-serif text-[#141414] text-lg sm:text-[19px] leading-[1.85] space-y-6 pt-2">
           {ldesc ? (
-            ldesc.split("\n\n").map((para, i) => {
-              if (para.startsWith("### ")) {
+            ldesc.split("\n\n").map((block, idx) => {
+              if (block.startsWith("### ")) {
                 return (
-                  <h3 key={i} className="text-2xl font-bold text-white pt-4 pb-2 border-b border-slate-800">
-                    {para.replace("### ", "")}
+                  <h3
+                    key={idx}
+                    className="font-serif text-2xl sm:text-3xl font-bold text-[#141414] pt-8 pb-2 border-b border-[#e8e4dc]"
+                  >
+                    {block.replace("### ", "")}
                   </h3>
                 );
               }
-              if (para.startsWith("```")) {
-                const code = para.replace(/```[a-z]*/g, "").trim();
+              if (block.startsWith("```")) {
+                const code = block.replace(/```[a-z]*/g, "").trim();
                 return (
-                  <pre key={i} className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 text-sm font-mono text-indigo-300 overflow-x-auto shadow-inner">
-                    <code>{code}</code>
-                  </pre>
+                  <div key={idx} className="my-8 border border-[#141414] bg-[#f4f1ea] p-5">
+                    <div className="font-mono text-[10px] uppercase tracking-widest text-[#5e5a54] mb-2 border-b border-[#e8e4dc] pb-1">
+                      Code Manifest • Plain Implementation
+                    </div>
+                    <pre className="font-mono text-xs sm:text-sm text-[#141414] overflow-x-auto leading-relaxed">
+                      <code>{code}</code>
+                    </pre>
+                  </div>
                 );
               }
               return (
-                <p key={i} className="leading-relaxed">
-                  {para}
+                <p key={idx} className={idx === 0 ? "drop-cap" : ""}>
+                  {block}
                 </p>
               );
             })
           ) : (
-            <p>No content provided.</p>
+            <p>Essay text unavailable.</p>
           )}
         </div>
 
-        {/* Article Footer Endnote */}
-        <div className="mt-14 p-6 rounded-2xl bg-slate-900/40 border border-slate-800/80 flex items-center justify-between flex-wrap gap-4">
-          <div className="flex items-center gap-2 text-xs text-slate-400 font-mono">
-            <Sparkles className="w-4 h-4 text-indigo-400" />
-            <span>End of article • Published on MixHub 2026</span>
+        {/* End of Essay Seal Mark */}
+        <div className="my-16 py-8 border-t border-b border-[#141414] text-center space-y-2">
+          <div className="w-8 h-8 mx-auto border border-[#b91c1c] text-[#b91c1c] font-serif font-bold flex items-center justify-center text-sm">
+            M
           </div>
-
-          <button
-            onClick={handleCopyLink}
-            className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1.5"
-          >
-            {copied ? "Link Copied!" : "Share this article"}
-          </button>
+          <div className="font-serif italic text-xs text-[#5e5a54]">
+            End of Dispatch • Published in the Autumn 2026 Broadsheet
+          </div>
         </div>
 
-        {/* Comments Section */}
-        <section className="mt-16 pt-12 border-t border-slate-800/80">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-2xl font-bold text-white flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-indigo-400" />
-              Community Discussion ({comments.length})
+        {/* Reader Marginalia / Community Notes */}
+        <section className="mt-12 space-y-6">
+          <div className="flex items-center justify-between border-b border-[#141414] pb-2">
+            <h3 className="font-mono text-xs uppercase tracking-widest font-bold text-[#141414]">
+              Marginalia & Reader Notes ({notes.length})
             </h3>
+            <span className="font-mono text-[11px] text-[#5e5a54]">
+              Reflections on this text
+            </span>
           </div>
 
-          {/* Comment Form */}
-          <form onSubmit={handleAddComment} className="mb-10 space-y-3">
-            <div className="relative rounded-2xl bg-slate-900 border border-slate-800 p-2 focus-within:border-indigo-500/80 transition-colors">
-              <textarea
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                rows={3}
-                placeholder={user ? "Write your perspective or constructive question..." : "Join the conversation (signing in recommended)..."}
-                className="w-full bg-transparent p-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none resize-none"
-              />
-              <div className="flex items-center justify-between pt-2 border-t border-slate-800/60 px-2">
-                <span className="text-[11px] text-slate-500">Markdown formatting supported</span>
-                <button
-                  type="submit"
-                  disabled={!newComment.trim()}
-                  className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md"
-                >
-                  <span>Post Comment</span>
-                  <Send className="w-3 h-3" />
-                </button>
-              </div>
+          {/* Form */}
+          <form onSubmit={handleAddNote} className="border border-[#141414] p-4 bg-[#ffffff] space-y-3">
+            <label className="block font-mono text-[11px] uppercase tracking-wider text-[#5e5a54]">
+              Add a Reflective Note to the Margin
+            </label>
+            <textarea
+              rows={3}
+              value={newNote}
+              onChange={(e) => setNewNote(e.target.value)}
+              placeholder="Contribute your architectural perspective or historical reference..."
+              className="w-full bg-[#faf8f5] border border-[#e8e4dc] p-3 text-sm font-serif text-[#141414] placeholder-[#8c867c] focus:outline-none focus:border-[#141414] resize-none"
+            />
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                disabled={!newNote.trim()}
+                className="px-4 py-2 border border-[#141414] bg-[#141414] text-[#faf8f5] text-xs font-mono uppercase tracking-wider font-bold hover:bg-transparent hover:text-[#141414] transition-all disabled:opacity-40"
+              >
+                Inscribe Note
+              </button>
             </div>
           </form>
 
-          {/* Comment List */}
-          <div className="space-y-4">
-            {comments.map((c) => (
-              <div
-                key={c.id}
-                className="p-5 rounded-2xl bg-slate-900/50 border border-slate-800/70 space-y-2"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    {c.avatar ? (
-                      <img
-                        src={c.avatar}
-                        alt={c.author}
-                        className="w-7 h-7 rounded-full object-cover ring-1 ring-slate-700"
-                      />
-                    ) : (
-                      <div className="w-7 h-7 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
-                        <User className="w-4 h-4" />
-                      </div>
-                    )}
-                    <span className="text-xs font-bold text-white">{c.author}</span>
-                  </div>
-                  <span className="text-[11px] text-slate-500 font-mono">{c.date}</span>
+          {/* Notes Ledger */}
+          <div className="divide-y divide-[#e8e4dc]">
+            {notes.map((note) => (
+              <div key={note.id} className="py-4 space-y-1">
+                <div className="flex items-center justify-between text-xs font-mono text-[#5e5a54]">
+                  <span className="font-bold text-[#141414]">{note.author}</span>
+                  <span>{note.date}</span>
                 </div>
-                <p className="text-sm text-slate-300 pl-9 leading-relaxed">{c.text}</p>
+                <p className="font-serif text-sm text-[#2e2e2e] leading-relaxed">
+                  {note.text}
+                </p>
               </div>
             ))}
           </div>
         </section>
-
-        {/* Related Reads */}
-        {relatedBlogs.length > 0 && (
-          <section className="mt-20 pt-12 border-t border-slate-800/80">
-            <h3 className="text-xl font-bold text-white mb-6">Related Publications</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {relatedBlogs.map((b) => (
-                <Link
-                  key={b._id || b.id}
-                  to={`/blog/${b._id || b.id}`}
-                  className="group p-4 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-indigo-500/40 transition-all flex flex-col justify-between"
-                >
-                  <div className="space-y-2">
-                    <span className="text-[10px] uppercase font-mono text-indigo-400 font-semibold">
-                      {b.category?.replace("_", " ") || "Story"}
-                    </span>
-                    <h4 className="text-sm font-bold text-white group-hover:text-indigo-400 transition-colors line-clamp-2">
-                      {b.title}
-                    </h4>
-                  </div>
-                  <span className="text-[11px] text-slate-500 mt-4 font-mono">
-                    Read article →
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
-      </article>
+      </main>
     </>
   );
 };

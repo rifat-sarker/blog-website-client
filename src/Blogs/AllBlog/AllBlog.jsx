@@ -1,35 +1,31 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { blogService } from "../../services/api";
-import BlogCard from "../BlogCard/BlogCard";
-import { Search, Sparkles, Filter, X, SlidersHorizontal } from "lucide-react";
-import { motion } from "framer-motion";
+import { useSearchParams, Link } from "react-router-dom";
+import { editorialService } from "../../services/api";
+import { Search, X, ArrowUpRight } from "lucide-react";
 
-const CATEGORIES = [
-  { id: "all", label: "All Categories" },
-  { id: "software_development", label: "Software & AI" },
-  { id: "motivation", label: "Motivation" },
-  { id: "travel", label: "Travel" },
-  { id: "recipes", label: "Recipes & Health" },
-  { id: "fashion", label: "Design & Style" },
-  { id: "parenting", label: "Parenting" },
+const SECTIONS = [
+  "All Sections",
+  "Architecture",
+  "Philosophy",
+  "Engineering",
+  "Culture",
+  "Stillness",
 ];
 
 const AllBlog = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
 
-  const [blogs, setBlogs] = useState([]);
-  const [category, setCategory] = useState("all");
-  const [searchTitle, setSearchTitle] = useState(initialQuery);
-  const [sortBy, setSortBy] = useState("newest");
+  const [articles, setArticles] = useState([]);
+  const [activeSection, setActiveSection] = useState("All Sections");
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
-    blogService.getAllBlogs().then((data) => {
+    editorialService.getArticles().then((data) => {
       if (isMounted) {
-        setBlogs(data);
+        setArticles(data);
         setIsLoading(false);
       }
     });
@@ -38,157 +34,161 @@ const AllBlog = () => {
     };
   }, []);
 
-  // Sync state if query params change
   useEffect(() => {
     const q = searchParams.get("q");
-    if (q !== null && q !== searchTitle) {
-      setSearchTitle(q);
+    if (q !== null && q !== searchQuery) {
+      setSearchQuery(q);
     }
   }, [searchParams]);
 
-  // Filter logic
-  const filtered = blogs
-    .filter((blog) => category === "all" || blog.category?.toLowerCase() === category.toLowerCase())
-    .filter((blog) => {
-      if (!searchTitle.trim()) return true;
-      const term = searchTitle.toLowerCase();
+  const filtered = articles
+    .filter((a) => {
+      if (activeSection === "All Sections") return true;
+      return a.category?.toLowerCase() === activeSection.toLowerCase();
+    })
+    .filter((a) => {
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
       return (
-        blog.title?.toLowerCase().includes(term) ||
-        blog.sdesc?.toLowerCase().includes(term) ||
-        blog.ldesc?.toLowerCase().includes(term)
+        a.title?.toLowerCase().includes(q) ||
+        a.sdesc?.toLowerCase().includes(q) ||
+        a.author?.name?.toLowerCase().includes(q)
       );
     });
 
-  // Sort logic
-  const sortedBlogs = [...filtered].sort((a, b) => {
-    if (sortBy === "newest") return new Date(b.date || 0) - new Date(a.date || 0);
-    if (sortBy === "oldest") return new Date(a.date || 0) - new Date(b.date || 0);
-    if (sortBy === "title") return (a.title || "").localeCompare(b.title || "");
-    return 0;
-  });
-
   const clearFilters = () => {
-    setCategory("all");
-    setSearchTitle("");
+    setActiveSection("All Sections");
+    setSearchQuery("");
     setSearchParams({});
   };
 
   return (
-    <div className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Title & Eyebrow */}
-      <div className="text-center max-w-2xl mx-auto mb-10 space-y-3">
-        <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-indigo-400 font-semibold">
-          <Sparkles className="w-3.5 h-3.5" />
-          The Archive
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+      {/* Archive Header */}
+      <div className="border-b-2 border-[#141414] pb-6 mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <span className="font-mono text-xs uppercase tracking-widest text-[#b91c1c] font-bold block mb-1">
+            Complete Ledger
+          </span>
+          <h1 className="font-serif text-3xl sm:text-5xl font-normal text-[#141414]">
+            The Dispatch Archive
+          </h1>
         </div>
-        <h1 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
-          Explore All Publications
-        </h1>
-        <p className="text-sm text-slate-400">
-          Search across engineering paradigms, product architectures, and creative deep dives.
+        <p className="font-serif italic text-sm text-[#5e5a54] max-w-sm sm:text-right">
+          A permanent chronological index of published essays, architectural monographs, and critical inquiries.
         </p>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 sm:p-6 mb-10 space-y-4 shadow-xl">
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-          {/* Search Input */}
-          <div className="relative w-full md:w-96">
-            <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchTitle}
-              onChange={(e) => setSearchTitle(e.target.value)}
-              placeholder="Search by keywords..."
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-9 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
-            />
-            {searchTitle && (
-              <button
-                onClick={() => setSearchTitle("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-
-          {/* Sort By Dropdown */}
-          <div className="flex items-center gap-3 w-full md:w-auto justify-end">
-            <SlidersHorizontal className="w-4 h-4 text-slate-400" />
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="bg-slate-950 border border-slate-800 text-slate-200 text-xs font-semibold rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500"
+      <div className="border border-[#141414] p-4 bg-[#ffffff] mb-10 flex flex-col md:flex-row items-center justify-between gap-4">
+        {/* Search */}
+        <div className="relative w-full md:w-80">
+          <Search className="w-4 h-4 text-[#8c867c] absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by keywords, title, author..."
+            className="w-full bg-[#faf8f5] border border-[#e8e4dc] pl-9 pr-8 py-2 text-xs font-serif text-[#141414] placeholder-[#8c867c] focus:outline-none focus:border-[#141414]"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#8c867c] hover:text-[#141414]"
             >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="title">Alphabetical (A-Z)</option>
-            </select>
-          </div>
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
 
-        {/* Category Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pt-2 no-scrollbar">
-          {CATEGORIES.map((cat) => (
+        {/* Section Chips */}
+        <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto no-scrollbar">
+          {SECTIONS.map((sec) => (
             <button
-              key={cat.id}
-              onClick={() => setCategory(cat.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all ${
-                category === cat.id
-                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30 font-semibold"
-                  : "bg-slate-950 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700"
+              key={sec}
+              onClick={() => setActiveSection(sec)}
+              className={`px-3 py-1.5 text-xs font-mono uppercase tracking-wider whitespace-nowrap transition-colors ${
+                activeSection === sec
+                  ? "bg-[#141414] text-[#faf8f5] font-bold"
+                  : "bg-[#faf8f5] text-[#5e5a54] hover:text-[#141414] border border-[#e8e4dc]"
               }`}
             >
-              {cat.label}
+              {sec}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Results Meta */}
-      <div className="flex items-center justify-between text-xs text-slate-400 mb-6 px-1">
+      {/* Count Meta */}
+      <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-[#5e5a54] mb-6 pb-2 border-b border-[#e8e4dc]">
         <span>
-          Showing <strong className="text-white">{sortedBlogs.length}</strong> {sortedBlogs.length === 1 ? "story" : "stories"}
+          Showing {filtered.length} {filtered.length === 1 ? "Dispatch" : "Dispatches"}
         </span>
-        {(searchTitle || category !== "all") && (
+        {(searchQuery || activeSection !== "All Sections") && (
           <button
             onClick={clearFilters}
-            className="text-indigo-400 hover:underline flex items-center gap-1 font-semibold"
+            className="text-[#b91c1c] hover:underline flex items-center gap-1 font-bold"
           >
-            Clear Active Filters <X className="w-3 h-3" />
+            Reset Filters <X className="w-3 h-3" />
           </button>
         )}
       </div>
 
-      {/* Articles Grid */}
+      {/* Catalogue List */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[1, 2, 3, 4, 5, 6].map((n) => (
-            <div
-              key={n}
-              className="h-96 rounded-2xl bg-slate-900/60 border border-slate-800 animate-pulse flex flex-col p-4 space-y-4"
-            >
-              <div className="h-48 rounded-xl bg-slate-800" />
-              <div className="h-6 w-3/4 rounded bg-slate-800" />
-              <div className="h-4 w-full rounded bg-slate-800" />
-            </div>
+        <div className="space-y-4 animate-pulse">
+          {[1, 2, 3, 4, 5].map((n) => (
+            <div key={n} className="h-16 bg-[#e8e4dc]" />
           ))}
         </div>
-      ) : sortedBlogs.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {sortedBlogs.map((blog) => (
-            <BlogCard key={blog._id || blog.id} blog={blog} />
+      ) : filtered.length > 0 ? (
+        <div className="divide-y divide-[#e8e4dc] border-b border-[#e8e4dc]">
+          {filtered.map((item, idx) => (
+            <article
+              key={item._id || item.id || idx}
+              className="py-6 flex flex-col md:flex-row md:items-baseline justify-between gap-4 group hover:bg-[#f4f1ea]/50 transition-colors px-2"
+            >
+              <div className="space-y-1.5 max-w-3xl">
+                <div className="flex items-center gap-3 text-[11px] font-mono text-[#5e5a54] uppercase tracking-wider">
+                  <span className="font-bold text-[#b91c1c]">[{item.category || "Essay"}]</span>
+                  <span>•</span>
+                  <span>{item.readTime || "5 min read"}</span>
+                  <span>•</span>
+                  <span>{item.date ? new Date(item.date).toLocaleDateString() : "2026"}</span>
+                </div>
+
+                <Link to={`/blog/${item._id || item.id}`} className="block">
+                  <h3 className="font-serif text-2xl font-normal text-[#141414] group-hover:underline leading-tight">
+                    {item.title}
+                  </h3>
+                </Link>
+
+                <p className="font-serif text-sm text-[#5e5a54] leading-relaxed line-clamp-2">
+                  {item.sdesc}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-4 text-xs font-mono text-[#5e5a54] uppercase tracking-wider flex-shrink-0 self-start md:self-center">
+                <span>By {item.author?.name || "Rifat Sarker"}</span>
+                <Link
+                  to={`/blog/${item._id || item.id}`}
+                  className="inline-flex items-center gap-1 text-[#141414] font-bold hover:underline"
+                >
+                  Read <ArrowUpRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </article>
           ))}
         </div>
       ) : (
-        <div className="text-center py-20 bg-slate-900/30 rounded-3xl border border-slate-800/80 p-8 space-y-4">
-          <p className="text-lg font-semibold text-white">No matching stories found</p>
-          <p className="text-sm text-slate-400 max-w-sm mx-auto">
-            We couldn't find any articles matching your search criteria. Try a different query or reset filters.
+        <div className="text-center py-20 border border-[#e8e4dc] p-8 space-y-3 bg-[#ffffff]">
+          <h3 className="font-serif text-xl text-[#141414]">No entries found in archive</h3>
+          <p className="font-serif italic text-sm text-[#5e5a54]">
+            Try adjusting your search keywords or resetting your section filters.
           </p>
           <button
             onClick={clearFilters}
-            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md transition-all"
+            className="px-4 py-2 border border-[#141414] bg-[#141414] text-[#faf8f5] text-xs font-mono uppercase tracking-wider font-bold"
           >
             Reset Filters
           </button>

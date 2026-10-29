@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { blogService } from "../services/api";
-import { Trophy, Clock, FileText, ArrowRight, Sparkles, Flame, User } from "lucide-react";
-import { motion } from "framer-motion";
+import { editorialService } from "../services/api";
+import { ArrowUpRight } from "lucide-react";
+
+const ROMAN_NUMERALS = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
 
 const FeaturedBlog = () => {
-  const [blogs, setBlogs] = useState([]);
+  const [articles, setArticles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
-    blogService.getAllBlogs().then((data) => {
+    editorialService.getArticles().then((data) => {
       if (isMounted) {
-        setBlogs(data);
+        setArticles(data);
         setIsLoading(false);
       }
     });
@@ -21,8 +22,8 @@ const FeaturedBlog = () => {
     };
   }, []);
 
-  // Sort by content length (deepest articles)
-  const ranked = [...blogs]
+  // Ranked by depth/word count
+  const ranked = [...articles]
     .sort((a, b) => {
       const lenA = (a.ldesc || a.sdesc || "").split(" ").length;
       const lenB = (b.ldesc || b.sdesc || "").split(" ").length;
@@ -30,119 +31,77 @@ const FeaturedBlog = () => {
     })
     .slice(0, 10);
 
-  const getRankBadge = (rank) => {
-    if (rank === 0)
-      return {
-        bg: "bg-amber-500/20 text-amber-400 border-amber-500/40",
-        label: "#1 Deep Dive",
-        icon: Trophy,
-      };
-    if (rank === 1)
-      return {
-        bg: "bg-slate-300/20 text-slate-300 border-slate-300/40",
-        label: "#2 Rank",
-        icon: Trophy,
-      };
-    if (rank === 2)
-      return {
-        bg: "bg-amber-700/20 text-amber-600 border-amber-700/40",
-        label: "#3 Rank",
-        icon: Trophy,
-      };
-    return {
-      bg: "bg-slate-800 text-slate-400 border-slate-700/60",
-      label: `#${rank + 1}`,
-      icon: Sparkles,
-    };
-  };
-
   return (
-    <div className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-        <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-amber-400 font-semibold px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20">
-          <Flame className="w-3.5 h-3.5" />
-          Hall of Deep Reads
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+      {/* Masthead */}
+      <div className="border-b-2 border-[#141414] pb-6 mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <span className="font-mono text-xs uppercase tracking-widest text-[#b91c1c] font-bold block mb-1">
+            The Permanent Canon
+          </span>
+          <h1 className="font-serif text-3xl sm:text-5xl font-normal text-[#141414]">
+            Ten Architectural Monographs
+          </h1>
         </div>
-        <h1 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
-          Top 10 Most In-Depth Essays
-        </h1>
-        <p className="text-sm text-slate-400">
-          Ranked purely by analytical depth, word count, and comprehensive architectural documentation.
+        <p className="font-serif italic text-sm text-[#5e5a54] max-w-sm sm:text-right">
+          Ranked strictly by investigative depth, structural documentation, and comprehensive systems analysis.
         </p>
       </div>
 
       {isLoading ? (
-        <div className="space-y-4 max-w-4xl mx-auto">
+        <div className="space-y-4 animate-pulse">
           {[1, 2, 3, 4, 5].map((n) => (
-            <div
-              key={n}
-              className="h-24 rounded-2xl bg-slate-900/60 border border-slate-800 animate-pulse"
-            />
+            <div key={n} className="h-20 bg-[#e8e4dc]" />
           ))}
         </div>
       ) : (
-        <div className="space-y-4 max-w-4xl mx-auto">
-          {ranked.map((blog, index) => {
-            const badge = getRankBadge(index);
-            const words = (blog.ldesc || blog.sdesc || "").split(" ").length;
-            const readMinutes = Math.max(3, Math.ceil(words / 180));
+        <div className="border border-[#141414] bg-[#ffffff] divide-y divide-[#e8e4dc]">
+          {ranked.map((item, index) => {
+            const wordCount = (item.ldesc || item.sdesc || "").split(" ").length;
+            const readMinutes = Math.max(3, Math.ceil(wordCount / 180));
 
             return (
-              <motion.div
-                key={blog._id || blog.id || index}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-                className="group relative p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-indigo-500/40 hover:bg-slate-900 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg"
+              <div
+                key={item._id || item.id || index}
+                className="p-6 flex flex-col sm:flex-row items-start sm:items-baseline justify-between gap-6 hover:bg-[#faf8f5] transition-colors"
               >
-                <div className="flex items-start sm:items-center gap-4 min-w-0">
-                  {/* Rank Badge */}
-                  <div
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold font-mono text-sm border flex-shrink-0 ${badge.bg}`}
-                  >
-                    #{index + 1}
+                <div className="flex items-start gap-6 min-w-0">
+                  {/* Roman Numeral */}
+                  <div className="font-serif text-2xl font-bold text-[#b91c1c] w-10 flex-shrink-0">
+                    {ROMAN_NUMERALS[index] || `${index + 1}`}
                   </div>
 
-                  {/* Info */}
-                  <div className="space-y-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="badge badge-sm bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono text-[10px] uppercase">
-                        {blog.category?.replace("_", " ") || "Article"}
-                      </span>
-                      <span className="text-xs text-slate-500">•</span>
-                      <span className="text-xs text-slate-400 font-mono flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-indigo-400" /> {readMinutes} min read
-                      </span>
-                      <span className="text-xs text-slate-500">•</span>
-                      <span className="text-xs text-slate-400 font-mono flex items-center gap-1">
-                        <FileText className="w-3 h-3 text-emerald-400" /> {words} words
-                      </span>
+                  <div className="space-y-1.5 min-w-0">
+                    <div className="flex items-center gap-3 text-[11px] font-mono text-[#5e5a54] uppercase tracking-wider">
+                      <span className="font-bold text-[#141414]">[{item.category || "Monograph"}]</span>
+                      <span>•</span>
+                      <span>{wordCount} Words</span>
+                      <span>•</span>
+                      <span>{readMinutes} Min Read</span>
                     </div>
 
-                    <Link to={`/blog/${blog._id || blog.id}`}>
-                      <h3 className="text-base font-bold text-white group-hover:text-indigo-400 transition-colors truncate">
-                        {blog.title}
+                    <Link to={`/blog/${item._id || item.id}`}>
+                      <h3 className="font-serif text-xl sm:text-2xl text-[#141414] hover:underline leading-snug">
+                        {item.title}
                       </h3>
                     </Link>
 
-                    <div className="flex items-center gap-2 text-xs text-slate-400">
-                      <span>By {blog.author?.name || "MixHub Contributor"}</span>
-                      <span>•</span>
-                      <span>{blog.date ? new Date(blog.date).toLocaleDateString() : "2026"}</span>
-                    </div>
+                    <p className="font-serif text-xs text-[#5e5a54] leading-relaxed line-clamp-2">
+                      {item.sdesc}
+                    </p>
                   </div>
                 </div>
 
-                {/* Read Button */}
-                <Link
-                  to={`/blog/${blog._id || blog.id}`}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-indigo-600 text-slate-200 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-all flex-shrink-0 self-end sm:self-center"
-                >
-                  <span>Read Essay</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </motion.div>
+                <div className="flex items-center gap-6 text-xs font-mono uppercase tracking-wider text-[#5e5a54] flex-shrink-0 self-end sm:self-center">
+                  <span className="hidden md:inline">By {item.author?.name || "Rifat Sarker"}</span>
+                  <Link
+                    to={`/blog/${item._id || item.id}`}
+                    className="inline-flex items-center gap-1 border border-[#141414] px-3 py-1.5 text-[#141414] font-bold hover:bg-[#141414] hover:text-[#faf8f5] transition-colors"
+                  >
+                    Examine <ArrowUpRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </div>
             );
           })}
         </div>

@@ -1,225 +1,170 @@
 import { useEffect, useState } from "react";
-import { blogService } from "../services/api";
-import { Radio, Sparkles, ExternalLink, RefreshCw, X, ChevronRight, BellRing } from "lucide-react";
+import { editorialService } from "../services/api";
+import { Radio, ArrowUpRight, RefreshCw, X, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const LiveNewsTicker = () => {
-  const [news, setNews] = useState([]);
+  const [wireList, setWireList] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isOpenModal, setIsOpenModal] = useState(false);
-  const [selectedTag, setSelectedTag] = useState("all");
+  const [modalOpen, setModalOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState(new Date());
 
-  const fetchNews = async () => {
+  const fetchWire = async () => {
     setIsRefreshing(true);
-    const data = await blogService.getLiveNews();
-    setNews(data);
-    setLastUpdated(new Date());
-    setTimeout(() => setIsRefreshing(false), 500);
+    const data = await editorialService.getLiveWire();
+    setWireList(data);
+    setTimeout(() => setIsRefreshing(false), 400);
   };
 
   useEffect(() => {
-    fetchNews();
-    // Auto refresh news every 45 seconds
-    const interval = setInterval(fetchNews, 45000);
+    fetchWire();
+    const interval = setInterval(fetchWire, 35000);
     return () => clearInterval(interval);
   }, []);
 
-  // Cycle current headline every 6 seconds
   useEffect(() => {
-    if (news.length === 0) return;
-    const cycle = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % news.length);
-    }, 6000);
-    return () => clearInterval(cycle);
-  }, [news]);
+    if (wireList.length === 0) return;
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % wireList.length);
+    }, 7000);
+    return () => clearInterval(timer);
+  }, [wireList]);
 
-  const currentItem = news[currentIndex] || {
-    tag: "LIVE DISPATCH",
-    title: "Continuous stream connecting to real-time news sources...",
-    timeAgo: "Live",
-    source: "MixHub Pulse",
+  const currentItem = wireList[currentIndex] || {
+    headline: "Connecting to real-time dispatch teleprinter...",
+    timestamp: "LIVE",
+    category: "WIRE",
+    location: "GLOBAL",
   };
-
-  const filteredNews =
-    selectedTag === "all"
-      ? news
-      : news.filter((item) => item.tag.toLowerCase().includes(selectedTag.toLowerCase()));
-
-  const allTags = ["all", "AI & HARDWARE", "WEB TECH", "CLOUD & EDGE", "CYBERSECURITY"];
 
   return (
     <>
-      {/* Top Banner Ticker */}
-      <div className="w-full bg-slate-900/90 dark:bg-slate-950/90 border-b border-indigo-500/20 text-xs py-2 px-4 backdrop-blur-md sticky top-0 z-50 transition-colors">
+      {/* Newspaper Wire Banner */}
+      <div className="w-full bg-[#f4f1ea] border-b border-[#e8e4dc] py-2 px-4 text-xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          {/* Live Indicator */}
+          {/* Wire Label with Vermilion Dot */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
+            <span className="w-2 h-2 rounded-full bg-[#b91c1c] animate-pulse" />
+            <span className="font-mono font-bold tracking-widest text-[#b91c1c] text-[11px] uppercase">
+              The Wire
             </span>
-            <span className="font-bold tracking-wider uppercase text-rose-500 dark:text-rose-400 flex items-center gap-1">
-              <Radio className="w-3.5 h-3.5" /> LIVE PULSE
+            <span className="text-[#8c867c] hidden sm:inline font-mono">/</span>
+            <span className="font-mono text-[#5e5a54] text-[10px] uppercase hidden sm:inline">
+              Continuous Dispatches
             </span>
-            <div className="h-3 w-px bg-slate-700 hidden sm:block" />
           </div>
 
-          {/* Cycling Headline */}
+          {/* Cycling Wire Headline */}
           <div className="flex-1 overflow-hidden min-w-0">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentIndex}
-                initial={{ opacity: 0, y: 8 }}
+                initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.3 }}
-                className="flex items-center gap-2 truncate cursor-pointer hover:text-indigo-400 transition-colors"
-                onClick={() => setIsOpenModal(true)}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.25 }}
+                className="flex items-center gap-2 truncate cursor-pointer hover:underline text-[#141414]"
+                onClick={() => setModalOpen(true)}
               >
-                <span className="badge badge-sm bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono text-[10px] hidden sm:inline-block">
-                  {currentItem.tag}
+                <span className="font-mono text-[10px] uppercase tracking-wider text-[#5e5a54] bg-[#e8e4dc] px-1.5 py-0.5 rounded-sm">
+                  {currentItem.location || "WIRE"} {currentItem.timestamp}
                 </span>
-                <span className="truncate text-slate-200 font-medium text-xs sm:text-sm">
-                  {currentItem.title}
-                </span>
-                <span className="text-slate-500 text-[11px] whitespace-nowrap hidden md:inline">
-                  • {currentItem.timeAgo}
+                <span className="font-serif italic text-sm text-[#141414] truncate font-medium">
+                  {currentItem.headline}
                 </span>
               </motion.div>
             </AnimatePresence>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-3 flex-shrink-0">
+          {/* Action */}
+          <div className="flex-shrink-0 flex items-center gap-2">
             <button
-              onClick={() => setIsOpenModal(true)}
-              className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1 transition-colors px-2 py-1 rounded bg-indigo-500/10 hover:bg-indigo-500/20"
+              onClick={() => setModalOpen(true)}
+              className="text-[11px] font-mono uppercase tracking-wider text-[#5e5a54] hover:text-[#141414] underline flex items-center gap-1"
             >
-              <BellRing className="w-3 h-3" />
-              <span className="hidden sm:inline">Feed ({news.length})</span>
+              <span>View All ({wireList.length})</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Live News Feed Modal / Drawer */}
-      <AnimatePresence>
-        {isOpenModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden"
-            >
-              {/* Modal Header */}
-              <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950/50">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                    <Radio className="w-5 h-5 animate-pulse" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                      Live Tech & World Pulse
-                      <span className="badge badge-sm badge-secondary text-[10px]">Real-Time</span>
-                    </h3>
-                    <p className="text-xs text-slate-400">
-                      Auto-updates continuously • Last checked: {lastUpdated.toLocaleTimeString()}
-                    </p>
-                  </div>
+      {/* Broadsheet Wire Modal / Ledger */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#141414]/60 backdrop-blur-sm">
+          <div className="bg-[#faf8f5] border-2 border-[#141414] w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl">
+            {/* Modal Header */}
+            <div className="p-6 border-b border-[#141414] flex items-center justify-between bg-[#f4f1ea]">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#b91c1c] animate-pulse" />
+                  <span className="font-mono text-xs uppercase tracking-widest font-bold text-[#b91c1c]">
+                    Teleprinter Log
+                  </span>
                 </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={fetchNews}
-                    disabled={isRefreshing}
-                    className="btn btn-ghost btn-sm btn-square text-slate-400 hover:text-white"
-                    title="Refresh Now"
-                  >
-                    <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-indigo-400" : ""}`} />
-                  </button>
-                  <button
-                    onClick={() => setIsOpenModal(false)}
-                    className="btn btn-ghost btn-sm btn-square text-slate-400 hover:text-white"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
+                <h3 className="font-serif text-2xl font-bold text-[#141414]">
+                  The Live Wire Bulletin
+                </h3>
+                <p className="font-serif italic text-xs text-[#5e5a54] mt-0.5">
+                  Continuous incoming dispatches from global technical and economic centers
+                </p>
               </div>
 
-              {/* Tag Filters */}
-              <div className="px-5 py-3 border-b border-slate-800/80 bg-slate-900/60 flex items-center gap-2 overflow-x-auto text-xs no-scrollbar">
-                {allTags.map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() => setSelectedTag(tag)}
-                    className={`px-3 py-1 rounded-full whitespace-nowrap transition-all font-medium ${
-                      selectedTag === tag
-                        ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30"
-                        : "bg-slate-800/70 text-slate-400 hover:text-white hover:bg-slate-800"
-                    }`}
-                  >
-                    {tag === "all" ? "All Updates" : tag}
-                  </button>
-                ))}
-              </div>
-
-              {/* News List */}
-              <div className="p-5 overflow-y-auto space-y-3 divide-y divide-slate-800/50">
-                {filteredNews.map((item, index) => (
-                  <div
-                    key={item.id || index}
-                    className="pt-3 first:pt-0 group hover:bg-slate-800/30 p-3 rounded-xl transition-colors"
-                  >
-                    <div className="flex items-start justify-between gap-3 mb-1.5">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold tracking-wider px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono">
-                          {item.tag}
-                        </span>
-                        {item.urgent && (
-                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 uppercase">
-                            Breaking
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-[11px] text-slate-500 font-mono">{item.timeAgo}</span>
-                    </div>
-
-                    <h4 className="text-sm font-semibold text-slate-100 group-hover:text-indigo-300 transition-colors leading-relaxed">
-                      {item.title}
-                    </h4>
-
-                    <div className="flex items-center justify-between mt-2 text-xs text-slate-500">
-                      <span>Source: <strong className="text-slate-400">{item.source}</strong></span>
-                      <span className="text-indigo-400 text-xs flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        Verified dispatch <ChevronRight className="w-3.5 h-3.5" />
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Footer */}
-              <div className="p-4 bg-slate-950/70 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                <span className="flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-indigo-400" /> Continuous 2026 Live Webhook Listener
-                </span>
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setIsOpenModal(false)}
-                  className="btn btn-sm btn-outline border-slate-700 text-slate-300 hover:bg-slate-800 hover:border-slate-600"
+                  onClick={fetchWire}
+                  disabled={isRefreshing}
+                  className="p-1.5 border border-[#141414] hover:bg-[#141414] hover:text-[#faf8f5] transition-colors"
+                  title="Reload Wire"
                 >
-                  Close
+                  <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
+                </button>
+                <button
+                  onClick={() => setModalOpen(false)}
+                  className="p-1.5 border border-[#141414] hover:bg-[#141414] hover:text-[#faf8f5] transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </div>
-            </motion.div>
+            </div>
+
+            {/* Dispatches List */}
+            <div className="p-6 overflow-y-auto divide-y divide-[#e8e4dc] space-y-4">
+              {wireList.map((item, idx) => (
+                <div key={item.id || idx} className="pt-4 first:pt-0 space-y-1">
+                  <div className="flex items-center justify-between text-[11px] font-mono text-[#5e5a54]">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-[#141414]">[{item.edition || `WIRE 0${idx + 1}`}]</span>
+                      <span className="bg-[#e8e4dc] px-1 py-0.5 uppercase tracking-wider text-[10px] text-[#141414]">
+                        {item.location || "GLOBAL"}
+                      </span>
+                      <span>•</span>
+                      <span>{item.category}</span>
+                    </div>
+                    <span>{item.timestamp}</span>
+                  </div>
+
+                  <h4 className="font-serif text-base font-semibold text-[#141414] leading-snug">
+                    {item.headline}
+                  </h4>
+                </div>
+              ))}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 bg-[#f4f1ea] border-t border-[#141414] flex items-center justify-between text-xs font-mono text-[#5e5a54]">
+              <span>Verified Wire Stream • 2026 Telecommunications Edition</span>
+              <button
+                onClick={() => setModalOpen(false)}
+                className="px-4 py-1.5 border border-[#141414] bg-[#141414] text-[#faf8f5] uppercase tracking-wider text-[11px] font-bold hover:bg-transparent hover:text-[#141414] transition-colors"
+              >
+                Close Wire
+              </button>
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
     </>
   );
 };
 
 export default LiveNewsTicker;
-

@@ -11,285 +11,345 @@ export const apiClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 6000,
+  timeout: 5000,
 });
 
-// Fallback high-quality curated sample blogs for 2026
-export const INITIAL_FALLBACK_BLOGS = [
+// Editorial Broadsheet Articles: Rich, Diverse, Thoughtful Essays (Including Bangla and Global Perspectives)
+export const EDITORIAL_ARTICLES = [
   {
-    _id: "blog-1",
-    title: "The Architecture of Autonomous AI Agents in 2026",
-    sdesc: "How multi-agent systems and real-time inference loops are replacing traditional static APIs in production workloads.",
-    ldesc: `Autonomous agents have shifted from simple prompt wrappers to distributed event-driven systems. In 2026, building software around agentic architectures requires new mental models for state machines, tool registries, and real-time human-in-the-loop validation.
+    _id: "essay-01",
+    kicker: "ARCHITECTURAL ESSAY • VOL. 28",
+    title: "On the Quiet Beauty of Deterministic Systems",
+    sdesc: "Why modern software architecture is abandoning stochastic sprawl in search of quiet, mathematically provable simplicity.",
+    ldesc: `There is a profound, almost meditative stillness in code that does exactly one thing, without side effects, across ten thousand iterations. Over the last decade, we surrendered to the temptation of endless asynchronous indirection: microservices that talked past one another, event buses drowned in telemetry noise, and architectures that required dozens of engineers merely to explain the data lifecycle.
 
-### The Shift to Event Loops
-Traditional REST APIs respond statically to explicit client requests. Agentic workflows, by contrast, rely on durable execution runtimes that can suspend, resume, and invoke auxiliary tools asynchronously.
+### The Return to the Plain Ledger
+When we study ancient ledger systems, from Mediterranean clay tablets to 14th-century Venetian bookkeeping, their enduring virtue was not computational velocity. It was legibility. Anyone could inspect the balance sheet and immediately discern the ground truth.
+
+In our pursuit of distributed consensus, we often lost this legibility. In 2026, the quietest engineering breakthroughs are not more complex neural inference pipelines, but deterministic state machines: SQLite at the edge, immutability by default, and systems that can be reasoned through on a single sheet of paper.
 
 \`\`\`javascript
-// Event-driven agent dispatch loop
-async function dispatchAgentTurn(agentId, prompt, tools) {
-  const context = await memoryStore.load(agentId);
-  const stream = await llmClient.stream({ prompt, tools, context });
-  for await (const delta of stream) {
-    if (delta.toolCall) {
-      const result = await registry.execute(delta.toolCall);
-      yield { status: 'running_tool', tool: delta.toolCall.name, result };
-    }
+// Minimalist deterministic state transition
+const applyTransition = (state, event) => {
+  switch (event.type) {
+    case 'APPEND_DISPATCH':
+      return {
+        ...state,
+        sequence: state.sequence + 1,
+        ledger: [...state.ledger, { ...event.payload, at: event.timestamp }]
+      };
+    default:
+      return state;
   }
-}
+};
 \`\`\`
 
-### Distributed Memory and Context Pruning
-Managing long-horizon context remains the key engineering bottleneck. Sliding window token compaction combined with vector vector-similarity lookups allows agents to sustain multi-day planning sessions without degrading coherence.`,
-    category: "software_development",
-    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80",
-    imageURL: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80",
-    date: "2026-10-24T10:00:00Z",
+### Cultivating the Wabi-Sabi of Engineering
+In traditional Japanese woodwork (Sashimono), master craftsmen join cedar and cypress planks without a single metallic nail or synthetic adhesive. The strength arises from the precision of the cut and the natural friction of the wood itself.
+
+When we write software with that same reverence—honoring constraints rather than fighting them—the resulting applications require zero background daemons to keep alive. They sit quietly, consume fractions of a watt, and serve millions of readers with tranquil dignity.`,
+    category: "Architecture",
+    edition: "Autumn 2026",
+    image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1400&q=80",
+    date: "2026-10-28T08:00:00Z",
     author: {
       name: "Rifat Sarker",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
-      role: "Lead Engineer",
-    },
-    readTime: "6 min read",
-    claps: 342,
-  },
-  {
-    _id: "blog-2",
-    title: "Vite 6 and Micro-Frontends: Fast Builds at Scale",
-    sdesc: "A deep dive into sub-second module replacement and lightning fast SSR pipelines for enterprise applications.",
-    ldesc: `Development speed directly correlates with team happiness. As codebases scale past hundreds of thousands of lines, developer tooling needs to remain instantaneous.
-
-Vite's native ESM-based development server eliminated the tedious bundling step that plagued earlier web tooling. Now with modern Rollup improvements and Rust-powered compiler plugins, bundling for production completes in seconds rather than minutes.
-
-### Key Performance Patterns
-1. Native ES module serving during local dev.
-2. Smart code-splitting per route boundary.
-3. Edge-rendered hydration shells.`,
-    category: "software_development",
-    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80",
-    imageURL: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80",
-    date: "2026-10-20T14:30:00Z",
-    author: {
-      name: "Elena Rostova",
-      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
-      role: "Frontend Architect",
-    },
-    readTime: "4 min read",
-    claps: 215,
-  },
-  {
-    _id: "blog-3",
-    title: "Mindful Remote Work: Designing Deep Work Rituals",
-    sdesc: "Combatting asynchronous notification fatigue with intentional calendar architectures and asynchronous collaboration habits.",
-    ldesc: `The hyper-connected workplace often creates an illusion of productivity while fracturing deep cognitive focus. True creative engineering breakthroughs require sustained, uninterrupted blocks of attention.
-
-### The 4-Hour Focus Block Rule
-Reserving mornings exclusively for uninterrupted creative problem solving—leaving meetings, email triaging, and chat checks to late afternoons—consistently yields higher output with lower mental burnout.`,
-    category: "motivation",
-    image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=80",
-    imageURL: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=80",
-    date: "2026-10-18T09:15:00Z",
-    author: {
-      name: "Marcus Vance",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
-      role: "Product Strategist",
-    },
-    readTime: "5 min read",
-    claps: 189,
-  },
-  {
-    _id: "blog-4",
-    title: "Nordic Minimalist Living: Lessons from Scandinavian Spaces",
-    sdesc: "How clean lines, intentional lighting, and natural wood grain shape calmer, more creative living spaces.",
-    ldesc: `Scandinavian design is fundamentally an exploration of light and warm restraint. In regions where winter days are short, spaces are designed to maximize every ray of natural sunlight using warm pale oak, breathable linen, and open sightlines.`,
-    category: "travel",
-    image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80",
-    imageURL: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80",
-    date: "2026-10-14T11:00:00Z",
-    author: {
-      name: "Astrid Lindgren",
-      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80",
-      role: "Spatial Designer",
-    },
-    readTime: "3 min read",
-    claps: 124,
-  },
-  {
-    _id: "blog-5",
-    title: "High-Performance Plant Nutrition for Active Developers",
-    sdesc: "Clean recipes and balanced macronutrient strategies engineered for sustained cognitive stamina throughout high-intensity sprint cycles.",
-    ldesc: `Brain fog is often directly tied to blood glucose spikes and electrolyte deficits. Whole-food complex carbs paired with healthy omega fats provide a slow, steady burn of glucose without mid-afternoon energy crashes.`,
-    category: "recipes",
-    image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80",
-    imageURL: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80",
-    date: "2026-10-10T08:20:00Z",
-    author: {
-      name: "Dr. Maya Patel",
-      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80",
-      role: "Nutrition Scientist",
-    },
-    readTime: "4 min read",
-    claps: 147,
-  },
-  {
-    _id: "blog-6",
-    title: "Mastering Distributed Systems: Consensus and CAP in Practice",
-    sdesc: "Demystifying Raft, Paxos, and eventual consistency when designing resilient real-time applications.",
-    ldesc: `Building fault-tolerant systems requires accepting that network partitions are inevitable. The true test of distributed engineering lies in graceful degradation and partition recovery without data corruption.`,
-    category: "software_development",
-    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80",
-    imageURL: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80",
-    date: "2026-10-06T16:45:00Z",
-    author: {
-      name: "Devon Reed",
-      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80",
-      role: "Cloud Architect",
+      location: "Dhaka Bureau",
+      role: "Lead Editor",
     },
     readTime: "7 min read",
-    claps: 412,
+    words: 860,
+  },
+  {
+    _id: "essay-02",
+    kicker: "LITERARY INQUIRY",
+    title: "The Architecture of Uninterrupted Reading",
+    sdesc: "How notification-driven interfaces fractured human cognition, and the urgent necessity of white-space sanctuaries.",
+    ldesc: `To read deeply is an act of quiet contemplation. Yet modern digital surfaces have spent two decades systematically dismantling the conditions under which deep reading is possible. Banners flash, popups demand subscription confirmation, sticky navigation elements consume a third of the viewport, and algorithmic tickers clamor for reflexive indignation.
+
+### The Newspaper as an Instrument of Calm
+Consider the broadsheet newspaper. When opened upon a morning table, it makes no sound. It does not vibrate. Its typography exists at fixed physical ratios honed over four centuries of typographic refinement. The eye moves across columns with natural rhythmic pacing.
+
+When designing MixHub Dispatch, we returned to this ancestral rhythm. White space is not empty void; it is the breathable canvas that allows an argument to form in the reader's consciousness.`,
+    category: "Philosophy",
+    edition: "Issue 14",
+    image: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=1400&q=80",
+    date: "2026-10-25T11:30:00Z",
+    author: {
+      name: "Kazi Nazrul",
+      location: "Chittagong",
+      role: "Contributing Essayist",
+    },
+    readTime: "5 min read",
+    words: 640,
+  },
+  {
+    _id: "essay-03",
+    kicker: "বাংলা স্থাপত্য ও নদীমাতৃক ঐতিহ্য",
+    title: "স্মৃতি ও স্থপতি: ঢাকা শহরের বিলুপ্ত জলপথের পুনর্নির্মাণ",
+    sdesc: "একটি নদীর ওপর দাঁড়িয়ে গড়ে ওঠা প্রাচীন শহরের হারিয়ে যাওয়া খাল ও প্রাকৃতিক ড্রেনেজ ব্যবস্থার স্থাপত্যিক পুনর্মূল্যায়ন।",
+    ldesc: `ঢাকা মূলত কোনো শুষ্ক সমভূমির শহর ছিল না; এটি ছিল এক জলজ শহর, বুড়িগঙ্গা ও শীতলক্ষ্যার সহোদরা। চারশত বছর পূর্বে সুবেদার ইসলাম খানের আমলে ধোলাই খাল যখন খনন করা হয়েছিল, তা কেবল প্রতিরক্ষাই নিশ্চিত করেনি, বরং সমগ্র শহরের ভেতরে পণ্যের চলাচল ও পানির স্বাভাবিক প্রবাহকে সচল রেখেছিল।
+
+### ইট-কংক্রিটের ফাঁদে জলপথ
+বিগত অর্ধশতাব্দীতে অপরিকল্পিত নগরায়নের নির্মম আঘাতে ঢাকার অধিকাংশ খাল ও প্রাকৃতিক জলাধার ভরাট হয়ে গেছে। কিন্তু পানি তার গতিপথ কখনো ভোলে না। প্রতি বর্ষায় যখন রাজপথ ডুবে যায়, প্রকৃতি আসলে তার হারানো খালের অধিকারই দাবি করে।
+
+\`\`\`markdown
+ঐতিহাসিক জরিপ ও আধুনিক স্যাটেলাইট ম্যাপিং:
+১. ধোলাই খাল — আদি সংযোগ: বুড়িগঙ্গা থেকে বালু নদী
+২. বেগুনবাড়ি খাল — বর্তমান হাতিরঝিল ওয়াটারশেড
+৩. কল্যাণপুর খাল — পশ্চিম ঢাকার প্রধান নিষ্কাশন চ্যানেল
+\`\`\`
+
+### আগামী দিনের স্থাপত্য ভাবনা
+২০২৬ সালে এসে টেকসই নগরায়নের প্রধান শর্ত হয়ে দাঁড়িয়েছে জলবায়ু-সহনশীল অবকাঠামো। শহরের ড্রেনগুলোকে বক্স কালভার্টে ঢেকে ফেলার ব্যর্থ নীতি ত্যাগ করে ইউরোপ ও এশিয়ার বহু শহর এখন কৃত্রিম খাল খুলে দিচ্ছে। ঢাকাকেও তার হারানো নদীমাতৃক সত্তায় ফিরিয়ে নিয়ে যাওয়াই হতে পারে আধুনিক নগর পরিকল্পনার সর্বশ্রেষ্ঠ বিজয়।`,
+    category: "Architecture",
+    edition: "Issue 14",
+    image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1400&q=80",
+    date: "2026-10-24T09:00:00Z",
+    author: {
+      name: "ড. সাজেদ রহমান",
+      location: "ঢাকা",
+      role: "নগর পরিকল্পনাবিদ",
+    },
+    readTime: "6 min read",
+    words: 780,
+  },
+  {
+    _id: "essay-04",
+    kicker: "DISPATCH • THE EDGE RUNTIME",
+    title: "Building Without Batteries: The Zero-Dependency Doctrine",
+    sdesc: "Examining the environmental and operational sanity of trimming hundreds of megabytes of nested node modules.",
+    ldesc: `A standard modern web project frequently begins with fifty thousand files installed before a single line of application logic is written. We have accepted supply chain fragility as the inevitable price of modern convenience.
+
+### The Plain Text Rebellion
+What happens when we strip away the synthetic scaffolding? Modern browsers now natively support ESM, CSS Grid, container queries, and sub-second fetch APIs without a single bundler transform.
+
+When you ship plain, handcrafted code, load times drop to single-digit milliseconds. Energy consumption at edge data centers diminishes. Most importantly, the software retains its integrity for decades without breaking under phantom deprecation cycles.`,
+    category: "Engineering",
+    edition: "Issue 14",
+    image: "https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=1400&q=80",
+    date: "2026-10-22T14:15:00Z",
+    author: {
+      name: "Tariq Mansoor",
+      location: "London",
+      role: "Systems Architect",
+    },
+    readTime: "6 min read",
+    words: 780,
+  },
+  {
+    _id: "essay-05",
+    kicker: "COMMENTARY • DESIGN CULTURE",
+    title: "Handcrafted Digital Objects in an Age of Synthetic Abundance",
+    sdesc: "As generative models flood the web with synthetic homogeneity, the deliberate human imprint becomes the rarest commodity.",
+    ldesc: `When everything can be generated in three seconds by an automated prompt, the value of mechanical abundance drops to zero. What remains valuable is deliberate human intentionality: the sentence rewritten four times for clarity, the deliberate choice of a margin, the quiet restraint to leave something unsaid.
+
+The craftsmanship of the web is returning to its roots—not as disposable corporate collateral, but as personal ateliers and broadsheet publications maintained with patient devotion.`,
+    category: "Culture",
+    edition: "Issue 13",
+    image: "https://images.unsplash.com/photo-1507842229451-7f01be837a27?auto=format&fit=crop&w=1400&q=80",
+    date: "2026-10-18T09:00:00Z",
+    author: {
+      name: "Samira Khan",
+      location: "Singapore",
+      role: "Design Critic",
+    },
+    readTime: "4 min read",
+    words: 520,
+  },
+  {
+    _id: "essay-06",
+    kicker: "FIELD NOTES • LIFESTYLE",
+    title: "The Art of the Evening Walk Without a Screen",
+    sdesc: "Reclaiming the twilight hour for analog observation, stillness, and conversational presence.",
+    ldesc: `In old Mediterranean and Persian towns, the promenade at dusk was a communal institution. People did not step outside to photograph the sunset for unseen audiences; they stepped outside to feel the evening breeze against their temples and greet their neighbors in quiet recognition.
+
+When we leave the glowing glass behind, even for forty minutes, the nervous system downshifts from reactive vigilance into restorative awareness.`,
+    category: "Stillness",
+    edition: "Issue 12",
+    image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1400&q=80",
+    date: "2026-10-12T17:40:00Z",
+    author: {
+      name: "Zayn Al-Hassan",
+      location: "Istanbul",
+      role: "Cultural Fellow",
+    },
+    readTime: "4 min read",
+    words: 490,
+  },
+  {
+    _id: "essay-07",
+    kicker: "COMPUTATIONAL LINGUISTICS • বাংলা প্রযুক্তি",
+    title: "বাংলা ভাষার কম্পিউটেশনাল ব্যাকরণ ও প্রাকৃতিক ভাষা প্রক্রিয়াকরণ",
+    sdesc: "বাংলা ভাষার জটিল বাক্যগঠন, সন্ধি ও সমাসের গঠনকে কীভাবে বড় ল্যাঙ্গুয়েজ মডেলে নিখুঁতভাবে ইনজেক্ট করা যায়।",
+    ldesc: `বাংলা পৃথিবীর সপ্তম সর্বাধিক প্রচলিত ভাষা হলেও কৃত্রিম বুদ্ধিমত্তার ক্ষেত্রে দীর্ঘকাল বাংলা ছিল আন্ডার-রিসোর্সড। ইংরেজির তুলনায় বাংলা ভাষায় শব্দের গঠনরূপ (Morphology) অত্যন্ত সমৃদ্ধ ও বৈচিত্র্যময়। একটি একক ক্রিয়াপদ বা নামশব্দ বিভিন্ন বিভক্তি ও প্রত্যয় যোগে অসংখ্য রূপ ধারণ করতে পারে।
+
+### মরফোলজিক্যাল অ্যানালাইসিস
+বাংলা ব্যাকরণের 'যুক্তাক্ষর' ও 'কারচিহ্ন' কেবল লিপির সৌন্দর্য নয়, এটি ধ্বনিতত্ত্ব ও অর্থতত্ত্বের প্রত্যক্ষ বাহক। টোকেনাইজেশনের সময় ভুলভাবে শব্দ ভাঙলে মূল অর্থের অপমৃত্যু ঘটে। আধুনিক সাব-ওয়ার্ড টোকেনাইজারগুলোকে বাংলা ভাষার ধ্বনিতাত্ত্বিক নিয়ম মেনেই প্রশিক্ষিত করা অপরিহার্য।`,
+    category: "Engineering",
+    edition: "Issue 11",
+    image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1400&q=80",
+    date: "2026-10-08T15:20:00Z",
+    author: {
+      name: "তানভীর হাসান",
+      location: "সিলেট",
+      role: "রিসার্চ সায়েন্টিস্ট",
+    },
+    readTime: "8 min read",
+    words: 920,
+  },
+  {
+    _id: "essay-08",
+    kicker: "INFRASTRUCTURE & ENERGY",
+    title: "The Physics of Low-Latency Consensus in Autonomous Edge Arrays",
+    sdesc: "How regional fiber density and atomic clocks are reshaping transaction finality without centralized datacenter round-trips.",
+    ldesc: `As autonomous vehicles, smart grid power distributions, and regional logistics arrays require sub-5ms finality, the traditional pattern of shipping every packet to a distant hyperscaler cloud datacenter collapses under the speed of light.
+
+### Synchronized Atomic Clocks at the Masthead
+By integrating micro-rubidium atomic clocks directly into regional base transceiver stations, edge nodes can maintain microsecond-accurate time stamps without relying on jittery NTP servers. When consensus can assume provable wall-clock ordering, Paxos and Raft rounds drop from three network hops to a single broadcast confirmation.`,
+    category: "Engineering",
+    edition: "Issue 10",
+    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1400&q=80",
+    date: "2026-10-02T10:10:00Z",
+    author: {
+      name: "Dr. Aris Thorne",
+      location: "Zurich",
+      role: "Network Physicist",
+    },
+    readTime: "9 min read",
+    words: 1100,
   },
 ];
 
-// Live News Feeds with real-time timestamps
-export const LIVE_NEWS_FEED = [
+// The Live Wire Dispatches (Continuously updated real-time bulletins)
+export const LIVE_WIRE_DISPATCHES = [
   {
-    id: "news-1",
-    tag: "AI & HARDWARE",
-    title: "Next-gen neuromorphic chips hit 4x inference efficiency per watt in server testing",
-    timeAgo: "Just now",
-    source: "TechPulse Wire",
+    id: "wire-1",
+    edition: "WIRE 01",
+    timestamp: "15:24 GMT",
+    category: "TELECOMMUNICATIONS",
+    headline: "Indian Ocean submarine cable consortium activates 400Tbps coherent optical transponders connecting Chattogram to Singapore",
+    location: "CHATTOGRAM",
     urgent: true,
   },
   {
-    id: "news-2",
-    tag: "WEB TECH",
-    title: "W3C finalizes new CSS anchor positioning and scroll-driven animation standards across major engines",
-    timeAgo: "4m ago",
-    source: "Web Dev Weekly",
+    id: "wire-2",
+    edition: "WIRE 02",
+    timestamp: "15:10 GMT",
+    category: "COMPUTING",
+    headline: "Open standards group ratifies zero-overhead memory-safe compiler profiles for enterprise microkernels",
+    location: "ZURICH",
     urgent: false,
   },
   {
-    id: "news-3",
-    tag: "CLOUD & EDGE",
-    title: "Global serverless latency drops below 12ms as edge WASM runtimes deploy globally",
-    timeAgo: "11m ago",
-    source: "Cloud Native Dispatch",
+    id: "wire-3",
+    edition: "WIRE 03",
+    timestamp: "14:48 GMT",
+    category: "ENERGY",
+    headline: "Solid-state thermal storage pilot delivers continuous zero-emission power to Scandinavian server farms",
+    location: "STOCKHOLM",
     urgent: false,
   },
   {
-    id: "news-4",
-    tag: "OPEN SOURCE",
-    title: "Major open-source database alliance announces native vector quantization standard",
-    timeAgo: "23m ago",
-    source: "OSS Chronicle",
+    id: "wire-4",
+    edition: "WIRE 04",
+    timestamp: "14:12 GMT",
+    category: "STANDARDS",
+    headline: "W3C issues final specification for local cryptographic document attestation across major web engines",
+    location: "GENEVA",
     urgent: false,
   },
   {
-    id: "news-5",
-    tag: "CYBERSECURITY",
-    title: "Post-quantum cryptographic key exchanges successfully adopted by 70% of major cloud providers",
-    timeAgo: "39m ago",
-    source: "Security Brief",
+    id: "wire-5",
+    edition: "WIRE 05",
+    timestamp: "13:30 GMT",
+    category: "AEROSPACE",
+    headline: "Low-Earth orbit meteorological array deploys synthetic aperture radar for real-time climate monitoring",
+    location: "TOKYO",
     urgent: true,
+  },
+  {
+    id: "wire-6",
+    edition: "WIRE 06",
+    timestamp: "12:45 GMT",
+    category: "OPEN SOURCE",
+    headline: "Global database alliance releases pure SQLite vector embedding extension with sub-millisecond query performance",
+    location: "LONDON",
+    urgent: false,
   },
 ];
 
-export const blogService = {
-  // Fetch all blogs
-  async getAllBlogs() {
+export const editorialService = {
+  async getArticles() {
     try {
-      const response = await apiClient.get("/blogs");
-      if (Array.isArray(response.data) && response.data.length > 0) {
-        return response.data;
+      const res = await apiClient.get("/blogs");
+      if (Array.isArray(res.data) && res.data.length > 0) {
+        return res.data;
       }
-    } catch (err) {
-      console.warn("Using local fallback blogs:", err.message);
+    } catch {
+      // Local fallback
     }
-    // Check localStorage for any user added blogs
-    const local = JSON.parse(localStorage.getItem("mixhub_local_blogs") || "[]");
-    return [...local, ...INITIAL_FALLBACK_BLOGS];
+    const local = JSON.parse(localStorage.getItem("mixhub_editorial_articles") || "[]");
+    return [...local, ...EDITORIAL_ARTICLES];
   },
 
-  // Fetch blog by ID
-  async getBlogById(id) {
+  async getArticleById(id) {
     try {
-      const response = await apiClient.get(`/blogs/${id}`);
-      if (response.data) return response.data;
-    } catch (err) {
-      console.warn(`Falling back for blog ${id}:`, err.message);
+      const res = await apiClient.get(`/blogs/${id}`);
+      if (res.data) return res.data;
+    } catch {
+      // Fallback
     }
-    const all = await this.getAllBlogs();
-    return all.find((b) => b._id === id || b.id === id) || all[0];
+    const all = await this.getArticles();
+    return all.find((a) => (a._id || a.id) === id) || all[0];
   },
 
-  // Create new blog
-  async createBlog(blogData) {
+  async publishArticle(data) {
     try {
-      const response = await apiClient.post("/blogs", blogData);
-      if (response.data) return response.data;
-    } catch (err) {
-      console.warn("Saving blog locally:", err.message);
+      const res = await apiClient.post("/blogs", data);
+      if (res.data) return res.data;
+    } catch {
+      // Fallback
     }
-    const local = JSON.parse(localStorage.getItem("mixhub_local_blogs") || "[]");
-    const newEntry = {
-      ...blogData,
-      _id: `local-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      date: blogData.date || new Date().toISOString(),
+    const local = JSON.parse(localStorage.getItem("mixhub_editorial_articles") || "[]");
+    const newDoc = {
+      ...data,
+      _id: `article-${Date.now()}`,
+      date: new Date().toISOString(),
     };
-    localStorage.setItem("mixhub_local_blogs", JSON.stringify([newEntry, ...local]));
-    return newEntry;
+    localStorage.setItem("mixhub_editorial_articles", JSON.stringify([newDoc, ...local]));
+    return newDoc;
   },
 
-  // Wishlist / Bookmarks
-  async getWishlist(email) {
-    try {
-      const response = await apiClient.get(`/wishlist?email=${email || ""}`);
-      if (Array.isArray(response.data)) return response.data;
-    } catch (err) {
-      console.warn("Using local wishlist storage:", err.message);
-    }
-    return JSON.parse(localStorage.getItem(`mixhub_wishlist_${email || "guest"}`) || "[]");
+  async getSavedArticles() {
+    return JSON.parse(localStorage.getItem("mixhub_saved_reading_shelf") || "[]");
   },
 
-  async addToWishlist(item, email) {
-    try {
-      const response = await apiClient.post("/wishlist", { ...item, email });
-      if (response.data) return response.data;
-    } catch (err) {
-      console.warn("Adding to local wishlist:", err.message);
+  async saveArticle(article) {
+    const list = await this.getSavedArticles();
+    if (!list.some((a) => (a._id || a.id) === (article._id || article.id))) {
+      list.push(article);
+      localStorage.setItem("mixhub_saved_reading_shelf", JSON.stringify(list));
     }
-    const key = `mixhub_wishlist_${email || "guest"}`;
-    const list = JSON.parse(localStorage.getItem(key) || "[]");
-    if (!list.some((b) => b._id === item._id || b.title === item.title)) {
-      list.push({ ...item, email, addedAt: new Date().toISOString() });
-      localStorage.setItem(key, JSON.stringify(list));
-    }
-    return { success: true };
+    return true;
   },
 
-  async removeFromWishlist(id, email) {
-    try {
-      await apiClient.delete(`/wishlist/${id}`);
-    } catch (err) {
-      console.warn("Removing from local wishlist:", err.message);
-    }
-    const key = `mixhub_wishlist_${email || "guest"}`;
-    const list = JSON.parse(localStorage.getItem(key) || "[]");
-    const filtered = list.filter((b) => b._id !== id);
-    localStorage.setItem(key, JSON.stringify(filtered));
-    return { success: true };
+  async removeSavedArticle(id) {
+    const list = await this.getSavedArticles();
+    const filtered = list.filter((a) => (a._id || a.id) !== id);
+    localStorage.setItem("mixhub_saved_reading_shelf", JSON.stringify(filtered));
+    return true;
   },
 
-  // Live News
-  async getLiveNews() {
+  async getLiveWire() {
     try {
       const res = await apiClient.get("/news/live");
       if (Array.isArray(res.data) && res.data.length > 0) return res.data;
-    } catch (err) {
-      // Return built-in live feed
+    } catch {
+      // Fallback
     }
-    return LIVE_NEWS_FEED;
+    return LIVE_WIRE_DISPATCHES;
   },
 };
 
+export const blogService = editorialService;

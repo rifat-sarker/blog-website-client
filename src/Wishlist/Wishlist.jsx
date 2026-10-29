@@ -1,146 +1,111 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { AuthContext } from "../providers/AuthProvider";
-import { blogService } from "../services/api";
-import Swal from "sweetalert2";
-import { Bookmark, Trash2, ArrowUpRight, Sparkles, Compass } from "lucide-react";
-import { motion } from "framer-motion";
+import { editorialService } from "../services/api";
+import { Bookmark, Trash2, ArrowUpRight, BookOpen } from "lucide-react";
 
 const Wishlist = () => {
-  const { user } = useContext(AuthContext);
-  const [items, setItems] = useState([]);
+  const [savedItems, setSavedItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const loadWishlist = async () => {
+  const loadShelf = async () => {
     setIsLoading(true);
-    const data = await blogService.getWishlist(user?.email);
-    setItems(data);
+    const data = await editorialService.getSavedArticles();
+    setSavedItems(data);
     setIsLoading(false);
   };
 
   useEffect(() => {
-    loadWishlist();
-  }, [user]);
+    loadShelf();
+  }, []);
 
-  const handleRemove = async (id, title) => {
-    const result = await Swal.fire({
-      title: "Remove from wishlist?",
-      text: `"${title}" will be removed from your saved shelf.`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#ef4444",
-      cancelButtonColor: "#64748b",
-      confirmButtonText: "Yes, remove",
-    });
-
-    if (result.isConfirmed) {
-      await blogService.removeFromWishlist(id, user?.email);
-      setItems((prev) => prev.filter((item) => (item._id || item.id) !== id));
-      Swal.fire({
-        title: "Removed",
-        text: "Story removed from your wishlist.",
-        icon: "success",
-        timer: 1400,
-        showConfirmButton: false,
-      });
-    }
+  const handleRemove = async (id) => {
+    await editorialService.removeSavedArticle(id);
+    setSavedItems((prev) => prev.filter((item) => (item._id || item.id) !== id));
   };
 
   return (
-    <div className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[70vh]">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 min-h-[70vh]">
       {/* Header */}
-      <div className="text-center max-w-2xl mx-auto mb-10 space-y-3">
-        <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-pink-400 font-semibold px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/20">
-          <Bookmark className="w-3.5 h-3.5" />
-          Reading Shelf
+      <div className="border-b-2 border-[#141414] pb-6 mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <span className="font-mono text-xs uppercase tracking-widest text-[#b91c1c] font-bold block mb-1">
+            Personal Repository
+          </span>
+          <h1 className="font-serif text-3xl sm:text-5xl font-normal text-[#141414]">
+            The Reading Shelf
+          </h1>
         </div>
-        <h1 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
-          Your Saved Stories
-        </h1>
-        <p className="text-sm text-slate-400">
-          Articles bookmarked for offline study, deep reading, and architectural reference.
+        <p className="font-serif italic text-sm text-[#5e5a54] max-w-sm sm:text-right">
+          Monographs and dispatches set aside for uninterrupted contemplation.
         </p>
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[1, 2, 3].map((n) => (
-            <div
-              key={n}
-              className="h-80 rounded-2xl bg-slate-900/60 border border-slate-800 animate-pulse"
-            />
-          ))}
+        <div className="space-y-4 animate-pulse">
+          <div className="h-20 bg-[#e8e4dc]" />
+          <div className="h-20 bg-[#e8e4dc]" />
         </div>
-      ) : items.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {items.map((item) => {
+      ) : savedItems.length > 0 ? (
+        <div className="border border-[#141414] bg-[#ffffff] divide-y divide-[#e8e4dc]">
+          {savedItems.map((item, idx) => {
             const itemId = item._id || item.id;
-            const displayImage =
-              item.imageURL || item.image || "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80";
-
             return (
-              <motion.div
-                key={itemId}
-                whileHover={{ y: -5 }}
-                className="group relative flex flex-col bg-slate-900/70 border border-slate-800 rounded-2xl overflow-hidden hover:border-pink-500/40 hover:shadow-xl transition-all"
+              <div
+                key={itemId || idx}
+                className="p-6 flex flex-col sm:flex-row sm:items-baseline justify-between gap-6 hover:bg-[#faf8f5] transition-colors"
               >
-                <div className="relative h-48 w-full overflow-hidden bg-slate-800">
-                  <img
-                    src={displayImage}
-                    alt={item.title}
-                    className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
-                  <span className="absolute top-3 left-3 text-[10px] font-mono font-semibold uppercase px-2 py-0.5 rounded-full bg-slate-900/80 text-pink-400 border border-pink-500/30">
-                    {item.category?.replace("_", " ") || "Saved"}
-                  </span>
-                </div>
+                <div className="space-y-1.5 max-w-3xl">
+                  <div className="flex items-center gap-3 text-[11px] font-mono text-[#5e5a54] uppercase tracking-wider">
+                    <span className="text-[#b91c1c] font-bold">[{item.category || "Saved"}]</span>
+                    <span>•</span>
+                    <span>{item.readTime || "5 min read"}</span>
+                  </div>
 
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                  <div className="space-y-2">
-                    <h3 className="text-base font-bold text-white group-hover:text-pink-400 transition-colors line-clamp-2">
+                  <Link to={`/blog/${itemId}`}>
+                    <h3 className="font-serif text-2xl text-[#141414] hover:underline leading-snug">
                       {item.title}
                     </h3>
-                    <p className="text-xs text-slate-400 line-clamp-2">
-                      {item.sdesc || item.ldesc}
-                    </p>
-                  </div>
+                  </Link>
 
-                  <div className="pt-4 border-t border-slate-800 flex items-center justify-between text-xs">
-                    <button
-                      onClick={() => handleRemove(itemId, item.title)}
-                      className="text-rose-400 hover:text-rose-300 flex items-center gap-1 font-semibold transition-colors"
-                      title="Remove from Shelf"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" /> Remove
-                    </button>
-
-                    <Link
-                      to={`/blog/${itemId}`}
-                      className="inline-flex items-center gap-1 text-indigo-400 hover:text-indigo-300 font-semibold transition-colors"
-                    >
-                      Read Now <ArrowUpRight className="w-3.5 h-3.5" />
-                    </Link>
-                  </div>
+                  <p className="font-serif text-sm text-[#5e5a54] line-clamp-2">
+                    {item.sdesc}
+                  </p>
                 </div>
-              </motion.div>
+
+                <div className="flex items-center gap-4 text-xs font-mono uppercase tracking-wider flex-shrink-0 self-start sm:self-center">
+                  <button
+                    onClick={() => handleRemove(itemId)}
+                    className="text-[#8c867c] hover:text-[#b91c1c] flex items-center gap-1 transition-colors"
+                    title="Remove from Shelf"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Remove</span>
+                  </button>
+
+                  <Link
+                    to={`/blog/${itemId}`}
+                    className="border border-[#141414] px-3.5 py-1.5 text-[#141414] font-bold hover:bg-[#141414] hover:text-[#faf8f5] transition-colors inline-flex items-center gap-1"
+                  >
+                    <span>Read</span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </div>
             );
           })}
         </div>
       ) : (
-        <div className="text-center py-24 bg-slate-900/30 rounded-3xl border border-slate-800 p-8 space-y-4 max-w-lg mx-auto">
-          <div className="w-16 h-16 rounded-2xl bg-pink-500/10 text-pink-400 border border-pink-500/20 flex items-center justify-center mx-auto">
-            <Bookmark className="w-8 h-8" />
-          </div>
-          <h3 className="text-xl font-bold text-white">Your Reading Shelf is Empty</h3>
-          <p className="text-sm text-slate-400">
-            Browse our curated stories and click the bookmark icon on any card to save it here for later.
+        <div className="border border-[#141414] p-12 text-center space-y-4 bg-[#ffffff] max-w-xl mx-auto my-12">
+          <BookOpen className="w-8 h-8 mx-auto text-[#141414]" />
+          <h3 className="font-serif text-2xl text-[#141414]">Your Shelf is Unburdened</h3>
+          <p className="font-serif italic text-sm text-[#5e5a54]">
+            While reading any essay in the archive, click the "Save to Shelf" bookmark to store it here for quiet study.
           </p>
           <Link
             to="/allBlog"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md transition-all"
+            className="inline-block px-5 py-2.5 border border-[#141414] bg-[#141414] text-[#faf8f5] font-mono text-xs uppercase tracking-wider font-bold hover:bg-transparent hover:text-[#141414] transition-all"
           >
-            <Compass className="w-4 h-4" /> Discover Articles
+            Explore The Archive
           </Link>
         </div>
       )}
