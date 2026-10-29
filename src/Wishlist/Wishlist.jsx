@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { editorialService } from "../services/api";
+import { editorialService, getLocalized } from "../services/api";
+import { useLanguage } from "../context/LanguageContext";
 import { Bookmark, Trash2, ArrowUpRight, BookOpen } from "lucide-react";
 
 const Wishlist = () => {
+  const { t, currentLang } = useLanguage();
   const [savedItems, setSavedItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -20,7 +22,7 @@ const Wishlist = () => {
 
   const handleRemove = async (id) => {
     await editorialService.removeSavedArticle(id);
-    setSavedItems((prev) => prev.filter((item) => (item._id || item.id) !== id));
+    setSavedItems((prev) => prev.filter((item) => (item._id || item.id) !== id && item.blogId !== id));
   };
 
   return (
@@ -29,14 +31,16 @@ const Wishlist = () => {
       <div className="border-b-2 border-[#141414] pb-6 mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <span className="font-mono text-xs uppercase tracking-widest text-[#b91c1c] font-bold block mb-1">
-            Personal Repository
+            {currentLang === "bn" ? "ব্যক্তিগত পড়ার সংগ্রহশালা" : "Personal Repository"}
           </span>
           <h1 className="font-serif text-3xl sm:text-5xl font-normal text-[#141414]">
-            The Reading Shelf
+            {t("readingShelf")}
           </h1>
         </div>
         <p className="font-serif italic text-sm text-[#5e5a54] max-w-sm sm:text-right">
-          Monographs and dispatches set aside for uninterrupted contemplation.
+          {currentLang === "bn"
+            ? "নীরব ও গভীর পাঠের জন্য আলাদা করে রাখা ব্যক্তিগত প্রবন্ধ ও টেলিপ্রিন্টার বার্তা।"
+            : "Monographs and dispatches set aside for uninterrupted contemplation."}
         </p>
       </div>
 
@@ -48,7 +52,13 @@ const Wishlist = () => {
       ) : savedItems.length > 0 ? (
         <div className="border border-[#141414] bg-[#ffffff] divide-y divide-[#e8e4dc]">
           {savedItems.map((item, idx) => {
-            const itemId = item._id || item.id;
+            const itemId = item._id || item.id || item.blogId;
+            const linkId = item.blogId || itemId;
+            const localizedTitle = getLocalized(item.title, currentLang);
+            const localizedSdesc = getLocalized(item.sdesc, currentLang);
+            const localizedCategory = getLocalized(item.category, currentLang);
+            const localizedReadTime = getLocalized(item.readTime, currentLang) || "5 min read";
+
             return (
               <div
                 key={itemId || idx}
@@ -56,19 +66,19 @@ const Wishlist = () => {
               >
                 <div className="space-y-1.5 max-w-3xl">
                   <div className="flex items-center gap-3 text-[11px] font-mono text-[#5e5a54] uppercase tracking-wider">
-                    <span className="text-[#b91c1c] font-bold">[{item.category || "Saved"}]</span>
+                    <span className="text-[#b91c1c] font-bold">[{localizedCategory || "Saved"}]</span>
                     <span>•</span>
-                    <span>{item.readTime || "5 min read"}</span>
+                    <span>{localizedReadTime}</span>
                   </div>
 
-                  <Link to={`/blog/${itemId}`}>
+                  <Link to={`/blog/${linkId}`}>
                     <h3 className="font-serif text-2xl text-[#141414] hover:underline leading-snug">
-                      {item.title}
+                      {localizedTitle}
                     </h3>
                   </Link>
 
                   <p className="font-serif text-sm text-[#5e5a54] line-clamp-2">
-                    {item.sdesc}
+                    {localizedSdesc}
                   </p>
                 </div>
 
@@ -76,17 +86,17 @@ const Wishlist = () => {
                   <button
                     onClick={() => handleRemove(itemId)}
                     className="text-[#8c867c] hover:text-[#b91c1c] flex items-center gap-1 transition-colors"
-                    title="Remove from Shelf"
+                    title={currentLang === "bn" ? "তাক থেকে মুছুন" : "Remove from Shelf"}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
-                    <span>Remove</span>
+                    <span>{currentLang === "bn" ? "মুছুন" : "Remove"}</span>
                   </button>
 
                   <Link
-                    to={`/blog/${itemId}`}
+                    to={`/blog/${linkId}`}
                     className="border border-[#141414] px-3.5 py-1.5 text-[#141414] font-bold hover:bg-[#141414] hover:text-[#faf8f5] transition-colors inline-flex items-center gap-1"
                   >
-                    <span>Read</span>
+                    <span>{currentLang === "bn" ? "পড়ুন" : "Read"}</span>
                     <ArrowUpRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -97,15 +107,19 @@ const Wishlist = () => {
       ) : (
         <div className="border border-[#141414] p-12 text-center space-y-4 bg-[#ffffff] max-w-xl mx-auto my-12">
           <BookOpen className="w-8 h-8 mx-auto text-[#141414]" />
-          <h3 className="font-serif text-2xl text-[#141414]">Your Shelf is Unburdened</h3>
+          <h3 className="font-serif text-2xl text-[#141414]">
+            {currentLang === "bn" ? "আপনার তাক বর্তমানে ফাঁকা" : "Your Shelf is Unburdened"}
+          </h3>
           <p className="font-serif italic text-sm text-[#5e5a54]">
-            While reading any essay in the archive, click the "Save to Shelf" bookmark to store it here for quiet study.
+            {currentLang === "bn"
+              ? "যেকোনো প্রবন্ধ পড়ার সময় 'তাক সংরক্ষণ' বোতামে চাপ দিলে তা পরবর্তীতে পাঠের জন্য এখানে জমা থাকবে।"
+              : 'While reading any essay in the archive, click the "Save to Shelf" bookmark to store it here for quiet study.'}
           </p>
           <Link
             to="/allBlog"
             className="inline-block px-5 py-2.5 border border-[#141414] bg-[#141414] text-[#faf8f5] font-mono text-xs uppercase tracking-wider font-bold hover:bg-transparent hover:text-[#141414] transition-all"
           >
-            Explore The Archive
+            {t("allManuscripts")}
           </Link>
         </div>
       )}

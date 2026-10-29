@@ -602,22 +602,56 @@ export const editorialService = {
   },
 
   async getSavedArticles() {
+    try {
+      const res = await apiClient.get("/wishlist");
+      if (Array.isArray(res.data) && res.data.length > 0) {
+        return res.data;
+      }
+    } catch {
+      // Local fallback
+    }
     return JSON.parse(localStorage.getItem("mixhub_saved_reading_shelf") || "[]");
   },
 
   async saveArticle(article) {
-    const list = await this.getSavedArticles();
-    if (!list.some((a) => (a._id || a.id) === (article._id || article.id))) {
+    const list = JSON.parse(localStorage.getItem("mixhub_saved_reading_shelf") || "[]");
+    const articleId = article._id || article.id;
+    if (!list.some((a) => (a._id || a.id) === articleId)) {
       list.push(article);
       localStorage.setItem("mixhub_saved_reading_shelf", JSON.stringify(list));
+    }
+
+    try {
+      await apiClient.post("/wishlist", {
+        blogId: articleId,
+        title: article.title,
+        sdesc: article.sdesc,
+        ldesc: article.ldesc,
+        category: article.category,
+        image: article.image || article.imageURL,
+        imageURL: article.imageURL || article.image,
+        author: article.author,
+        readTime: article.readTime,
+        words: article.words,
+        edition: article.edition,
+        email: "reader@mixhub.press",
+      });
+    } catch {
+      // Offline / Local save suffices
     }
     return true;
   },
 
   async removeSavedArticle(id) {
-    const list = await this.getSavedArticles();
-    const filtered = list.filter((a) => (a._id || a.id) !== id);
+    const list = JSON.parse(localStorage.getItem("mixhub_saved_reading_shelf") || "[]");
+    const filtered = list.filter((a) => (a._id || a.id) !== id && a.blogId !== id);
     localStorage.setItem("mixhub_saved_reading_shelf", JSON.stringify(filtered));
+
+    try {
+      await apiClient.delete(`/wishlist/${id}`);
+    } catch {
+      // Ignored
+    }
     return true;
   },
 
