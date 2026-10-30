@@ -2,32 +2,38 @@ import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { editorialService, getLocalized } from "../../services/api";
 import { useLanguage } from "../../context/LanguageContext";
-import { Search, X, ArrowUpRight } from "lucide-react";
+import { Search, X, Bookmark } from "lucide-react";
 
 const SECTIONS = [
-  "All Sections",
+  "All Stories",
+  "Technology",
   "Architecture",
   "Philosophy",
   "Engineering",
   "Culture",
-  "Stillness",
 ];
 
 const AllBlog = () => {
-  const { t, currentLang } = useLanguage();
+  const { currentLang } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
 
   const [articles, setArticles] = useState([]);
-  const [activeSection, setActiveSection] = useState("All Sections");
+  const [savedIds, setSavedIds] = useState(new Set());
+  const [activeSection, setActiveSection] = useState("All Stories");
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
-    editorialService.getArticles().then((data) => {
+    Promise.all([
+      editorialService.getArticles(),
+      editorialService.getSavedArticles(),
+    ]).then(([data, saved]) => {
       if (isMounted) {
-        setArticles(data);
+        setArticles(data || []);
+        const ids = new Set((saved || []).map((s) => s._id || s.id || s.blogId));
+        setSavedIds(ids);
         setIsLoading(false);
       }
     });
@@ -43,9 +49,27 @@ const AllBlog = () => {
     }
   }, [searchParams]);
 
+  const handleToggleBookmark = async (article) => {
+    const aId = article._id || article.id;
+    const isCurrentlySaved = savedIds.has(aId);
+
+    setSavedIds((prev) => {
+      const next = new Set(prev);
+      if (isCurrentlySaved) next.delete(aId);
+      else next.add(aId);
+      return next;
+    });
+
+    if (isCurrentlySaved) {
+      await editorialService.removeSavedArticle(aId);
+    } else {
+      await editorialService.saveArticle(article);
+    }
+  };
+
   const filtered = articles
     .filter((a) => {
-      if (activeSection === "All Sections") return true;
+      if (activeSection === "All Stories") return true;
       const cat = typeof a.category === "object" ? a.category.en : a.category;
       return cat?.toLowerCase() === activeSection.toLowerCase();
     })
@@ -59,46 +83,39 @@ const AllBlog = () => {
     });
 
   const clearFilters = () => {
-    setActiveSection("All Sections");
+    setActiveSection("All Stories");
     setSearchQuery("");
     setSearchParams({});
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
-      {/* Archive Header */}
-      <div className="border-b-2 border-[#141414] pb-6 mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div>
-          <span className="font-mono text-xs uppercase tracking-widest text-[#b91c1c] font-bold block mb-1">
-            {currentLang === "bn" ? "সম্পূর্ণ প্রবন্ধ নির্ঘণ্ট" : "Complete Ledger"}
-          </span>
-          <h1 className="font-serif text-3xl sm:text-5xl font-normal text-[#141414]">
-            {t("archive")}
-          </h1>
-        </div>
-        <p className="font-serif italic text-sm text-[#5e5a54] max-w-sm sm:text-right">
-          {currentLang === "bn"
-            ? "প্রকাশিত সকল গবেষণা প্রবন্ধ, স্থাপত্য সমীক্ষা ও মননশীল চিন্তার কালানুক্রমিক সাধারণ সূচি।"
-            : "A permanent chronological index of published essays, architectural monographs, and critical inquiries."}
+    <div className="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+      {/* Header */}
+      <div className="pb-6 mb-8 border-b border-[#f2f2f2]">
+        <h1 className="font-serif text-3xl sm:text-4xl font-bold text-[#242424] mb-2 tracking-tight">
+          Explore Stories
+        </h1>
+        <p className="text-sm text-[#6b6b6b]">
+          Discover thoughtful essays, technical investigations, and independent ideas.
         </p>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="border border-[#141414] p-4 bg-[#ffffff] mb-10 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
         {/* Search */}
-        <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 text-[#8c867c] absolute left-3 top-1/2 -translate-y-1/2" />
+        <div className="relative w-full sm:w-80">
+          <Search className="w-4 h-4 text-[#6b6b6b] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={currentLang === "bn" ? "প্রবন্ধ বা লেখক খুঁজুন..." : "Search by keywords, title, author..."}
-            className="w-full bg-[#faf8f5] border border-[#e8e4dc] pl-9 pr-8 py-2 text-xs font-serif text-[#141414] placeholder-[#8c867c] focus:outline-none focus:border-[#141414]"
+            placeholder="Search stories..."
+            className="w-full bg-[#f9f9f9] border border-[#e6e6e6] rounded-full pl-9 pr-8 py-2 text-sm text-[#242424] placeholder-[#6b6b6b] focus:outline-none focus:border-[#242424] transition-all"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#8c867c] hover:text-[#141414]"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b6b6b] hover:text-[#242424]"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -106,15 +123,15 @@ const AllBlog = () => {
         </div>
 
         {/* Section Chips */}
-        <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto no-scrollbar">
+        <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto no-scrollbar">
           {SECTIONS.map((sec) => (
             <button
               key={sec}
               onClick={() => setActiveSection(sec)}
-              className={`px-3 py-1.5 text-xs font-mono uppercase tracking-wider whitespace-nowrap transition-colors ${
+              className={`px-3.5 py-1.5 text-xs rounded-full whitespace-nowrap transition-colors ${
                 activeSection === sec
-                  ? "bg-[#141414] text-[#faf8f5] font-bold"
-                  : "bg-[#faf8f5] text-[#5e5a54] hover:text-[#141414] border border-[#e8e4dc]"
+                  ? "bg-[#242424] text-[#ffffff] font-medium"
+                  : "bg-[#f2f2f2] text-[#6b6b6b] hover:text-[#242424]"
               }`}
             >
               {sec}
@@ -124,79 +141,101 @@ const AllBlog = () => {
       </div>
 
       {/* Count Meta */}
-      <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-[#5e5a54] mb-6 pb-2 border-b border-[#e8e4dc]">
+      <div className="flex items-center justify-between text-xs text-[#6b6b6b] mb-6 pb-2 border-b border-[#f2f2f2]">
         <span>
-          {currentLang === "bn"
-            ? `${filtered.length}টি প্রবন্ধ প্রদর্শিত হচ্ছে`
-            : `Showing ${filtered.length} ${filtered.length === 1 ? "Dispatch" : "Dispatches"}`}
+          Showing {filtered.length} {filtered.length === 1 ? "story" : "stories"}
         </span>
-        {(searchQuery || activeSection !== "All Sections") && (
+        {(searchQuery || activeSection !== "All Stories") && (
           <button
             onClick={clearFilters}
-            className="text-[#b91c1c] hover:underline flex items-center gap-1 font-bold"
+            className="text-[#1a8917] hover:underline flex items-center gap-1 font-medium"
           >
-            Reset Filters <X className="w-3 h-3" />
+            Clear filters <X className="w-3 h-3" />
           </button>
         )}
       </div>
 
       {/* Catalogue List */}
       {isLoading ? (
-        <div className="space-y-4 animate-pulse">
-          {[1, 2, 3, 4, 5].map((n) => (
-            <div key={n} className="h-16 bg-[#e8e4dc]" />
+        <div className="space-y-6 animate-pulse">
+          {[1, 2, 3].map((n) => (
+            <div key={n} className="h-28 bg-[#f9f9f9] rounded-lg" />
           ))}
         </div>
       ) : filtered.length > 0 ? (
-        <div className="divide-y divide-[#e8e4dc] border-b border-[#e8e4dc]">
-          {filtered.map((item, idx) => (
-            <article
-              key={item._id || item.id || idx}
-              className="py-6 flex flex-col md:flex-row md:items-baseline justify-between gap-4 group hover:bg-[#f4f1ea]/50 transition-colors px-2"
-            >
-              <div className="space-y-1.5 max-w-3xl">
-                <div className="flex items-center gap-3 text-[11px] font-mono text-[#5e5a54] uppercase tracking-wider">
-                  <span className="font-bold text-[#b91c1c]">[{getLocalized(item.category, currentLang) || "Essay"}]</span>
-                  <span>•</span>
-                  <span>{getLocalized(item.readTime, currentLang) || "5 min read"}</span>
-                  <span>•</span>
-                  <span>{item.date ? new Date(item.date).toLocaleDateString(currentLang === "bn" ? "bn-BD" : "en-US") : "2026"}</span>
+        <div className="divide-y divide-[#f2f2f2]">
+          {filtered.map((item, idx) => {
+            const articleId = item._id || item.id || idx;
+            const isSaved = savedIds.has(articleId);
+            const title = getLocalized(item.title, currentLang);
+            const sdesc = getLocalized(item.sdesc, currentLang);
+            const authorName = getLocalized(item.author?.name, currentLang) || "Rifat Sarker";
+            const readTime = getLocalized(item.readTime, currentLang) || "5 min read";
+            const category = getLocalized(item.category, currentLang) || "Essay";
+
+            return (
+              <article key={articleId} className="py-7 first:pt-0">
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-6">
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-2 text-xs text-[#6b6b6b]">
+                      <span className="text-[#242424] font-medium">{authorName}</span>
+                      <span>•</span>
+                      <span>{category}</span>
+                    </div>
+
+                    <Link to={`/blog/${articleId}`} className="group block">
+                      <h2 className="font-bold text-xl leading-snug text-[#242424] group-hover:text-[#6b6b6b] transition-colors">
+                        {title}
+                      </h2>
+                    </Link>
+
+                    <p className="font-serif text-sm text-[#6b6b6b] line-clamp-2 leading-relaxed">
+                      {sdesc}
+                    </p>
+
+                    <div className="pt-3 flex items-center justify-between text-xs text-[#6b6b6b]">
+                      <span>{readTime}</span>
+                      <button
+                        onClick={() => handleToggleBookmark(item)}
+                        className={`p-1.5 rounded transition-all flex items-center gap-1 ${
+                          isSaved ? "text-[#1a8917] bg-[#f0fdf4]" : "text-[#6b6b6b] hover:text-[#242424]"
+                        }`}
+                        title={isSaved ? "Saved" : "Save story"}
+                      >
+                        <Bookmark
+                          className={`w-4 h-4 stroke-[1.8] ${isSaved ? "fill-[#1a8917] text-[#1a8917]" : ""}`}
+                        />
+                        {isSaved && <span className="text-[11px] font-medium">Saved</span>}
+                      </button>
+                    </div>
+                  </div>
+
+                  {item.image && (
+                    <Link to={`/blog/${articleId}`} className="flex-shrink-0">
+                      <img
+                        src={item.image}
+                        alt={title}
+                        className="w-24 h-24 sm:w-32 sm:h-24 object-cover rounded-md"
+                        loading="lazy"
+                      />
+                    </Link>
+                  )}
                 </div>
-
-                <Link to={`/blog/${item._id || item.id}`} className="block">
-                  <h3 className="font-serif text-2xl font-normal text-[#141414] group-hover:underline leading-tight">
-                    {getLocalized(item.title, currentLang)}
-                  </h3>
-                </Link>
-
-                <p className="font-serif text-sm text-[#5e5a54] leading-relaxed line-clamp-2">
-                  {getLocalized(item.sdesc, currentLang)}
-                </p>
-              </div>
-
-              <div className="flex items-center gap-4 text-xs font-mono text-[#5e5a54] uppercase tracking-wider flex-shrink-0 self-start md:self-center">
-                <span>By {getLocalized(item.author?.name, currentLang) || "Rifat Sarker"}</span>
-                <Link
-                  to={`/blog/${item._id || item.id}`}
-                  className="inline-flex items-center gap-1 text-[#141414] font-bold hover:underline"
-                >
-                  {t("readEssay")} <ArrowUpRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
       ) : (
-        <div className="text-center py-20 border border-[#e8e4dc] p-8 space-y-3 bg-[#ffffff]">
-          <h3 className="font-serif text-xl text-[#141414]">No entries found in archive</h3>
-          <p className="font-serif italic text-sm text-[#5e5a54]">
+        <div className="text-center py-16 border border-[#f2f2f2] rounded-lg p-8 space-y-3 bg-[#fafafa]">
+          <h3 className="font-serif text-lg text-[#242424]">No stories found</h3>
+          <p className="text-sm text-[#6b6b6b]">
             Try adjusting your search keywords or resetting your section filters.
           </p>
           <button
             onClick={clearFilters}
-            className="px-4 py-2 border border-[#141414] bg-[#141414] text-[#faf8f5] text-xs font-mono uppercase tracking-wider font-bold"
+            className="px-4 py-2 bg-[#242424] text-[#ffffff] text-xs font-medium rounded-full hover:bg-[#1a8917] transition-colors"
           >
-            Reset Filters
+            Clear filters
           </button>
         </div>
       )}

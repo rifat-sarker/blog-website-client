@@ -1,19 +1,20 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { editorialService } from "../../services/api";
-import { PenLine, ArrowUpRight, BookOpen } from "lucide-react";
+import { AuthContext } from "../../providers/AuthProvider";
+import { Image, Send } from "lucide-react";
+
+const CATEGORIES = ["Technology", "Architecture", "Philosophy", "Engineering", "Culture", "Design"];
 
 const AddBlog = () => {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
 
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("Architecture");
-  const [kicker, setKicker] = useState("FIELD DISPATCH");
+  const [category, setCategory] = useState("Technology");
   const [sdesc, setSdesc] = useState("");
   const [ldesc, setLdesc] = useState("");
-  const [image, setImage] = useState(
-    "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1400&q=80"
-  );
+  const [image, setImage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const wordCount = (ldesc || "").split(/\s+/).filter(Boolean).length;
@@ -27,157 +28,111 @@ const AddBlog = () => {
     const newDoc = {
       title: title.trim(),
       category,
-      kicker: kicker.trim().toUpperCase(),
+      kicker: category.toUpperCase(),
       sdesc: sdesc.trim() || title.trim(),
       ldesc: ldesc.trim(),
-      image,
+      image: image.trim() || "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1400&q=80",
       date: new Date().toISOString(),
       author: {
-        name: "Rifat Sarker",
-        location: "Dhaka",
-        role: "Contributing Editor",
+        name: user?.displayName || "Rifat Sarker",
+        location: "Dhaka Bureau",
+        role: "Author",
       },
       readTime: `${readMinutes} min read`,
       words: wordCount,
-      edition: "Autumn 2026",
+      edition: "2026",
     };
 
-    const created = await editorialService.publishArticle(newDoc);
-    setIsSubmitting(false);
-    navigate(`/blog/${created._id || created.id}`);
+    try {
+      const created = await editorialService.publishArticle(newDoc);
+      setIsSubmitting(false);
+      navigate(`/blog/${created._id || created.id}`);
+    } catch (err) {
+      console.error("Failed to publish story:", err);
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
-      {/* Header */}
-      <div className="border-b-2 border-[#141414] pb-6 mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div>
-          <span className="font-mono text-xs uppercase tracking-widest text-[#b91c1c] font-bold block mb-1">
-            The Author's Atelier
-          </span>
-          <h1 className="font-serif text-3xl sm:text-5xl font-normal text-[#141414]">
-            Draft a Manuscript
-          </h1>
-        </div>
-        <div className="font-mono text-xs uppercase tracking-wider text-[#5e5a54] text-right">
-          {wordCount} Words • {readMinutes} Min Read
-        </div>
-      </div>
-
-      <form onSubmit={handleSubmit} className="washi-card p-6 sm:p-10 space-y-8 relative overflow-hidden">
-        {/* Subtle handcrafted scratch / sketch corner motif */}
-        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#eae4d6]/40 to-transparent pointer-events-none" />
-        
-        {/* Title */}
-        <div className="space-y-2">
-          <label className="block font-mono text-xs uppercase tracking-wider text-[#141414] font-bold">
-            Manuscript Title
-          </label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g. On the Quiet Elegance of Provable Systems"
-            required
-            className="w-full bg-[#fdfbf7] border border-[#141414] p-3 text-xl font-serif text-[#141414] placeholder-[#8c867c] focus:outline-none shadow-inner"
-          />
-        </div>
-
-        {/* Kicker & Section Category */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="block font-mono text-xs uppercase tracking-wider text-[#141414] font-bold">
-              Kicker Tag (Uppercase)
-            </label>
-            <input
-              type="text"
-              value={kicker}
-              onChange={(e) => setKicker(e.target.value)}
-              placeholder="e.g. ARCHITECTURAL ESSAY"
-              className="w-full bg-[#faf8f5] border border-[#e8e4dc] p-2.5 font-mono text-xs uppercase text-[#141414] focus:outline-none focus:border-[#141414]"
-            />
+    <div className="max-w-[800px] mx-auto px-4 sm:px-6 py-10 min-h-[80vh]">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Top Action Bar */}
+        <div className="flex items-center justify-between pb-4 border-b border-[#f2f2f2]">
+          <div className="text-xs text-[#6b6b6b]">
+            <span>Draft in MixHub</span>
+            <span className="mx-2">•</span>
+            <span>{wordCount} words ({readMinutes} min read)</span>
           </div>
 
-          <div className="space-y-2">
-            <label className="block font-mono text-xs uppercase tracking-wider text-[#141414] font-bold">
-              Section Classification
-            </label>
+          <div className="flex items-center gap-3">
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full bg-[#faf8f5] border border-[#e8e4dc] p-2.5 font-mono text-xs uppercase text-[#141414] focus:outline-none focus:border-[#141414]"
+              className="text-xs bg-[#f9f9f9] border border-[#e6e6e6] rounded-full px-3 py-1.5 text-[#242424] outline-none"
             >
-              <option value="Architecture">Architecture</option>
-              <option value="Philosophy">Philosophy</option>
-              <option value="Engineering">Engineering</option>
-              <option value="Culture">Culture</option>
-              <option value="Stillness">Stillness</option>
+              {CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
             </select>
+
+            <button
+              type="submit"
+              disabled={isSubmitting || !title.trim() || !ldesc.trim()}
+              className="px-4 py-1.5 bg-[#1a8917] hover:bg-[#156d12] text-[#ffffff] text-xs font-medium rounded-full transition-colors disabled:opacity-40 flex items-center gap-1.5"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>{isSubmitting ? "Publishing..." : "Publish"}</span>
+            </button>
           </div>
         </div>
 
-        {/* Lede Summary */}
-        <div className="space-y-2">
-          <label className="block font-mono text-xs uppercase tracking-wider text-[#141414] font-bold">
-            Abstract / Lede Summary
-          </label>
+        {/* Story Title */}
+        <div>
           <textarea
-            rows={2}
-            value={sdesc}
-            onChange={(e) => setSdesc(e.target.value)}
-            placeholder="A single, carefully balanced paragraph outlining the essay's core thesis..."
-            className="w-full bg-[#faf8f5] border border-[#e8e4dc] p-3 font-serif text-sm text-[#141414] placeholder-[#8c867c] focus:outline-none focus:border-[#141414] resize-none leading-relaxed"
+            rows={1}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Title"
+            required
+            className="w-full font-serif text-3xl sm:text-4xl font-bold text-[#242424] placeholder-[#b3b3b1] border-none outline-none resize-none leading-tight bg-transparent"
           />
         </div>
 
-        {/* Cover Image Plate Link */}
-        <div className="space-y-2">
-          <label className="block font-mono text-xs uppercase tracking-wider text-[#141414] font-bold">
-            Archival Plate Image Link
-          </label>
+        {/* Short Subtitle */}
+        <div>
+          <input
+            type="text"
+            value={sdesc}
+            onChange={(e) => setSdesc(e.target.value)}
+            placeholder="Write a preview subtitle..."
+            className="w-full font-serif text-lg text-[#6b6b6b] placeholder-[#b3b3b1] border-none outline-none bg-transparent"
+          />
+        </div>
+
+        {/* Cover Image Input */}
+        <div className="flex items-center gap-2 py-2 px-3 bg-[#f9f9f9] rounded-lg border border-[#f2f2f2] text-xs">
+          <Image className="w-4 h-4 text-[#6b6b6b] flex-shrink-0" />
           <input
             type="url"
             value={image}
             onChange={(e) => setImage(e.target.value)}
-            placeholder="https://images.unsplash.com/..."
-            className="w-full bg-[#faf8f5] border border-[#e8e4dc] p-2.5 font-mono text-xs text-[#141414] focus:outline-none focus:border-[#141414]"
+            placeholder="Add a cover image URL (optional)..."
+            className="w-full bg-transparent outline-none text-[#242424] placeholder-[#8c867c]"
           />
         </div>
 
-        {/* Full Essay Text */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <label className="block font-mono text-xs uppercase tracking-wider text-[#141414] font-bold">
-              Manuscript Body
-            </label>
-            <span className="font-mono text-[11px] text-[#5e5a54]">
-              Supports ### Headings and ```code snippets
-            </span>
-          </div>
+        {/* Story Body */}
+        <div>
           <textarea
-            rows={14}
+            rows={16}
             value={ldesc}
             onChange={(e) => setLdesc(e.target.value)}
-            placeholder="Write with calm deliberation... Use standard markdown:&#10;&#10;### Section Heading&#10;Paragraph text...&#10;&#10;```javascript&#10;// code example&#10;```"
+            placeholder="Tell your story... You can use paragraphs and standard markdown."
             required
-            className="w-full bg-[#faf8f5] border border-[#141414] p-4 font-serif text-base text-[#141414] placeholder-[#8c867c] focus:outline-none leading-relaxed resize-y"
+            className="w-full font-medium-serif text-lg text-[#242424] placeholder-[#b3b3b1] border-none outline-none resize-y leading-relaxed bg-transparent"
           />
-        </div>
-
-        {/* Submit */}
-        <div className="pt-4 border-t border-[#e8e4dc] flex items-center justify-between">
-          <span className="font-serif italic text-xs text-[#5e5a54]">
-            Draft will be inscribed into the dispatch archive.
-          </span>
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="px-6 py-3 border border-[#141414] bg-[#141414] text-[#faf8f5] font-mono text-xs uppercase tracking-widest font-bold hover:bg-transparent hover:text-[#141414] transition-all flex items-center gap-2"
-          >
-            <PenLine className="w-3.5 h-3.5" />
-            <span>{isSubmitting ? "Inscribing..." : "Inscribe & Publish"}</span>
-          </button>
         </div>
       </form>
     </div>

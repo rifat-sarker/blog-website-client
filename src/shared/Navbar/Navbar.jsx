@@ -5,13 +5,11 @@ import { useLanguage } from "../../context/LanguageContext";
 import { editorialService, getLocalized } from "../../services/api";
 import {
   Search,
-  Bell,
   SquarePen,
   Bookmark,
   ChevronDown,
   LogOut,
   X,
-  ArrowRight,
 } from "lucide-react";
 
 const Navbar = () => {
@@ -19,7 +17,6 @@ const Navbar = () => {
   const { currentLang, setCurrentLang, t, LANGUAGES } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [liveResults, setLiveResults] = useState([]);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const searchContainerRef = useRef(null);
@@ -47,7 +44,6 @@ const Navbar = () => {
     return () => clearTimeout(timer);
   }, [searchQuery, currentLang]);
 
-  // Click outside to close instant search dropdown
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
@@ -73,30 +69,26 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 bg-[#ffffff] border-b border-[#f2f2f2]">
       <div className="max-w-[1336px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-[57px]">
-          {/* Left: Medium Official Logo + Instant Search Box */}
-          <div className="flex items-center gap-5 flex-1 relative" ref={searchContainerRef}>
-            <Link to="/" className="flex items-center gap-2.5 flex-shrink-0 group">
-              {/* Medium Official 3-Circles Logo Mark */}
-              <svg className="w-[32px] h-[32px]" viewBox="0 0 1043.63 592.71">
-                <path
-                  d="M588.67 296.36c0 163.67-131.78 296.35-294.33 296.35S0 460.03 0 296.36 131.78 0 294.34 0s294.33 132.69 294.33 296.36M911.56 296.36c0 154.06-65.89 279-147.17 279s-147.17-124.94-147.17-279 65.88-279 147.16-279 147.17 124.9 147.17 279M1043.63 296.36c0 138-23.17 249.94-51.76 249.94s-51.75-111.91-51.75-249.94 23.17-249.94 51.75-249.94 51.76 111.9 51.76 249.94"
-                  fill="#242424"
-                />
-              </svg>
-              {/* Medium Typographic Wordmark */}
+          {/* Left: MixHub Logo & Instant Live Search */}
+          <div className="flex items-center gap-6 flex-1 relative" ref={searchContainerRef}>
+            <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
+              {/* Custom MixHub Minimalist M-Emblem */}
+              <div className="w-8 h-8 rounded-lg bg-[#242424] text-[#ffffff] flex items-center justify-center font-serif text-lg font-bold group-hover:bg-[#1a8917] transition-colors">
+                M
+              </div>
               <span className="font-serif text-[22px] font-bold tracking-tight text-[#242424]">
-                Medium
+                MixHub
               </span>
             </Link>
 
-            {/* Medium Pill Search Input (Real-time Instant Search) */}
-            <form onSubmit={handleSearchSubmit} className="hidden sm:flex items-center relative max-w-[260px] w-full">
+            {/* Instant Search Bar */}
+            <form onSubmit={handleSearchSubmit} className="hidden sm:flex items-center relative max-w-[280px] w-full">
               <Search className="w-4 h-4 text-[#6b6b6b] absolute left-3 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search Medium..."
+                placeholder="Search stories, ideas..."
                 className="w-full bg-[#f9f9f9] border border-transparent focus:border-[#e6e6e6] focus:bg-[#ffffff] text-sm text-[#242424] placeholder-[#6b6b6b] rounded-full py-2 pl-9 pr-8 outline-none transition-all"
               />
               {searchQuery && (
@@ -114,7 +106,7 @@ const Navbar = () => {
             {liveResults.length > 0 && (
               <div className="absolute top-[48px] left-[155px] w-96 bg-[#ffffff] border border-[#f2f2f2] rounded-lg shadow-2xl z-50 overflow-hidden divide-y divide-[#f2f2f2]">
                 <div className="p-2.5 text-[11px] font-mono uppercase tracking-wider text-[#6b6b6b] bg-[#fafafa]">
-                  Stories ({liveResults.length})
+                  Stories Found ({liveResults.length})
                 </div>
                 {liveResults.map((story) => (
                   <Link
@@ -138,7 +130,7 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Right: Write Button, Live Wire, Language, Profile */}
+          {/* Right: Write Story, The Wire, Language, Profile */}
           <div className="flex items-center gap-4 sm:gap-6">
             <Link
               to="/addBlog"
@@ -193,7 +185,7 @@ const Navbar = () => {
               )}
             </div>
 
-            {/* Profile or Get Started Button */}
+            {/* User Profile */}
             {user ? (
               <div className="relative">
                 <button

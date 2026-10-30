@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
-import { ArrowUpRight, Check } from "lucide-react";
+import { Check } from "lucide-react";
 
 const Footer = () => {
   const { t } = useLanguage();
@@ -18,116 +18,112 @@ const Footer = () => {
   };
 
   return (
-    <footer className="mt-20 border-t-2 border-[#141414] bg-[#faf8f5] text-[#141414]">
-      {/* Upper Broadsheet Colophon Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10">
-          {/* Masthead Colophon */}
-          <div className="lg:col-span-5 space-y-4 lg:pr-8 lg:border-r border-[#e8e4dc]">
-            <div className="flex items-center gap-2">
-              <span className="w-6 h-6 border border-[#b91c1c] text-[#b91c1c] font-serif font-bold flex items-center justify-center text-xs">
+    <footer className="mt-16 border-t border-[#f2f2f2] bg-[#ffffff] text-[#242424]">
+      <div className="max-w-[1336px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8">
+          {/* Masthead */}
+          <div className="lg:col-span-5 space-y-3 lg:pr-8">
+            <Link to="/" className="flex items-center gap-2 group">
+              <div className="w-7 h-7 rounded-lg bg-[#242424] text-[#ffffff] flex items-center justify-center font-serif text-sm font-bold group-hover:bg-[#1a8917] transition-colors">
                 M
+              </div>
+              <span className="font-serif text-xl font-bold tracking-tight text-[#242424]">
+                MixHub
               </span>
-              <span className="font-serif text-2xl font-bold tracking-tight text-[#141414]">
-                MixHub Dispatch
-              </span>
-            </div>
+            </Link>
 
-            <p className="font-serif italic text-sm text-[#5e5a54] leading-relaxed max-w-md">
-              {t("tagline")}. Designed in homage to classical broadsheets, handcrafted bookbinding, and the quiet dignity of sustained contemplation.
+            <p className="font-serif text-sm text-[#6b6b6b] leading-relaxed max-w-md">
+              A quiet space for reading, writing, and understanding complex ideas. Free of clickbait and cognitive noise.
             </p>
 
-            <div className="font-mono text-[11px] text-[#8c867c] uppercase tracking-wider space-y-1">
-              <div>Typefaces: Newsreader & Plus Jakarta Sans</div>
-              <div>Palette: Warm Ivory Paper (#FAF8F5) & Sumi Ink (#141414)</div>
+            <div className="text-xs text-[#8c867c] space-y-0.5">
+              <div>Designed with minimal typography & focus</div>
             </div>
           </div>
 
-          {/* Sections */}
-          <div className="lg:col-span-3 space-y-3 font-mono text-xs uppercase tracking-wider">
-            <h4 className="font-bold text-[#141414] border-b border-[#141414] pb-1">
-              Departments
+          {/* Navigation Links */}
+          <div className="lg:col-span-3 space-y-2 text-sm">
+            <h4 className="font-semibold text-xs uppercase tracking-wider text-[#6b6b6b]">
+              Explore
             </h4>
-            <ul className="space-y-2 text-[#5e5a54]">
+            <ul className="space-y-2 text-sm text-[#6b6b6b]">
               <li>
-                <Link to="/" className="hover:text-[#141414] transition-colors">
+                <Link to="/" className="hover:text-[#242424] transition-colors">
                   {t("frontPage")}
                 </Link>
               </li>
               <li>
-                <Link to="/live-wire" className="hover:text-[#141414] transition-colors">
-                  {t("theWire")}
+                <Link to="/live-wire" className="hover:text-[#242424] transition-colors">
+                  The Wire
                 </Link>
               </li>
               <li>
-                <Link to="/allBlog" className="hover:text-[#141414] transition-colors">
-                  {t("archive")}
+                <Link to="/allBlog" className="hover:text-[#242424] transition-colors">
+                  All Stories
                 </Link>
               </li>
               <li>
-                <Link to="/featuredBlog" className="hover:text-[#141414] transition-colors">
-                  {t("theCanon")}
+                <Link to="/featuredBlog" className="hover:text-[#242424] transition-colors">
+                  Featured
                 </Link>
               </li>
               <li>
-                <Link to="/wishlist" className="hover:text-[#141414] transition-colors">
-                  {t("readingShelf")}
+                <Link to="/wishlist" className="hover:text-[#242424] transition-colors">
+                  Reading List
                 </Link>
               </li>
               <li>
-                <Link to="/addBlog" className="hover:text-[#141414] transition-colors">
-                  {t("authorStudio")}
+                <Link to="/addBlog" className="hover:text-[#242424] transition-colors">
+                  Write a Story
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Weekly Sunday Dispatch Subscription */}
-          <div className="lg:col-span-4 space-y-4">
-            <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-[#141414] border-b border-[#141414] pb-1">
-              The Sunday Dispatch
+          {/* Newsletter Subscription */}
+          <div className="lg:col-span-4 space-y-3">
+            <h4 className="font-semibold text-xs uppercase tracking-wider text-[#6b6b6b]">
+              Weekly Digest
             </h4>
-            <p className="font-serif text-xs text-[#5e5a54] leading-relaxed">
-              Receive a quiet, unadorned summary of the week's published monographs directly via email. Zero advertising, zero clickbait.
+            <p className="text-xs text-[#6b6b6b] leading-relaxed">
+              Receive the week's best stories and ideas directly in your inbox. No spam, ever.
             </p>
 
             {subscribed ? (
-              <div className="border border-[#141414] p-3 text-xs font-mono uppercase tracking-wider text-[#141414] flex items-center gap-2 bg-[#ffffff]">
-                <Check className="w-4 h-4 text-[#b91c1c]" />
-                <span>You have been inscribed into the circulation roll.</span>
+              <div className="border border-[#1a8917] bg-[#f0fdf4] p-3 text-xs text-[#1a8917] flex items-center gap-2 rounded-lg">
+                <Check className="w-4 h-4 text-[#1a8917]" />
+                <span>You have been subscribed to the MixHub digest.</span>
               </div>
             ) : (
-              <form onSubmit={handleSubscribe} className="space-y-2">
-                <div className="flex border border-[#141414] bg-[#ffffff]">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@domain.com"
-                    required
-                    className="flex-1 bg-transparent px-3 py-2 text-xs font-serif text-[#141414] placeholder-[#8c867c] focus:outline-none"
-                  />
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-[#141414] text-[#faf8f5] text-xs font-mono uppercase tracking-wider font-bold hover:bg-[#2e2e2e] transition-colors"
-                  >
-                    Subscribe
-                  </button>
-                </div>
+              <form onSubmit={handleSubscribe} className="flex gap-2">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@domain.com"
+                  required
+                  className="flex-1 bg-[#f9f9f9] border border-[#e6e6e6] rounded-full px-4 py-2 text-xs text-[#242424] placeholder-[#8c867c] focus:outline-none focus:border-[#242424] transition-colors"
+                />
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-[#242424] text-[#ffffff] text-xs font-medium rounded-full hover:bg-[#1a8917] transition-colors"
+                >
+                  Subscribe
+                </button>
               </form>
             )}
           </div>
         </div>
 
         {/* Bottom Folio & Copyright */}
-        <div className="mt-12 pt-6 border-t border-[#e8e4dc] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-[#5e5a54] uppercase tracking-wider">
+        <div className="mt-10 pt-6 border-t border-[#f2f2f2] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#6b6b6b]">
           <div>
-            Published by Rifat Sarker • Autumn 2026 Edition
+            © 2026 MixHub Press. All rights reserved.
           </div>
-          <div className="flex items-center gap-6">
-            <span>{t("vol")}</span>
-            <span>•</span>
-            <span>Uninterrupted Reading Protocol</span>
+          <div className="flex items-center gap-4">
+            <Link to="/" className="hover:text-[#242424]">Privacy</Link>
+            <Link to="/" className="hover:text-[#242424]">Terms</Link>
+            <Link to="/" className="hover:text-[#242424]">About</Link>
           </div>
         </div>
       </div>

@@ -1,21 +1,43 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import { editorialService, getLocalized } from "../services/api";
 import { useLanguage } from "../context/LanguageContext";
-import { Bookmark, MessageCircle, Share2, Check, ArrowLeft } from "lucide-react";
+import { AuthContext } from "../providers/AuthProvider";
+import { Bookmark, MessageCircle, Share2, Check, Heart, User } from "lucide-react";
 
 const BlogDetails = () => {
   const { id } = useParams();
-  const { currentLang, t } = useLanguage();
+  const { currentLang } = useLanguage();
+  const { user } = useContext(AuthContext);
   const [article, setArticle] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
   const [copied, setCopied] = useState(false);
   const [claps, setClaps] = useState(0);
-  const [hasClapped, setHasClapped] = useState(false);
+
+  // Initialize like state from localStorage so it persists across page refresh
+  const [isLiked, setIsLiked] = useState(() => {
+    try {
+      const liked = JSON.parse(localStorage.getItem("mixhub_liked_articles") || "[]");
+      return liked.includes(id);
+    } catch {
+      return false;
+    }
+  });
+
   const [responses, setResponses] = useState([]);
   const [newResponse, setNewResponse] = useState("");
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+
+  const currentUserName =
+    user?.displayName ||
+    user?.name ||
+    user?.email?.split("@")[0] ||
+    "";
+  const currentUserAvatar =
+    user?.photoURL ||
+    user?.avatar ||
+    "";
 
   useEffect(() => {
     let isMounted = true;
@@ -24,13 +46,21 @@ const BlogDetails = () => {
     editorialService.getArticleById(id).then((data) => {
       if (isMounted && data) {
         setArticle(data);
-        setClaps(data.claps || 48);
+        setClaps(data.claps || 0);
         setResponses(data.comments || []);
         setIsLoading(false);
+
+        try {
+          const liked = JSON.parse(localStorage.getItem("mixhub_liked_articles") || "[]");
+          if (liked.includes(id) || (data._id && liked.includes(data._id))) {
+            setIsLiked(true);
+          }
+        } catch {
+          // ignore
+        }
       }
     });
 
-    // Check if saved in shelf
     editorialService.getSavedArticles().then((savedList) => {
       const exists = savedList.some((s) => (s._id || s.id || s.blogId) === id);
       if (isMounted) setIsSaved(exists);
@@ -41,10 +71,29 @@ const BlogDetails = () => {
     };
   }, [id, currentLang]);
 
-  // Dynamic Live Clap (Backend Persisted)
-  const handleClap = async () => {
-    setClaps((prev) => prev + 1);
-    setHasClapped(true);
+  // Dynamic Live Like / Heart (Backend & LocalStorage Persisted)
+  const handleLike = async () => {
+    const nextClaps = isLiked ? Math.max(0, claps - 1) : claps + 1;
+    setClaps(nextClaps);
+    const nextLiked = !isLiked;
+    setIsLiked(nextLiked);
+
+    try {
+      const liked = JSON.parse(localStorage.getItem("mixhub_liked_articles") || "[]");
+      const targetIds = [id, article?._id].filter(Boolean);
+      let nextList = [...liked];
+      if (nextLiked) {
+        targetIds.forEach((tId) => {
+          if (!nextList.includes(tId)) nextList.push(tId);
+        });
+      } else {
+        nextList = nextList.filter((sId) => !targetIds.includes(sId));
+      }
+      localStorage.setItem("mixhub_liked_articles", JSON.stringify(nextList));
+    } catch (e) {
+      console.error("Failed to update liked articles:", e);
+    }
+
     await editorialService.clapStory(id);
   };
 
@@ -70,7 +119,7 @@ const BlogDetails = () => {
         });
         return;
       } catch (err) {
-        // Fallback to clipboard
+        // Fallback
       }
     }
     navigator.clipboard.writeText(window.location.href);
@@ -78,22 +127,37 @@ const BlogDetails = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Dynamic Comment Add (Backend Persisted)
+  // Dynamic Comment Add with User Attribution (Persisted in MongoDB Atlas)
   const handleAddResponse = async (e) => {
     e.preventDefault();
     if (!newResponse.trim() || isSubmittingComment) return;
 
     setIsSubmittingComment(true);
-    const newComment = {
-      author: "Reader",
+
+    const authorName = currentUserName || "Reader";
+    const authorAvatar =
+      currentUserAvatar ||
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80";
+
+    const commentPayload = {
+      author: authorName,
+      avatar: authorAvatar,
       text: newResponse.trim(),
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
     };
 
-    const updated = await editorialService.addComment(id, newComment);
-    setResponses(Array.isArray(updated) ? updated : [newComment, ...responses]);
-    setNewResponse("");
-    setIsSubmittingComment(false);
+    try {
+      const updatedList = await editorialService.addComment(id, commentPayload);
+      if (Array.isArray(updatedList) && updatedList.length > 0) {
+        setResponses(updatedList);
+      } else {
+        setResponses([commentPayload, ...responses]);
+      }
+      setNewResponse("");
+    } catch (err) {
+      console.error("Comment submit failed:", err);
+    } finally {
+      setIsSubmittingComment(false);
+    }
   };
 
   if (isLoading) {
@@ -112,7 +176,7 @@ const BlogDetails = () => {
   const localizedSdesc = getLocalized(sdesc, currentLang);
   const localizedLdesc = getLocalized(ldesc, currentLang);
   const localizedAuthorName = getLocalized(author?.name, currentLang) || "Rifat Sarker";
-  const localizedAuthorLoc = getLocalized(author?.location, currentLang) || "Dhaka";
+  const localizedAuthorLoc = getLocalized(author?.location, currentLang) || "Dhaka Bureau";
   const localizedReadTime = getLocalized(readTime, currentLang) || "7 min read";
 
   const formattedDate = date
@@ -131,12 +195,12 @@ const BlogDetails = () => {
       </h1>
 
       {/* Subtitle */}
-      <p className="mt-3 text-lg sm:text-xl text-[#6b6b6b] leading-relaxed">
+      <p className="font-serif text-lg sm:text-[21px] text-[#6b6b6b] leading-snug mt-3 mb-8">
         {localizedSdesc}
       </p>
 
-      {/* Medium Author Header Card */}
-      <div className="mt-8 flex items-center justify-between pb-6 border-b border-[#f2f2f2]">
+      {/* Author Header Card */}
+      <div className="flex items-center justify-between pb-8 border-b border-[#f2f2f2]">
         <div className="flex items-center gap-3">
           <img
             src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
@@ -150,7 +214,7 @@ const BlogDetails = () => {
                 Follow
               </button>
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-[#6b6b6b] pt-0.5">
+            <div className="flex items-center gap-2 text-xs text-[#6b6b6b] mt-0.5">
               <span>{localizedReadTime}</span>
               <span>•</span>
               <span>{formattedDate}</span>
@@ -158,37 +222,42 @@ const BlogDetails = () => {
           </div>
         </div>
 
-        {/* Dynamic Action icons (Save & Share) */}
-        <div className="flex items-center gap-4 text-[#6b6b6b]">
+        <div className="flex items-center gap-3">
           <button
             onClick={handleSave}
-            className="hover:text-[#242424] transition-colors p-1"
-            title={isSaved ? "Remove from Reading List" : "Save story"}
+            className={`p-2 rounded-full transition-all flex items-center gap-1.5 ${
+              isSaved ? "bg-[#f0fdf4] text-[#1a8917]" : "hover:bg-[#f9f9f9] text-[#6b6b6b]"
+            }`}
+            title="Save to Reading List"
           >
-            <Bookmark className={`w-5 h-5 stroke-[1.5] ${isSaved ? "fill-[#242424] text-[#242424]" : ""}`} />
+            <Bookmark className={`w-5 h-5 stroke-[1.8] ${isSaved ? "fill-[#1a8917] text-[#1a8917]" : ""}`} />
+            {isSaved && <span className="text-xs font-medium text-[#1a8917] hidden sm:inline">Saved</span>}
           </button>
           <button
             onClick={handleShare}
-            className="hover:text-[#242424] transition-colors p-1 flex items-center gap-1"
+            className="p-2 rounded-full hover:bg-[#f9f9f9] text-[#6b6b6b] transition-colors"
             title="Share story"
           >
-            {copied ? <Check className="w-5 h-5 text-[#1a8917]" /> : <Share2 className="w-5 h-5 stroke-[1.5]" />}
+            {copied ? <Check className="w-5 h-5 text-[#1a8917]" /> : <Share2 className="w-5 h-5 stroke-[1.8]" />}
           </button>
         </div>
       </div>
 
-      {/* Article Cover Image */}
+      {/* Cover Image */}
       {image && (
         <figure className="my-10">
           <img
             src={image}
             alt={localizedTitle}
-            className="w-full max-h-[440px] object-cover rounded"
+            className="w-full h-auto max-h-[480px] object-cover rounded-md"
           />
+          <figcaption className="text-center font-sans text-xs text-[#6b6b6b] mt-2.5">
+            Archival field photography • MixHub Bureau
+          </figcaption>
         </figure>
       )}
 
-      {/* Medium Signature Reading Typography */}
+      {/* Story Body */}
       <div className="font-medium-serif text-[#242424] text-[19px] sm:text-[21px] leading-[1.8] space-y-7">
         {localizedLdesc ? (
           localizedLdesc.split("\n\n").map((block, idx) => {
@@ -196,64 +265,74 @@ const BlogDetails = () => {
               return (
                 <h2
                   key={idx}
-                  className="font-sans font-bold text-2xl sm:text-[26px] text-[#242424] pt-8 pb-1 tracking-tight"
+                  className="font-sans font-bold text-2xl sm:text-[26px] text-[#242424] pt-4 tracking-tight"
                 >
                   {block.replace("### ", "")}
                 </h2>
               );
             }
             if (block.startsWith("```")) {
-              const code = block.replace(/```[a-z]*/g, "").trim();
+              const codeLines = block.split("\n").filter((l) => !l.startsWith("```")).join("\n");
               return (
                 <pre
                   key={idx}
-                  className="my-8 rounded bg-[#f9f9f9] border border-[#f2f2f2] p-4 sm:p-5 font-mono text-xs sm:text-sm text-[#242424] overflow-x-auto leading-relaxed"
+                  className="p-4 bg-[#f9f9f9] border border-[#f2f2f2] rounded-md font-mono text-[13px] text-[#242424] overflow-x-auto leading-relaxed my-6"
                 >
-                  <code>{code}</code>
+                  <code>{codeLines}</code>
                 </pre>
               );
             }
             return (
-              <p key={idx} className="font-normal">
+              <p key={idx} className="leading-relaxed">
                 {block}
               </p>
             );
           })
         ) : (
-          <p>Essay text unavailable.</p>
+          <p>No content available.</p>
         )}
       </div>
 
-      {/* Medium Dynamic Clap & Response Bar */}
+      {/* Dynamic Like (Heart/Clap) & Comment Bar */}
       <div className="mt-14 py-4 border-y border-[#f2f2f2] flex items-center justify-between text-[#6b6b6b] text-sm">
         <div className="flex items-center gap-6">
-          {/* Dynamic Clap Button */}
+          {/* Real Heart / Like Button (Dynamic & Persisted) */}
           <button
-            onClick={handleClap}
-            className={`flex items-center gap-2 transition-colors ${
-              hasClapped ? "text-[#1a8917] font-semibold" : "hover:text-[#242424]"
+            onClick={handleLike}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all ${
+              isLiked
+                ? "text-[#dc2626] bg-[#fef2f2] font-semibold"
+                : "hover:text-[#dc2626] hover:bg-[#f9f9f9]"
             }`}
-            title="Clap for this story"
+            title={isLiked ? "Unlike story" : "Like story"}
           >
-            <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
-              <path d="M11.37 2.19a.75.75 0 0 1 .76.04l8 6a.75.75 0 0 1 .15 1.04l-4 5.5a.75.75 0 0 1-.95.23l-3.33-1.66-2.5 3.33a.75.75 0 0 1-1.05.15l-6-4.5a.75.75 0 0 1-.15-1.04l6-8a.75.75 0 0 1 1.07-.09z"/>
-            </svg>
-            <span>{claps}</span>
+            <Heart className={`w-5 h-5 stroke-[1.8] ${isLiked ? "fill-[#dc2626] text-[#dc2626]" : ""}`} />
+            <span className="text-sm">{claps}</span>
           </button>
 
-          {/* Dynamic Response Count */}
+          {/* Response Count */}
           <div className="flex items-center gap-1.5 hover:text-[#242424] transition-colors cursor-pointer">
-            <MessageCircle className="w-5 h-5 stroke-[1.5]" />
+            <MessageCircle className="w-5 h-5 stroke-[1.8]" />
             <span>{responses.length}</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <button onClick={handleSave} className="hover:text-[#242424] transition-colors p-1">
-            <Bookmark className={`w-5 h-5 stroke-[1.5] ${isSaved ? "fill-[#242424] text-[#242424]" : ""}`} />
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleSave}
+            className={`p-2 rounded-full transition-all flex items-center gap-1 ${
+              isSaved ? "bg-[#f0fdf4] text-[#1a8917]" : "hover:bg-[#f9f9f9] hover:text-[#242424]"
+            }`}
+            title="Save to Reading List"
+          >
+            <Bookmark className={`w-5 h-5 stroke-[1.8] ${isSaved ? "fill-[#1a8917] text-[#1a8917]" : ""}`} />
           </button>
-          <button onClick={handleShare} className="hover:text-[#242424] transition-colors p-1">
-            {copied ? <Check className="w-5 h-5 text-[#1a8917]" /> : <Share2 className="w-5 h-5 stroke-[1.5]" />}
+          <button
+            onClick={handleShare}
+            className="p-2 rounded-full hover:bg-[#f9f9f9] hover:text-[#242424] transition-colors"
+            title="Share"
+          >
+            {copied ? <Check className="w-5 h-5 text-[#1a8917]" /> : <Share2 className="w-5 h-5 stroke-[1.8]" />}
           </button>
         </div>
       </div>
@@ -264,8 +343,44 @@ const BlogDetails = () => {
           Responses ({responses.length})
         </h3>
 
-        {/* Dynamic Comment Input */}
-        <form onSubmit={handleAddResponse} className="rounded-lg border border-[#f2f2f2] p-4 shadow-sm space-y-3">
+        {/* Dynamic Comment Form with Active User Profile Header */}
+        <form onSubmit={handleAddResponse} className="rounded-lg border border-[#f2f2f2] p-4 shadow-sm space-y-3 bg-[#ffffff]">
+          {/* Active commenter header */}
+          <div className="flex items-center justify-between pb-2 border-b border-[#f9f9f9]">
+            <div className="flex items-center gap-2.5">
+              {currentUserAvatar ? (
+                <img
+                  src={currentUserAvatar}
+                  alt={currentUserName}
+                  className="w-7 h-7 rounded-full object-cover border border-[#e6e6e6]"
+                />
+              ) : currentUserName ? (
+                <div className="w-7 h-7 rounded-full bg-[#242424] text-[#ffffff] flex items-center justify-center font-bold text-xs">
+                  {currentUserName.charAt(0).toUpperCase()}
+                </div>
+              ) : (
+                <div className="w-7 h-7 rounded-full bg-[#e6e6e6] text-[#6b6b6b] flex items-center justify-center">
+                  <User className="w-4 h-4 text-[#6b6b6b]" />
+                </div>
+              )}
+              <span className="text-xs font-medium text-[#242424]">
+                {currentUserName ? (
+                  currentUserName
+                ) : (
+                  <span className="text-[#6b6b6b]">
+                    Commenting as guest (<Link to="/login" className="text-[#1a8917] hover:underline font-semibold">Sign in</Link>)
+                  </span>
+                )}
+              </span>
+            </div>
+
+            {user && (
+              <span className="text-[11px] text-[#1a8917] font-medium bg-[#f0fdf4] px-2 py-0.5 rounded-full">
+                Signed in
+              </span>
+            )}
+          </div>
+
           <textarea
             rows={3}
             value={newResponse}
@@ -273,6 +388,7 @@ const BlogDetails = () => {
             placeholder="What are your thoughts?"
             className="w-full text-sm font-sans placeholder-[#6b6b6b] text-[#242424] outline-none resize-none"
           />
+
           <div className="flex justify-end gap-2 pt-2">
             <button
               type="submit"
@@ -284,16 +400,30 @@ const BlogDetails = () => {
           </div>
         </form>
 
-        {/* Dynamic Response List */}
+        {/* Dynamic Response List with User Avatars & Names */}
         <div className="space-y-4 pt-4 divide-y divide-[#f2f2f2]">
           {responses.map((res, i) => (
             <div key={res._id || i} className="pt-4 first:pt-0 space-y-2">
-              <div className="flex items-center gap-2 text-xs">
-                <span className="font-semibold text-[#242424]">{res.author || "Reader"}</span>
-                <span className="text-[#6b6b6b]">•</span>
-                <span className="text-[#6b6b6b]">{res.date ? new Date(res.date).toLocaleDateString() : "Just now"}</span>
+              <div className="flex items-center gap-3">
+                {res.avatar ? (
+                  <img
+                    src={res.avatar}
+                    alt={res.author}
+                    className="w-8 h-8 rounded-full object-cover border border-[#f0f0f0]"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-[#242424] text-[#ffffff] flex items-center justify-center font-bold text-xs flex-shrink-0">
+                    {(res.author || "R").charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="flex flex-col">
+                  <span className="font-semibold text-xs text-[#242424]">{res.author || "Reader"}</span>
+                  <span className="text-[11px] text-[#6b6b6b]">
+                    {res.date ? new Date(res.date).toLocaleDateString() : "Just now"}
+                  </span>
+                </div>
               </div>
-              <p className="font-sans text-sm text-[#242424] leading-relaxed">
+              <p className="font-sans text-sm text-[#242424] leading-relaxed pl-11">
                 {res.text}
               </p>
             </div>

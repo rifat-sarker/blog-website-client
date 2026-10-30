@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { editorialService, getLocalized } from "../../../services/api";
 import { useLanguage } from "../../../context/LanguageContext";
-import { Bookmark, Sparkles, TrendingUp } from "lucide-react";
+import { Bookmark } from "lucide-react";
 
 const TOPICS = [
   "For you",
@@ -11,32 +11,57 @@ const TOPICS = [
   "Philosophy",
   "Engineering",
   "Programming",
-  "Productivity",
 ];
 
 const Home = () => {
-  const { t, currentLang } = useLanguage();
+  const { currentLang } = useLanguage();
   const [articles, setArticles] = useState([]);
   const [wireItems, setWireItems] = useState([]);
+  const [savedIds, setSavedIds] = useState(new Set());
   const [activeTopic, setActiveTopic] = useState("For you");
   const [isLoading, setIsLoading] = useState(true);
 
+  const loadData = async () => {
+    try {
+      const [arts, wires, saved] = await Promise.all([
+        editorialService.getArticles(),
+        editorialService.getLiveWire(),
+        editorialService.getSavedArticles(),
+      ]);
+      setArticles(arts);
+      setWireItems(wires);
+      const ids = new Set(saved.map((s) => s._id || s.id || s.blogId));
+      setSavedIds(ids);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    let isMounted = true;
-    Promise.all([
-      editorialService.getArticles(),
-      editorialService.getLiveWire(),
-    ]).then(([arts, wires]) => {
-      if (isMounted) {
-        setArticles(arts);
-        setWireItems(wires);
-        setIsLoading(false);
-      }
-    });
-    return () => {
-      isMounted = false;
-    };
+    loadData();
   }, []);
+
+  const handleToggleBookmark = async (article) => {
+    const aId = article._id || article.id;
+    const isCurrentlySaved = savedIds.has(aId);
+
+    // Optimistic UI update
+    setSavedIds((prev) => {
+      const next = new Set(prev);
+      if (isCurrentlySaved) {
+        next.delete(aId);
+      } else {
+        next.add(aId);
+      }
+      return next;
+    });
+
+    if (isCurrentlySaved) {
+      await editorialService.removeSavedArticle(aId);
+    } else {
+      await editorialService.saveArticle(article);
+    }
+  };
 
   const filteredArticles = articles.filter((a) => {
     if (activeTopic === "For you") return true;
@@ -49,7 +74,7 @@ const Home = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
         {/* Main Feed Column (Left / 8 cols) */}
         <main className="lg:col-span-8 lg:pr-8">
-          {/* Medium Topic Navigation Bar */}
+          {/* Topic Navigation Bar */}
           <div className="flex items-center space-x-6 overflow-x-auto pb-4 mb-8 border-b border-[#f2f2f2] text-sm text-[#6b6b6b] no-scrollbar">
             {TOPICS.map((topic) => (
               <button
@@ -88,14 +113,15 @@ const Home = () => {
                 const category = getLocalized(article.category, currentLang) || "Essay";
                 const readTime = getLocalized(article.readTime, currentLang) || "5 min read";
                 const authorName = getLocalized(article.author?.name, currentLang) || "Rifat Sarker";
-                const authorLoc = getLocalized(article.author?.location, currentLang) || "Dhaka";
+                const authorLoc = getLocalized(article.author?.location, currentLang) || "Dhaka Bureau";
+                const isSaved = savedIds.has(articleId);
 
                 return (
                   <article key={articleId} className="py-8 first:pt-0">
                     <div className="flex flex-col sm:flex-row justify-between items-start gap-6 sm:gap-8">
                       {/* Story Text */}
                       <div className="flex-1 space-y-2">
-                        {/* Author Info & Publication Meta */}
+                        {/* Author Info */}
                         <div className="flex items-center gap-2 text-xs text-[#242424]">
                           <img
                             src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
@@ -107,19 +133,19 @@ const Home = () => {
                           <span className="text-[#6b6b6b]">{authorLoc}</span>
                         </div>
 
-                        {/* Title: Medium Bold/Medium Serif Title */}
+                        {/* Title */}
                         <Link to={`/blog/${articleId}`} className="group block">
                           <h2 className="font-bold text-xl sm:text-[22px] leading-[1.3] text-[#242424] group-hover:text-[#6b6b6b] transition-colors">
                             {title}
                           </h2>
                         </Link>
 
-                        {/* Subtitle / Excerpt */}
+                        {/* Subtitle */}
                         <p className="font-serif text-sm sm:text-[15px] text-[#6b6b6b] line-clamp-2 leading-relaxed">
                           {sdesc}
                         </p>
 
-                        {/* Footer Meta: Date, Read Time, Tag, Bookmark */}
+                        {/* Footer Meta: Read Time, Tag, Dynamic Bookmark */}
                         <div className="pt-3 flex items-center justify-between text-xs text-[#6b6b6b]">
                           <div className="flex items-center gap-3">
                             <span>{readTime}</span>
@@ -129,17 +155,27 @@ const Home = () => {
                             </span>
                           </div>
 
+                          {/* Dynamic Visual Bookmark Button */}
                           <button
-                            onClick={() => editorialService.saveArticle(article)}
-                            className="text-[#6b6b6b] hover:text-[#242424] transition-colors p-1"
-                            title="Save to Reading List"
+                            onClick={() => handleToggleBookmark(article)}
+                            className={`p-1.5 rounded transition-all flex items-center gap-1 ${
+                              isSaved
+                                ? "text-[#1a8917] bg-[#f0fdf4]"
+                                : "text-[#6b6b6b] hover:text-[#242424] hover:bg-[#f9f9f9]"
+                            }`}
+                            title={isSaved ? "Saved to Reading List" : "Save story"}
                           >
-                            <Bookmark className="w-4 h-4" />
+                            <Bookmark
+                              className={`w-4 h-4 stroke-[1.8] ${
+                                isSaved ? "fill-[#1a8917] text-[#1a8917]" : ""
+                              }`}
+                            />
+                            {isSaved && <span className="text-[11px] font-medium hidden sm:inline">Saved</span>}
                           </button>
                         </div>
                       </div>
 
-                      {/* Story Thumbnail (Medium 112x112 / 160x106 responsive square/rect) */}
+                      {/* Story Thumbnail */}
                       {article.image && (
                         <Link
                           to={`/blog/${articleId}`}
@@ -160,9 +196,9 @@ const Home = () => {
           )}
         </main>
 
-        {/* Medium Right Sidebar Column (4 cols) */}
+        {/* Medium Right Sidebar Column */}
         <aside className="lg:col-span-4 lg:border-l border-[#f2f2f2] lg:pl-10 space-y-10">
-          {/* Live Wire Box (Substack / Medium Staff Picks style) */}
+          {/* Live Wire Box */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-sm font-semibold text-[#242424]">
               <span className="w-2 h-2 rounded-full bg-[#1a8917] animate-pulse" />
@@ -194,7 +230,7 @@ const Home = () => {
             </Link>
           </div>
 
-          {/* Recommended Topics (Medium Tag Cloud) */}
+          {/* Recommended Topics */}
           <div className="space-y-3 pt-6 border-t border-[#f2f2f2]">
             <h3 className="text-sm font-semibold text-[#242424]">Recommended topics</h3>
             <div className="flex flex-wrap gap-2">
@@ -212,17 +248,16 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Medium Minimal Sidebar Footer */}
+          {/* Footer */}
           <div className="pt-6 border-t border-[#f2f2f2] text-xs text-[#6b6b6b] space-y-2 leading-relaxed">
             <div className="flex flex-wrap gap-x-4 gap-y-1">
               <Link to="/allBlog" className="hover:text-[#242424]">Help</Link>
               <Link to="/featuredBlog" className="hover:text-[#242424]">Status</Link>
               <Link to="/wishlist" className="hover:text-[#242424]">About</Link>
-              <Link to="/addBlog" className="hover:text-[#242424]">Careers</Link>
+              <Link to="/addBlog" className="hover:text-[#242424]">Write</Link>
               <Link to="/" className="hover:text-[#242424]">Privacy</Link>
-              <Link to="/" className="hover:text-[#242424]">Terms</Link>
             </div>
-            <p className="text-[11px] pt-1">© 2026 MixHub (Medium Clone Edition)</p>
+            <p className="text-[11px] pt-1">© 2026 MixHub Press</p>
           </div>
         </aside>
       </div>
