@@ -5,114 +5,60 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    background-color: #f5f2eb;
+    background-color: #faf8f5;
     color: #1a1917;
   }
 
   body {
-    background-color: #f5f2eb;
+    /* Pure, serene natural reading tint like Medium / Substack Paper */
+    background-color: #faf8f5;
     color: #1a1917;
     font-feature-settings: "kern", "liga", "clig", "calt";
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
-    position: relative;
     min-height: 100vh;
   }
 
-  /* 
-    Visible Handcrafted Asian Ink-Wash (Sumi-e) Clouds & Organic Parchment Scratch Art
-    SVG Data URI clouds: clearly visible yet graceful and non-distracting
-  */
-  body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.85;
-    /* Traditional swirling ink clouds and washi scratch pattern */
-    background-image: 
-      /* Traditional Stylized Cloud 1 (Top Left) */
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='120' viewBox='0 0 280 120'%3E%3Cpath d='M30,80 Q50,40 90,50 Q120,20 160,35 Q190,15 220,40 Q250,30 260,65 Q275,80 250,95 Q220,110 180,95 Q140,115 100,95 Q60,105 30,80 Z' fill='none' stroke='%238c8273' stroke-width='1.4' stroke-dasharray='4,3' opacity='0.35'/%3E%3Cpath d='M60,75 Q85,55 120,62 Q150,45 180,60' fill='none' stroke='%238c8273' stroke-width='1' opacity='0.25'/%3E%3C/svg%3E"),
-      /* Traditional Stylized Cloud 2 (Top Right) */
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='340' height='150' viewBox='0 0 340 150'%3E%3Cpath d='M40,90 Q70,45 120,55 Q160,25 210,40 Q250,20 290,50 Q325,40 330,80 Q340,110 300,120 Q250,135 200,115 Q140,130 90,110 Q50,120 40,90 Z' fill='none' stroke='%237a7062' stroke-width='1.5' opacity='0.32'/%3E%3Cpath d='M80,85 Q115,65 160,72 Q200,55 240,70' fill='none' stroke='%237a7062' stroke-width='1.2' stroke-dasharray='5,3' opacity='0.25'/%3E%3C/svg%3E"),
-      /* Washi Handcrafted Paper Scratch Fiber (Repeated) */
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M10,25 Q35,20 60,30 T110,20' fill='none' stroke='%23665c4d' stroke-width='0.5' opacity='0.12'/%3E%3Cpath d='M20,85 Q55,95 85,80 T115,90' fill='none' stroke='%23665c4d' stroke-width='0.4' opacity='0.1'/%3E%3Cpath d='M40,10 L45,30 M90,70 L95,90' stroke='%23665c4d' stroke-width='0.6' opacity='0.1' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat, no-repeat, repeat;
-    background-position: left 20px top 70px, right 30px top 140px, top left;
-    background-size: 280px 120px, 340px 150px, 120px 120px;
-  }
-
-  /* Make sure main content sits above atmospheric background */
-  #root {
-    position: relative;
-    z-index: 1;
-  }
-
-  /* Classical newsprint drop cap */
-  .drop-cap::first-letter {
+  /* Medium-style Reading Typography */
+  h1, h2, h3, h4 {
     font-family: 'Newsreader', Georgia, serif;
-    font-size: 3.6rem;
-    line-height: 0.8;
-    float: left;
-    margin-right: 0.75rem;
-    margin-top: 0.25rem;
-    font-weight: 600;
-    color: #141414;
+    font-weight: 400; /* Regular, non-chunky weight */
+    color: #1a1917;
+    letter-spacing: -0.015em;
   }
 
-  /* Handcrafted ink scrollbar */
+  p {
+    color: #2b2825;
+  }
+
+  /* Minimalist smooth scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #f5f2eb;
+    background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #c8c0b2;
-    border-radius: 3px;
+    background: #dcd6cb;
+    border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #8c867c;
+    background: #aba396;
   }
 }
 
 @layer utilities {
-  .washi-card {
-    background: rgba(255, 255, 255, 0.88);
-    backdrop-filter: blur(6px);
-    border: 1px solid #141414;
-    box-shadow: 3px 3px 0px rgba(20, 20, 20, 0.08);
+  .editorial-card {
+    background: #ffffff;
+    border: 1px solid #ebe5db;
+    transition: all 0.2s ease-in-out;
+  }
+  .editorial-card:hover {
+    border-color: #d1c8b8;
   }
 
-  .editorial-rule {
-    border-color: #ded7c8;
-  }
-
-  .editorial-rule-double {
-    border-top: 3px double #141414;
-  }
-
-  .editorial-rule-thick {
-    border-top: 2px solid #141414;
-  }
-
-  .serif-title {
-    font-family: 'Newsreader', Georgia, Cambria, serif;
-    font-weight: 500;
-    letter-spacing: -0.02em;
-  }
-
-  .seal-tag {
-    border: 1px solid #b91c1c;
-    color: #b91c1c;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+  .subtle-rule {
+    border-color: #ede7dc;
   }
 }

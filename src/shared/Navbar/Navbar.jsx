@@ -2,21 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../providers/AuthProvider";
 import { useLanguage } from "../../context/LanguageContext";
-import {
-  Search,
-  Bookmark,
-  PenLine,
-  Radio,
-  Menu,
-  X,
-  LogOut,
-  Info,
-  ChevronDown,
-  BookOpen,
-  Compass,
-  Trophy,
-  Clock,
-} from "lucide-react";
+import { Search, PenLine, Radio, Menu, X, LogOut, Info, ChevronDown } from "lucide-react";
 
 const Navbar = () => {
   const { user, logOut } = useContext(AuthContext);
@@ -26,16 +12,7 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [guideModalOpen, setGuideModalOpen] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date().toUTCString().slice(17, 22) + " GMT");
   const navigate = useNavigate();
-
-  // Real clock in GMT / UTC - 100% honest and genuine (No fake counters)
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date().toUTCString().slice(17, 22) + " GMT");
-    }, 10000);
-    return () => clearInterval(timer);
-  }, []);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -47,401 +24,186 @@ const Navbar = () => {
   };
 
   const navItems = [
-    {
-      to: "/",
-      label: t("frontPage"),
-      desc: t("frontPageDesc"),
-      icon: BookOpen,
-    },
-    {
-      to: "/live-wire",
-      label: t("theWire"),
-      desc: t("theWireDesc"),
-      isWire: true,
-      icon: Radio,
-    },
-    {
-      to: "/allBlog",
-      label: t("archive"),
-      desc: t("archiveDesc"),
-      icon: Compass,
-    },
-    {
-      to: "/featuredBlog",
-      label: t("theCanon"),
-      desc: t("theCanonDesc"),
-      icon: Trophy,
-    },
-    {
-      to: "/wishlist",
-      label: t("readingShelf"),
-      desc: t("readingShelfDesc"),
-      icon: Bookmark,
-    },
-    {
-      to: "/addBlog",
-      label: t("authorStudio"),
-      desc: t("authorStudioDesc"),
-      icon: PenLine,
-      isAuthProtected: true,
-    },
+    { name: t("frontPage"), path: "/" },
+    { name: t("theLiveWire"), path: "/live-wire", dot: true },
+    { name: t("allManuscripts"), path: "/allBlog" },
+    { name: t("theCanon"), path: "/featuredBlog" },
+    { name: t("readingShelf"), path: "/wishlist" },
   ];
 
   const currentLangObj = LANGUAGES.find((l) => l.code === currentLang) || LANGUAGES[0];
 
   return (
-    <header className="w-full bg-[#faf8f5] border-b border-[#e8e4dc]">
-      {/* Top Folio Bar: Volume, Global Time & Language Selector */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 border-b border-[#e8e4dc] flex flex-wrap items-center justify-between text-[11px] font-mono text-[#5e5a54] uppercase tracking-wider gap-2">
-        <div className="flex items-center gap-3">
-          <span className="font-bold text-[#141414]">{t("vol")}</span>
-          <span className="text-[#8c867c] hidden sm:inline">•</span>
-          <span className="hidden sm:inline">{t("cities")}</span>
-          <span className="text-[#8c867c] hidden md:inline">•</span>
-          <span className="font-serif italic font-normal normal-case text-xs text-[#141414] hidden md:inline">
-            {t("edition")}
-          </span>
-        </div>
-
-        {/* Real-time Clock, Language & Auth */}
-        <div className="flex items-center gap-4">
-          {/* Real Global Telemetry Time (100% Genuine) */}
-          <div className="hidden lg:flex items-center gap-1.5 text-xs font-mono text-[#141414]">
-            <span className="w-2 h-2 rounded-full bg-[#b91c1c] animate-pulse inline-block" />
-            <span className="font-bold">{currentTime}</span>
-            <span className="text-[#5e5a54]">Live Telemetry</span>
-          </div>
-
-          {/* Guide / Info Pill explaining options */}
-          <button
-            onClick={() => setGuideModalOpen(true)}
-            className="flex items-center gap-1 text-[#5e5a54] hover:text-[#141414] transition-colors"
-            title="Overview of Sections (কোন অপশনের কি কাজ)"
-          >
-            <Info className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Guide</span>
-          </button>
-
-          {/* Language Selector Dropdown (Top 10 Languages including Bangla) */}
-          <div className="relative">
-            <button
-              onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-              className="flex items-center gap-1.5 px-2.5 py-1 border border-[#141414] bg-[#ffffff] hover:bg-[#f4f1ea] text-[#141414] transition-colors shadow-sm"
-            >
-              <span>{currentLangObj.flag}</span>
-              <span className="font-bold text-xs">{currentLangObj.nativeName}</span>
-              <ChevronDown className="w-3 h-3 text-[#5e5a54]" />
-            </button>
-
-            {langDropdownOpen && (
-              <div className="absolute right-0 mt-1 w-48 bg-[#faf8f5] border-2 border-[#141414] shadow-2xl z-50 p-1 divide-y divide-[#e8e4dc]">
-                <div className="p-2 text-[10px] font-mono uppercase tracking-widest text-[#5e5a54]">
-                  Select Language (১০টি ভাষা)
-                </div>
-                <div className="max-h-64 overflow-y-auto">
-                  {LANGUAGES.map((lang) => (
-                    <button
-                      key={lang.code}
-                      onClick={() => {
-                        setCurrentLang(lang.code);
-                        setLangDropdownOpen(false);
-                      }}
-                      className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-[#141414] hover:text-[#faf8f5] transition-colors ${
-                        currentLang === lang.code ? "bg-[#f4f1ea] font-bold" : ""
-                      }`}
-                    >
-                      <span className="flex items-center gap-2">
-                        <span>{lang.flag}</span>
-                        <span>{lang.nativeName}</span>
-                      </span>
-                      <span className="font-mono text-[10px] opacity-60 uppercase">
-                        {lang.code}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Author Authentication State */}
-          {user ? (
-            <div className="flex items-center gap-2 pl-2 border-l border-[#e8e4dc]">
-              <span className="text-[11px] font-mono text-[#141414] font-bold hidden sm:inline">
-                {user.displayName}
+    <header className="sticky top-0 z-50 bg-[#faf8f5]/90 backdrop-blur-md border-b border-[#ece6dc]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Brand Logo: Clean, Elegant Serif like Medium / Substack */}
+          <div className="flex items-center gap-8">
+            <Link to="/" className="group flex items-baseline gap-2">
+              <span className="font-serif text-2xl sm:text-[26px] font-normal tracking-tight text-[#1a1917] hover:opacity-80 transition-opacity">
+                MixHub
               </span>
-              <button
-                onClick={logOut}
-                className="text-[#8c867c] hover:text-[#b91c1c] text-xs font-mono uppercase flex items-center gap-1"
-                title="Sign Out"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{t("signOut")}</span>
-              </button>
-            </div>
-          ) : (
-            <Link
-              to="/login"
-              className="text-[#141414] hover:text-[#b91c1c] font-bold text-xs font-mono uppercase pl-2 border-l border-[#e8e4dc]"
-            >
-              {t("signIn")}
+              <span className="hidden sm:inline font-mono text-[10px] text-[#9c9489] uppercase tracking-widest">
+                Dispatch
+              </span>
             </Link>
-          )}
-        </div>
-      </div>
 
-      {/* Main Newspaper Masthead */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 text-center relative overflow-hidden">
-        {/* Visible Handcrafted Asian Floating Ink Clouds (Sumi-e Outline & Stroke) */}
-        <div className="absolute top-2 left-4 sm:left-12 opacity-60 select-none pointer-events-none">
-          <svg width="140" height="60" viewBox="0 0 140 60" fill="none">
-            <path
-              d="M15,42 Q25,20 48,26 Q65,10 88,18 Q105,8 120,22 Q132,16 135,35 Q140,48 125,54 Q110,60 90,52 Q70,62 50,52 Q30,58 15,42 Z"
-              stroke="#7a7062"
-              strokeWidth="1.2"
-              strokeDasharray="3,2"
-              fill="rgba(255,255,255,0.4)"
-            />
-            <path d="M30,40 Q45,28 65,32 Q80,22 95,30" stroke="#7a7062" strokeWidth="0.8" />
-          </svg>
-        </div>
-
-        <div className="absolute bottom-2 right-4 sm:right-16 opacity-60 select-none pointer-events-none">
-          <svg width="160" height="70" viewBox="0 0 160 70" fill="none">
-            <path
-              d="M20,48 Q35,22 62,30 Q82,12 108,22 Q128,10 142,26 Q155,20 156,42 Q158,58 138,62 Q118,70 95,60 Q72,72 48,60 Q28,68 20,48 Z"
-              stroke="#7a7062"
-              strokeWidth="1.4"
-              fill="rgba(255,255,255,0.45)"
-            />
-            <path d="M40,46 Q60,32 85,38 Q105,26 125,36" stroke="#7a7062" strokeWidth="0.9" strokeDasharray="4,2" />
-          </svg>
-        </div>
-
-        <div className="inline-block relative z-10">
-          <Link to="/" className="group inline-block">
-            <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-[#141414] transition-colors group-hover:text-[#2e2e2e]">
-              MixHub Dispatch
-            </h1>
-          </Link>
-          <div className="mt-2 text-xs sm:text-sm font-serif italic text-[#5e5a54] tracking-wide flex items-center justify-center gap-3">
-            <span className="w-12 border-t border-[#b8af9f]" />
-            <span>{t("tagline")}</span>
-            <span className="w-12 border-t border-[#b8af9f]" />
-          </div>
-        </div>
-      </div>
-
-      {/* Primary Newspaper Navigation Strip with Double Border & Clarity */}
-      <div className="border-t border-b border-[#141414] bg-[#f7f4ee]/90 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14">
-            {/* Desktop Navigation Links with Clear Tooltip Subtext */}
-            <nav className="hidden lg:flex items-center space-x-6 text-xs font-mono uppercase tracking-widest text-[#141414]">
+            {/* Navigation Links: Medium Style Clean Sans */}
+            <nav className="hidden md:flex items-center space-x-6 text-[13px] text-[#696359]">
               {navItems.map((item) => (
-                <div key={item.to} className="relative group/nav">
-                  <NavLink
-                    to={item.to}
-                    className={({ isActive }) =>
-                      `py-4 transition-colors flex items-center gap-1.5 ${
-                        isActive
-                          ? "font-bold text-[#141414] border-b-2 border-[#141414]"
-                          : "text-[#5e5a54] hover:text-[#141414]"
-                      }`
-                    }
-                  >
-                    {item.isWire && (
-                      <span className="w-2 h-2 rounded-full bg-[#b91c1c] animate-pulse inline-block" />
-                    )}
-                    <span>{item.label}</span>
-                  </NavLink>
-
-                  {/* Clarifying Hover Card (কোন অপশনের কি কাজ) */}
-                  <div className="absolute left-0 top-full mt-1 hidden group-hover/nav:block w-56 bg-[#ffffff] border border-[#141414] shadow-xl p-3 z-50 pointer-events-none">
-                    <p className="font-mono text-[10px] uppercase font-bold text-[#b91c1c] mb-1">
-                      {item.label}
-                    </p>
-                    <p className="font-serif normal-case text-xs text-[#5e5a54] leading-relaxed">
-                      {item.desc}
-                    </p>
-                    {item.isAuthProtected && (
-                      <span className="block mt-1 font-mono text-[9px] uppercase tracking-wider text-[#b91c1c]">
-                        * Author login required to publish
-                      </span>
-                    )}
-                  </div>
-                </div>
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  className={({ isActive }) =>
+                    `transition-colors hover:text-[#1a1917] flex items-center gap-1.5 ${
+                      isActive ? "text-[#1a1917] font-medium" : ""
+                    }`
+                  }
+                >
+                  {item.dot && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#b91c1c] animate-pulse inline-block" />
+                  )}
+                  <span>{item.name}</span>
+                </NavLink>
               ))}
             </nav>
-
-            {/* Right Controls: Search + Write / Atelier CTA */}
-            <div className="flex items-center gap-4 w-full lg:w-auto justify-between lg:justify-end">
-              {/* Search Toggle */}
-              {isSearchOpen ? (
-                <form
-                  onSubmit={handleSearchSubmit}
-                  className="flex items-center gap-2 border-b border-[#141414] pb-0.5"
-                >
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search by title, author, keyword..."
-                    autoFocus
-                    className="bg-transparent text-xs text-[#141414] placeholder-[#8c867c] focus:outline-none w-48 sm:w-64 font-serif italic"
-                  />
-                  <button
-                    type="submit"
-                    className="text-xs uppercase font-mono tracking-wider font-bold text-[#141414]"
-                  >
-                    Go
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsSearchOpen(false)}
-                    className="text-[#8c867c] hover:text-[#141414]"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </form>
-              ) : (
-                <button
-                  onClick={() => setIsSearchOpen(true)}
-                  className="flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-[#5e5a54] hover:text-[#141414] transition-colors py-2"
-                >
-                  <Search className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">{t("search")}</span>
-                </button>
-              )}
-
-              {/* Author Atelier CTA (Login Protected) */}
-              <Link
-                to="/addBlog"
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-mono uppercase tracking-wider border border-[#141414] bg-[#141414] text-[#faf8f5] hover:bg-transparent hover:text-[#141414] transition-all font-bold"
-                title={user ? "Open Atelier" : "Sign in to publish"}
-              >
-                <PenLine className="w-3 h-3" />
-                <span>{t("authorStudio")}</span>
-              </Link>
-
-              {/* Mobile Menu Hamburger */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-1 text-[#141414]"
-              >
-                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </button>
-            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Mobile Drawer Menu with Clear Descriptions */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden border-b border-[#141414] bg-[#f4f1ea] px-6 py-6 space-y-4 font-mono text-xs uppercase tracking-wider">
-          <div className="text-[10px] text-[#8c867c] border-b border-[#e8e4dc] pb-2">
-            Navigation Index
-          </div>
-          {navItems.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 border-b border-[#e8e4dc] text-[#141414] hover:text-[#b91c1c]"
+          {/* Right Action Icons: Search, Language, Write & Profile */}
+          <div className="flex items-center gap-4">
+            {/* Minimal Search Button */}
+            <button
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className="p-1.5 text-[#696359] hover:text-[#1a1917] transition-colors"
+              title="Search"
             >
-              <div className="font-bold flex items-center justify-between">
-                <span>{item.label}</span>
-                {item.isWire && (
-                  <span className="w-2 h-2 rounded-full bg-[#b91c1c] animate-pulse" />
-                )}
-              </div>
-              <p className="font-serif normal-case text-xs text-[#5e5a54] mt-0.5">
-                {item.desc}
-              </p>
-            </Link>
-          ))}
+              <Search className="w-4 h-4" />
+            </button>
 
-          {/* User Auth on Mobile */}
-          <div className="pt-2">
+            {/* Minimal Language Switcher */}
+            <div className="relative">
+              <button
+                onClick={() => setLangDropdownOpen(!langDropdownOpen)}
+                className="flex items-center gap-1 text-[13px] text-[#696359] hover:text-[#1a1917] transition-colors py-1 px-1.5"
+              >
+                <span>{currentLangObj.flag}</span>
+                <span className="hidden sm:inline">{currentLangObj.code.toUpperCase()}</span>
+                <ChevronDown className="w-3 h-3 opacity-60" />
+              </button>
+
+              {langDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-40 bg-[#faf8f5] border border-[#e2dbce] rounded-md shadow-lg z-50 p-1 divide-y divide-[#ece6dc]">
+                  <div className="max-h-56 overflow-y-auto">
+                    {LANGUAGES.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => {
+                          setCurrentLang(lang.code);
+                          setLangDropdownOpen(false);
+                        }}
+                        className={`w-full text-left px-3 py-1.5 text-xs flex items-center justify-between hover:bg-[#f0ebe1] rounded transition-colors ${
+                          currentLang === lang.code ? "font-semibold text-[#1a1917]" : "text-[#696359]"
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span>{lang.flag}</span>
+                          <span>{lang.nativeName}</span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Substack/Medium Style "Write" Button */}
+            <Link
+              to="/addBlog"
+              className="hidden sm:flex items-center gap-1.5 text-[13px] text-[#696359] hover:text-[#1a1917] transition-colors px-2 py-1"
+            >
+              <PenLine className="w-3.5 h-3.5" />
+              <span>Write</span>
+            </Link>
+
+            {/* User Profile or Sign In */}
             {user ? (
-              <div className="flex items-center justify-between text-xs">
-                <span>Author: {user.displayName}</span>
+              <div className="flex items-center gap-3 pl-2 border-l border-[#ece6dc]">
+                <img
+                  src={user.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"}
+                  alt={user.displayName}
+                  className="w-7 h-7 rounded-full object-cover border border-[#d8d0c2]"
+                />
                 <button
-                  onClick={() => {
-                    logOut();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="text-[#b91c1c] font-bold"
+                  onClick={logOut}
+                  className="text-[#9c9489] hover:text-[#b91c1c] text-xs transition-colors"
+                  title="Sign out"
                 >
-                  Sign Out
+                  <LogOut className="w-3.5 h-3.5" />
                 </button>
               </div>
             ) : (
               <Link
                 to="/login"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block text-center py-2 border border-[#141414] bg-[#141414] text-[#faf8f5] font-bold"
+                className="text-[13px] font-medium text-[#ffffff] bg-[#1a1917] hover:bg-[#33312e] px-3.5 py-1.5 rounded-full transition-colors"
               >
-                Sign In as Author
+                Sign In
               </Link>
             )}
+
+            {/* Mobile Menu Toggle */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-1.5 text-[#1a1917]"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
+        </div>
+      </div>
+
+      {/* Floating Inline Search Bar (Substack style) */}
+      {isSearchOpen && (
+        <div className="border-t border-[#ece6dc] bg-[#faf8f5] px-4 py-3">
+          <form onSubmit={handleSearchSubmit} className="max-w-xl mx-auto flex items-center gap-3">
+            <Search className="w-4 h-4 text-[#9c9489]" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search stories, ideas, architecture..."
+              autoFocus
+              className="w-full text-sm font-sans bg-transparent border-none outline-none text-[#1a1917] placeholder-[#9c9489]"
+            />
+            <button type="submit" className="text-xs font-medium text-[#1a1917] hover:underline">
+              Search
+            </button>
+            <button type="button" onClick={() => setIsSearchOpen(false)} className="text-[#9c9489]">
+              <X className="w-4 h-4" />
+            </button>
+          </form>
         </div>
       )}
 
-      {/* Guide Modal: Explaining Every Option (কোন অপশনের কি কাজ) */}
-      {guideModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#141414]/60 backdrop-blur-sm">
-          <div className="bg-[#faf8f5] border-2 border-[#141414] w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl">
-            <div className="p-6 border-b border-[#141414] flex items-center justify-between bg-[#f4f1ea]">
-              <div>
-                <span className="font-mono text-xs uppercase tracking-widest text-[#b91c1c] font-bold block mb-1">
-                  Newspaper Index & Guide
-                </span>
-                <h3 className="font-serif text-2xl font-bold text-[#141414]">
-                  ন্যাভিগেশন নির্দেশিকা (কোন অপশনের কি কাজ)
-                </h3>
-              </div>
-              <button
-                onClick={() => setGuideModalOpen(false)}
-                className="p-1.5 border border-[#141414] hover:bg-[#141414] hover:text-[#faf8f5] transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="p-6 overflow-y-auto space-y-4 divide-y divide-[#e8e4dc]">
-              {navItems.map((item, idx) => (
-                <div key={item.to} className="pt-3 first:pt-0 space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-bold text-[#b91c1c]">
-                      ০{idx + 1}. {item.label}
-                    </span>
-                    <span className="font-mono text-[10px] text-[#8c867c]">
-                      [{item.to}]
-                    </span>
-                  </div>
-                  <p className="font-serif text-sm text-[#141414] leading-relaxed">
-                    {item.desc}
-                  </p>
-                  {item.isAuthProtected && (
-                    <p className="font-mono text-[11px] text-[#b91c1c]">
-                      * দ্রষ্টব্য: অপ্রমাণিত বা স্প্যাম রোধে পাণ্ডুলিপি লেখার জন্য অথর লগইন বাধ্যতামূলক।
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="p-4 bg-[#f4f1ea] border-t border-[#141414] flex justify-end">
-              <button
-                onClick={() => setGuideModalOpen(false)}
-                className="px-5 py-2 border border-[#141414] bg-[#141414] text-[#faf8f5] font-mono text-xs uppercase tracking-wider font-bold"
-              >
-                Close Guide
-              </button>
-            </div>
-          </div>
+      {/* Mobile Drawer */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-[#ece6dc] bg-[#faf8f5] px-4 py-3 space-y-2">
+          {navItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              onClick={() => setMobileMenuOpen(false)}
+              className="block py-1.5 text-sm text-[#696359] hover:text-[#1a1917]"
+            >
+              {item.name}
+            </Link>
+          ))}
+          <Link
+            to="/addBlog"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block py-1.5 text-sm font-medium text-[#1a1917]"
+          >
+            Write Story
+          </Link>
         </div>
       )}
     </header>
