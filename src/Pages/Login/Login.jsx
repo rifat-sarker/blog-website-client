@@ -2,33 +2,86 @@ import { useContext, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../providers/AuthProvider";
 import { useLanguage } from "../../context/LanguageContext";
-import { Lock, Mail, ArrowRight, ShieldCheck, PenLine } from "lucide-react";
+import { Mail, ArrowRight, ShieldCheck, KeyRound, CheckCircle2 } from "lucide-react";
 
 const Login = () => {
-  const { signInUser, googleLogIn } = useContext(AuthContext);
+  const { sendOTP, verifyOTP, googleLogIn } = useContext(AuthContext);
   const { t, currentLang } = useLanguage();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
+  const [step, setStep] = useState("email"); // 'email' or 'otp'
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+
   const navigate = useNavigate();
   const location = useLocation();
   const from = location?.state || "/addBlog";
 
-  const handleSignIn = async (e) => {
+  // Step 1: Request OTP to Email via Backend Google SMTP
+  const handleRequestOTP = async (e) => {
     e.preventDefault();
     if (!email.trim()) return;
 
     setIsSubmitting(true);
-    await signInUser(email, password || "editorial_pass");
-    setIsSubmitting(false);
-    navigate(from, { replace: true });
+    setErrorMsg("");
+    setSuccessMsg("");
+
+    try {
+      await sendOTP(email);
+      setStep("otp");
+      setSuccessMsg(
+        currentLang === "bn"
+          ? `আপনার ${email} ঠিকানায় ৬ ডিজিটের ওটিপি পাঠানো হয়েছে!`
+          : `A 6-digit verification code has been dispatched to ${email}`
+      );
+    } catch (err) {
+      setErrorMsg(
+        err?.response?.data?.error ||
+          (currentLang === "bn"
+            ? "ওটিপি পাঠাতে সমস্যা হয়েছে। ইমেইল চেক করুন।"
+            : "Failed to dispatch verification code.")
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
+  // Step 2: Verify OTP
+  const handleVerifyOTP = async (e) => {
+    e.preventDefault();
+    if (!otp.trim()) return;
+
+    setIsSubmitting(true);
+    setErrorMsg("");
+
+    try {
+      await verifyOTP(email, otp);
+      navigate(from, { replace: true });
+    } catch (err) {
+      setErrorMsg(
+        err?.response?.data?.error ||
+          (currentLang === "bn"
+            ? "ভুল কোড দেওয়া হয়েছে অথবা মেয়াদ শেষ হয়েছে।"
+            : "Invalid or expired verification code.")
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Google 1-Click Login
   const handleGoogleLogin = async () => {
     setIsSubmitting(true);
-    await googleLogIn();
-    setIsSubmitting(false);
-    navigate(from, { replace: true });
+    setErrorMsg("");
+    try {
+      await googleLogIn();
+      navigate(from, { replace: true });
+    } catch (err) {
+      setErrorMsg("Google Sign-In failed.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -46,9 +99,24 @@ const Login = () => {
             {t("signIn")}
           </h1>
           <p className="font-serif italic text-xs text-[#5e5a54] max-w-sm mx-auto">
-            {t("loginRequiredDesc")}
+            {currentLang === "bn"
+              ? "মঞ্চে পাণ্ডুলিপি প্রকাশ বা সংরক্ষণের জন্য জিমেইল বা ওটিপির মাধ্যমে পরিচয় নিশ্চিত করুন।"
+              : "Verify your credentials via verified Google account or passwordless email access code."}
           </p>
         </div>
+
+        {/* Feedback Messages */}
+        {errorMsg && (
+          <div className="p-3 bg-[#fef2f2] border border-[#b91c1c] text-[#b91c1c] text-xs font-mono">
+            ⚠️ {errorMsg}
+          </div>
+        )}
+        {successMsg && (
+          <div className="p-3 bg-[#f0fdf4] border border-[#15803d] text-[#15803d] text-xs font-mono flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+            <span>{successMsg}</span>
+          </div>
+        )}
 
         {/* Google 1-Click Login Button */}
         <button
@@ -75,74 +143,95 @@ const Login = () => {
               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
             />
           </svg>
-          <span>{currentLang === "bn" ? "গুগল অ্যাকাউন্ট দিয়ে ১-ক্লিকে লগইন" : "Continue with Google Account"}</span>
+          <span>{currentLang === "bn" ? "গুগল অ্যাকাউন্ট দিয়ে ১-ক্লিকে প্রবেশ" : "Continue with Verified Google"}</span>
         </button>
 
+        {/* Divider */}
         <div className="relative flex items-center justify-center">
           <div className="border-t border-[#e8e4dc] w-full" />
-          <span className="bg-[#ffffff] px-3 font-mono text-[10px] uppercase text-[#8c867c]">
-            {currentLang === "bn" ? "অথবা ইমেইল দ্বারা" : "or via author email"}
+          <span className="bg-[#ffffff] px-3 font-mono text-[10px] text-[#5e5a54] uppercase tracking-widest relative">
+            {currentLang === "bn" ? "অথবা ইমেইল ওটিপি কোড" : "OR EMAIL ACCESS CODE"}
           </span>
         </div>
 
-        {/* Email/Password Form */}
-        <form onSubmit={handleSignIn} className="space-y-5">
-          <div className="space-y-1.5">
-            <label className="block font-mono text-xs uppercase tracking-wider text-[#141414] font-bold">
-              {currentLang === "bn" ? "লেখকের ইমেইল ঠিকানা" : "Author Email Address"}
-            </label>
-            <div className="flex border border-[#141414] bg-[#faf8f5] p-2.5">
-              <Mail className="w-4 h-4 text-[#8c867c] mr-2 flex-shrink-0 mt-0.5" />
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                placeholder="author@mixhub.dev"
-                className="w-full bg-transparent font-serif text-sm text-[#141414] placeholder-[#8c867c] focus:outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <label className="block font-mono text-xs uppercase tracking-wider text-[#141414] font-bold">
-                {currentLang === "bn" ? "গোপন পাসওয়ার্ড" : "Passphrase"}
+        {/* Step 1: Email Form */}
+        {step === "email" ? (
+          <form onSubmit={handleRequestOTP} className="space-y-4">
+            <div>
+              <label className="block font-mono text-xs uppercase tracking-wider text-[#141414] font-bold mb-1.5">
+                {currentLang === "bn" ? "আপনার ইমেইল ঠিকানা" : "Author Email Address"}
               </label>
-              <span className="font-mono text-[10px] text-[#8c867c]">
-                {currentLang === "bn" ? "যেকোনো কী ব্যবহারযোগ্য" : "Any key for session"}
-              </span>
+              <div className="relative">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="editor@mixhub.press"
+                  required
+                  className="w-full bg-[#faf8f5] border border-[#141414] p-3 pl-10 text-sm font-mono text-[#141414] placeholder-[#8c867c] focus:outline-none"
+                />
+                <Mail className="w-4 h-4 text-[#8c867c] absolute left-3 top-3.5" />
+              </div>
             </div>
-            <div className="flex border border-[#141414] bg-[#faf8f5] p-2.5">
-              <Lock className="w-4 h-4 text-[#8c867c] mr-2 flex-shrink-0 mt-0.5" />
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
-                className="w-full bg-transparent font-serif text-sm text-[#141414] placeholder-[#8c867c] focus:outline-none"
-              />
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-3 px-4 border border-[#141414] bg-[#141414] text-[#faf8f5] text-xs font-mono uppercase tracking-widest font-bold hover:bg-transparent hover:text-[#141414] transition-all flex items-center justify-center gap-2"
+            >
+              <span>{isSubmitting ? "Dispatching..." : currentLang === "bn" ? "ওটিপি কোড পাঠান" : "Send Access Code"}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </form>
+        ) : (
+          /* Step 2: OTP Verification Form */
+          <form onSubmit={handleVerifyOTP} className="space-y-4">
+            <div>
+              <div className="flex justify-between items-center mb-1.5">
+                <label className="block font-mono text-xs uppercase tracking-wider text-[#141414] font-bold">
+                  {currentLang === "bn" ? "৬ ডিজিটের ওটিপি কোড" : "6-Digit Access Code"}
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setStep("email")}
+                  className="font-mono text-[11px] text-[#b91c1c] underline hover:text-[#141414]"
+                >
+                  {currentLang === "bn" ? "ইমেইল পরিবর্তন" : "Change Email"}
+                </button>
+              </div>
+              <div className="relative">
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+                  placeholder="123456"
+                  required
+                  autoFocus
+                  className="w-full bg-[#faf8f5] border border-[#141414] p-3 pl-10 text-xl font-mono tracking-[0.3em] text-center text-[#141414] placeholder-[#8c867c] focus:outline-none"
+                />
+                <KeyRound className="w-4 h-4 text-[#8c867c] absolute left-3 top-4" />
+              </div>
             </div>
-          </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-3 border border-[#141414] bg-[#141414] text-[#faf8f5] font-mono text-xs uppercase tracking-widest font-bold hover:bg-[#2e2e2e] transition-colors flex items-center justify-center gap-2"
-          >
-            <PenLine className="w-3.5 h-3.5" />
-            <span>{isSubmitting ? "Verifying..." : (currentLang === "bn" ? "লেখক হিসেবে প্রবেশ করুন" : "Authenticate as Author")}</span>
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-3 px-4 border border-[#141414] bg-[#141414] text-[#faf8f5] text-xs font-mono uppercase tracking-widest font-bold hover:bg-transparent hover:text-[#141414] transition-all flex items-center justify-center gap-2"
+            >
+              <span>{isSubmitting ? "Verifying..." : currentLang === "bn" ? "কোড যাচাই ও প্রবেশ" : "Verify & Enter"}</span>
+              <ShieldCheck className="w-4 h-4" />
+            </button>
+          </form>
+        )}
 
-        {/* Return Link */}
-        <div className="text-center pt-2">
-          <Link
-            to="/"
-            className="font-mono text-xs uppercase tracking-wider text-[#5e5a54] hover:text-[#141414] underline"
-          >
-            ← {currentLang === "bn" ? "লগইন না করে প্রধান পাতায় ফিরে যান" : "Return to Front Page Without Signing In"}
-          </Link>
+        {/* Footer Note */}
+        <div className="pt-4 border-t border-[#e8e4dc] text-center">
+          <p className="font-serif italic text-xs text-[#5e5a54]">
+            {currentLang === "bn"
+              ? "প্রবেশ সম্পন্ন হলে স্বয়ংক্রিয়ভাবে লেখক স্টুডিও ও ড্রাফটিং ডেস্ক উন্মুক্ত হবে।"
+              : "Accredited contributors gain direct access to the editorial atelier and telemetry dispatches."}
+          </p>
         </div>
       </div>
     </div>

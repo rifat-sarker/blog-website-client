@@ -3,9 +3,13 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 COPY . .
+# Point client to backend port 5001 inside Docker or host
+ENV VITE_API_URL=http://localhost:5001/api
+ENV VITE_MAIN_URL=http://localhost:5001/api
+
 RUN npm run build
 
 # Production Nginx serving stage
@@ -27,4 +31,3 @@ RUN echo 'server { \
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
-

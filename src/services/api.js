@@ -664,6 +664,22 @@ export const editorialService = {
     }
     return LIVE_WIRE_DISPATCHES;
   },
+
+  // Auth Integration
+  async requestEmailOTP(email) {
+    const res = await apiClient.post("/auth/send-otp", { email });
+    return res.data;
+  },
+
+  async verifyEmailOTP(email, otp) {
+    const res = await apiClient.post("/auth/verify-otp", { email, otp });
+    return res.data;
+  },
+
+  async verifyGoogleLogin(payload) {
+    const res = await apiClient.post("/auth/google", payload);
+    return res.data;
+  },
 };
 
 export const blogService = editorialService;
