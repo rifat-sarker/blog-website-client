@@ -1,7 +1,8 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../providers/AuthProvider";
 import { useLanguage } from "../../context/LanguageContext";
+import { editorialService, getLocalized } from "../../services/api";
 import {
   Search,
   Bell,
@@ -9,25 +10,59 @@ import {
   Bookmark,
   ChevronDown,
   LogOut,
-  User as UserIcon,
-  Compass,
-  Radio,
-  BookOpen,
-  Trophy,
+  X,
+  ArrowRight,
 } from "lucide-react";
 
 const Navbar = () => {
   const { user, logOut } = useContext(AuthContext);
   const { currentLang, setCurrentLang, t, LANGUAGES } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
+  const [liveResults, setLiveResults] = useState([]);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+  const searchContainerRef = useRef(null);
   const navigate = useNavigate();
+
+  // Instant Real-Time Search As You Type
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setLiveResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      const articles = await editorialService.getArticles();
+      const q = searchQuery.toLowerCase().trim();
+      const matched = articles.filter((a) => {
+        const title = getLocalized(a.title, currentLang).toLowerCase();
+        const sdesc = getLocalized(a.sdesc, currentLang).toLowerCase();
+        const cat = getLocalized(a.category, currentLang).toLowerCase();
+        return title.includes(q) || sdesc.includes(q) || cat.includes(q);
+      });
+      setLiveResults(matched.slice(0, 5));
+    }, 150);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, currentLang]);
+
+  // Click outside to close instant search dropdown
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
+        setLiveResults([]);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/allBlog?q=${encodeURIComponent(searchQuery.trim())}`);
+      setLiveResults([]);
       setSearchQuery("");
     }
   };
@@ -38,33 +73,73 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 bg-[#ffffff] border-b border-[#f2f2f2]">
       <div className="max-w-[1336px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-[57px]">
-          {/* Left: Medium Official Logo + Search Box */}
-          <div className="flex items-center gap-4 flex-1">
-            <Link to="/" className="flex items-center gap-2 flex-shrink-0">
-              {/* Exact Medium 3-Circles Logo Mark */}
-              <svg className="w-[120px] h-[25px]" viewBox="0 0 1043.63 592.71">
-                <g>
-                  <path d="M588.67 296.36c0 163.67-131.78 296.35-294.33 296.35S0 460.03 0 296.36 131.78 0 294.34 0s294.33 132.69 294.33 296.36M911.56 296.36c0 154.06-65.89 279-147.17 279s-147.17-124.94-147.17-279 65.88-279 147.16-279 147.17 124.9 147.17 279M1043.63 296.36c0 138-23.17 249.94-51.76 249.94s-51.75-111.91-51.75-249.94 23.17-249.94 51.75-249.94 51.76 111.9 51.76 249.94" fill="#242424"/>
-                </g>
+          {/* Left: Medium Official Logo + Instant Search Box */}
+          <div className="flex items-center gap-5 flex-1 relative" ref={searchContainerRef}>
+            <Link to="/" className="flex items-center gap-2.5 flex-shrink-0 group">
+              {/* Medium Official 3-Circles Logo Mark */}
+              <svg className="w-[32px] h-[32px]" viewBox="0 0 1043.63 592.71">
+                <path
+                  d="M588.67 296.36c0 163.67-131.78 296.35-294.33 296.35S0 460.03 0 296.36 131.78 0 294.34 0s294.33 132.69 294.33 296.36M911.56 296.36c0 154.06-65.89 279-147.17 279s-147.17-124.94-147.17-279 65.88-279 147.16-279 147.17 124.9 147.17 279M1043.63 296.36c0 138-23.17 249.94-51.76 249.94s-51.75-111.91-51.75-249.94 23.17-249.94 51.75-249.94 51.76 111.9 51.76 249.94"
+                  fill="#242424"
+                />
               </svg>
+              {/* Medium Typographic Wordmark */}
+              <span className="font-serif text-[22px] font-bold tracking-tight text-[#242424]">
+                Medium
+              </span>
             </Link>
 
-            {/* Medium Pill Search Input */}
-            <form onSubmit={handleSearchSubmit} className="hidden sm:flex items-center relative max-w-[240px] w-full">
+            {/* Medium Pill Search Input (Real-time Instant Search) */}
+            <form onSubmit={handleSearchSubmit} className="hidden sm:flex items-center relative max-w-[260px] w-full">
               <Search className="w-4 h-4 text-[#6b6b6b] absolute left-3 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search"
-                className="w-full bg-[#f9f9f9] border border-transparent focus:border-[#e6e6e6] focus:bg-[#ffffff] text-sm text-[#242424] placeholder-[#6b6b6b] rounded-full py-2 pl-9 pr-4 outline-none transition-all"
+                placeholder="Search Medium..."
+                className="w-full bg-[#f9f9f9] border border-transparent focus:border-[#e6e6e6] focus:bg-[#ffffff] text-sm text-[#242424] placeholder-[#6b6b6b] rounded-full py-2 pl-9 pr-8 outline-none transition-all"
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2.5 text-[#6b6b6b] hover:text-[#242424]"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
             </form>
+
+            {/* Instant Real-Time Search Results Dropdown */}
+            {liveResults.length > 0 && (
+              <div className="absolute top-[48px] left-[155px] w-96 bg-[#ffffff] border border-[#f2f2f2] rounded-lg shadow-2xl z-50 overflow-hidden divide-y divide-[#f2f2f2]">
+                <div className="p-2.5 text-[11px] font-mono uppercase tracking-wider text-[#6b6b6b] bg-[#fafafa]">
+                  Stories ({liveResults.length})
+                </div>
+                {liveResults.map((story) => (
+                  <Link
+                    key={story._id || story.id}
+                    to={`/blog/${story._id || story.id}`}
+                    onClick={() => {
+                      setLiveResults([]);
+                      setSearchQuery("");
+                    }}
+                    className="p-3 block hover:bg-[#f9f9f9] transition-colors"
+                  >
+                    <div className="text-xs font-semibold text-[#242424] truncate">
+                      {getLocalized(story.title, currentLang)}
+                    </div>
+                    <div className="text-[11px] text-[#6b6b6b] truncate mt-0.5">
+                      {getLocalized(story.sdesc, currentLang)}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Right: Write Button, Live Wire, Language, Profile */}
           <div className="flex items-center gap-4 sm:gap-6">
-            {/* Medium "Write" Button */}
             <Link
               to="/addBlog"
               className="flex items-center gap-2 text-sm text-[#6b6b6b] hover:text-[#242424] transition-colors"
@@ -73,7 +148,6 @@ const Navbar = () => {
               <span className="hidden sm:inline">Write</span>
             </Link>
 
-            {/* Live Wire Real-Time Telemetry Link */}
             <Link
               to="/live-wire"
               className="flex items-center gap-1.5 text-xs text-[#6b6b6b] hover:text-[#242424] transition-colors"
@@ -83,7 +157,7 @@ const Navbar = () => {
               <span className="hidden md:inline font-mono text-[11px] uppercase tracking-wider">The Wire</span>
             </Link>
 
-            {/* Language Switcher Dropdown */}
+            {/* Language Switcher */}
             <div className="relative">
               <button
                 onClick={() => setLangDropdownOpen(!langDropdownOpen)}
@@ -119,7 +193,7 @@ const Navbar = () => {
               )}
             </div>
 
-            {/* User Profile / Medium Green Sign In Button */}
+            {/* Profile or Get Started Button */}
             {user ? (
               <div className="relative">
                 <button
@@ -147,7 +221,7 @@ const Navbar = () => {
                         className="flex items-center gap-2.5 px-3 py-2 hover:bg-[#f9f9f9] rounded transition-colors text-xs text-[#6b6b6b]"
                       >
                         <Bookmark className="w-4 h-4" />
-                        <span>Reading list (Shelf)</span>
+                        <span>Reading list</span>
                       </Link>
                       <Link
                         to="/addBlog"

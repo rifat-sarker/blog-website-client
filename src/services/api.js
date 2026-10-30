@@ -665,6 +665,25 @@ export const editorialService = {
     return LIVE_WIRE_DISPATCHES;
   },
 
+  // Dynamic Likes (Claps) & Comments
+  async clapStory(id) {
+    try {
+      const res = await apiClient.post(`/blogs/${id}/clap`);
+      return res.data;
+    } catch {
+      return { claps: 1 };
+    }
+  },
+
+  async addComment(id, comment) {
+    try {
+      const res = await apiClient.post(`/blogs/${id}/comments`, comment);
+      return res.data;
+    } catch {
+      return [comment];
+    }
+  },
+
   // Auth Integration
   async requestEmailOTP(email) {
     const res = await apiClient.post("/auth/send-otp", { email });

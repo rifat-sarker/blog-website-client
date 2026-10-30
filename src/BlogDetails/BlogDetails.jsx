@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { editorialService, getLocalized } from "../services/api";
 import { useLanguage } from "../context/LanguageContext";
-import { Bookmark, MessageCircle, Share2, MoreHorizontal, ArrowLeft } from "lucide-react";
+import { Bookmark, MessageCircle, Share2, Check, ArrowLeft } from "lucide-react";
 
 const BlogDetails = () => {
   const { id } = useParams();
@@ -10,10 +10,12 @@ const BlogDetails = () => {
   const [article, setArticle] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
-  const [claps, setClaps] = useState(48);
+  const [copied, setCopied] = useState(false);
+  const [claps, setClaps] = useState(0);
   const [hasClapped, setHasClapped] = useState(false);
   const [responses, setResponses] = useState([]);
   const [newResponse, setNewResponse] = useState("");
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -22,58 +24,76 @@ const BlogDetails = () => {
     editorialService.getArticleById(id).then((data) => {
       if (isMounted && data) {
         setArticle(data);
+        setClaps(data.claps || 48);
+        setResponses(data.comments || []);
         setIsLoading(false);
       }
     });
 
-    const savedNotes = JSON.parse(localStorage.getItem(`notes_${id}`) || "[]");
-    if (savedNotes.length > 0) {
-      setResponses(savedNotes);
-    } else {
-      setResponses([
-        {
-          id: "res-1",
-          author: currentLang === "bn" ? "সহযাত্রী পাঠক" : "Sarah Jenkins",
-          date: currentLang === "bn" ? "২ দিন আগে" : "2 days ago",
-          text:
-            currentLang === "bn"
-              ? "অত্যন্ত গভীর ও সময়োপযোগী ভাবনা। সফটওয়্যার আর্কিটেকচারে এমন স্বচ্ছতা সত্যিই প্রয়োজন।"
-              : "This resonated so deeply with our team's recent transition back to deterministic monoliths. Beautifully written.",
-        },
-      ]);
-    }
+    // Check if saved in shelf
+    editorialService.getSavedArticles().then((savedList) => {
+      const exists = savedList.some((s) => (s._id || s.id || s.blogId) === id);
+      if (isMounted) setIsSaved(exists);
+    });
 
     return () => {
       isMounted = false;
     };
   }, [id, currentLang]);
 
-  const handleClap = () => {
+  // Dynamic Live Clap (Backend Persisted)
+  const handleClap = async () => {
     setClaps((prev) => prev + 1);
     setHasClapped(true);
+    await editorialService.clapStory(id);
   };
 
+  // Dynamic Bookmark (Backend & LocalStorage Synchronized)
   const handleSave = async () => {
     if (!article) return;
-    await editorialService.saveArticle(article);
-    setIsSaved(true);
+    if (isSaved) {
+      await editorialService.removeSavedArticle(id);
+      setIsSaved(false);
+    } else {
+      await editorialService.saveArticle(article);
+      setIsSaved(true);
+    }
   };
 
-  const handleAddResponse = (e) => {
-    e.preventDefault();
-    if (!newResponse.trim()) return;
+  // Dynamic Share (Native Web Share API + Clipboard Fallback)
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: getLocalized(article?.title, currentLang),
+          url: window.location.href,
+        });
+        return;
+      } catch (err) {
+        // Fallback to clipboard
+      }
+    }
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
-    const entry = {
-      id: `res-${Date.now()}`,
-      author: currentLang === "bn" ? "পাঠক" : "Reader",
-      date: currentLang === "bn" ? "এইমাত্র" : "Just now",
+  // Dynamic Comment Add (Backend Persisted)
+  const handleAddResponse = async (e) => {
+    e.preventDefault();
+    if (!newResponse.trim() || isSubmittingComment) return;
+
+    setIsSubmittingComment(true);
+    const newComment = {
+      author: "Reader",
       text: newResponse.trim(),
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
     };
 
-    const updated = [entry, ...responses];
-    setResponses(updated);
-    localStorage.setItem(`notes_${id}`, JSON.stringify(updated));
+    const updated = await editorialService.addComment(id, newComment);
+    setResponses(Array.isArray(updated) ? updated : [newComment, ...responses]);
     setNewResponse("");
+    setIsSubmittingComment(false);
   };
 
   if (isLoading) {
@@ -86,10 +106,9 @@ const BlogDetails = () => {
     );
   }
 
-  const { kicker, title, sdesc, ldesc, image, author, date, readTime, words } = article || {};
+  const { title, sdesc, ldesc, image, author, date, readTime } = article || {};
 
   const localizedTitle = getLocalized(title, currentLang);
-  const localizedKicker = getLocalized(kicker, currentLang);
   const localizedSdesc = getLocalized(sdesc, currentLang);
   const localizedLdesc = getLocalized(ldesc, currentLang);
   const localizedAuthorName = getLocalized(author?.name, currentLang) || "Rifat Sarker";
@@ -139,17 +158,21 @@ const BlogDetails = () => {
           </div>
         </div>
 
-        {/* Action icons */}
+        {/* Dynamic Action icons (Save & Share) */}
         <div className="flex items-center gap-4 text-[#6b6b6b]">
-          <button onClick={handleSave} className="hover:text-[#242424] transition-colors" title="Save story">
+          <button
+            onClick={handleSave}
+            className="hover:text-[#242424] transition-colors p-1"
+            title={isSaved ? "Remove from Reading List" : "Save story"}
+          >
             <Bookmark className={`w-5 h-5 stroke-[1.5] ${isSaved ? "fill-[#242424] text-[#242424]" : ""}`} />
           </button>
           <button
-            onClick={() => navigator.clipboard.writeText(window.location.href)}
-            className="hover:text-[#242424] transition-colors"
-            title="Copy link"
+            onClick={handleShare}
+            className="hover:text-[#242424] transition-colors p-1 flex items-center gap-1"
+            title="Share story"
           >
-            <Share2 className="w-5 h-5 stroke-[1.5]" />
+            {copied ? <Check className="w-5 h-5 text-[#1a8917]" /> : <Share2 className="w-5 h-5 stroke-[1.5]" />}
           </button>
         </div>
       </div>
@@ -165,7 +188,7 @@ const BlogDetails = () => {
         </figure>
       )}
 
-      {/* Medium Signature Reading Typography: 20px, 1.75 line-height, Source Serif / Charter */}
+      {/* Medium Signature Reading Typography */}
       <div className="font-medium-serif text-[#242424] text-[19px] sm:text-[21px] leading-[1.8] space-y-7">
         {localizedLdesc ? (
           localizedLdesc.split("\n\n").map((block, idx) => {
@@ -201,15 +224,16 @@ const BlogDetails = () => {
         )}
       </div>
 
-      {/* Medium Clap & Response Action Bar */}
+      {/* Medium Dynamic Clap & Response Bar */}
       <div className="mt-14 py-4 border-y border-[#f2f2f2] flex items-center justify-between text-[#6b6b6b] text-sm">
         <div className="flex items-center gap-6">
-          {/* Clap Icon */}
+          {/* Dynamic Clap Button */}
           <button
             onClick={handleClap}
-            className={`flex items-center gap-1.5 transition-colors ${
+            className={`flex items-center gap-2 transition-colors ${
               hasClapped ? "text-[#1a8917] font-semibold" : "hover:text-[#242424]"
             }`}
+            title="Clap for this story"
           >
             <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
               <path d="M11.37 2.19a.75.75 0 0 1 .76.04l8 6a.75.75 0 0 1 .15 1.04l-4 5.5a.75.75 0 0 1-.95.23l-3.33-1.66-2.5 3.33a.75.75 0 0 1-1.05.15l-6-4.5a.75.75 0 0 1-.15-1.04l6-8a.75.75 0 0 1 1.07-.09z"/>
@@ -217,7 +241,7 @@ const BlogDetails = () => {
             <span>{claps}</span>
           </button>
 
-          {/* Response Count */}
+          {/* Dynamic Response Count */}
           <div className="flex items-center gap-1.5 hover:text-[#242424] transition-colors cursor-pointer">
             <MessageCircle className="w-5 h-5 stroke-[1.5]" />
             <span>{responses.length}</span>
@@ -225,25 +249,22 @@ const BlogDetails = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <button onClick={handleSave} className="hover:text-[#242424] transition-colors">
+          <button onClick={handleSave} className="hover:text-[#242424] transition-colors p-1">
             <Bookmark className={`w-5 h-5 stroke-[1.5] ${isSaved ? "fill-[#242424] text-[#242424]" : ""}`} />
           </button>
-          <button
-            onClick={() => navigator.clipboard.writeText(window.location.href)}
-            className="hover:text-[#242424] transition-colors"
-          >
-            <Share2 className="w-5 h-5 stroke-[1.5]" />
+          <button onClick={handleShare} className="hover:text-[#242424] transition-colors p-1">
+            {copied ? <Check className="w-5 h-5 text-[#1a8917]" /> : <Share2 className="w-5 h-5 stroke-[1.5]" />}
           </button>
         </div>
       </div>
 
-      {/* Medium Responses (Comments) Section */}
+      {/* Dynamic Responses (Comments) Section */}
       <section className="mt-12 space-y-6">
         <h3 className="font-sans font-bold text-xl text-[#242424]">
           Responses ({responses.length})
         </h3>
 
-        {/* Input box */}
+        {/* Dynamic Comment Input */}
         <form onSubmit={handleAddResponse} className="rounded-lg border border-[#f2f2f2] p-4 shadow-sm space-y-3">
           <textarea
             rows={3}
@@ -255,22 +276,22 @@ const BlogDetails = () => {
           <div className="flex justify-end gap-2 pt-2">
             <button
               type="submit"
-              disabled={!newResponse.trim()}
+              disabled={!newResponse.trim() || isSubmittingComment}
               className="text-xs font-medium px-4 py-1.5 rounded-full medium-btn-green disabled:opacity-40"
             >
-              Respond
+              {isSubmittingComment ? "Posting..." : "Respond"}
             </button>
           </div>
         </form>
 
-        {/* Response List */}
+        {/* Dynamic Response List */}
         <div className="space-y-4 pt-4 divide-y divide-[#f2f2f2]">
-          {responses.map((res) => (
-            <div key={res.id} className="pt-4 first:pt-0 space-y-2">
+          {responses.map((res, i) => (
+            <div key={res._id || i} className="pt-4 first:pt-0 space-y-2">
               <div className="flex items-center gap-2 text-xs">
-                <span className="font-semibold text-[#242424]">{res.author}</span>
+                <span className="font-semibold text-[#242424]">{res.author || "Reader"}</span>
                 <span className="text-[#6b6b6b]">•</span>
-                <span className="text-[#6b6b6b]">{res.date}</span>
+                <span className="text-[#6b6b6b]">{res.date ? new Date(res.date).toLocaleDateString() : "Just now"}</span>
               </div>
               <p className="font-sans text-sm text-[#242424] leading-relaxed">
                 {res.text}
