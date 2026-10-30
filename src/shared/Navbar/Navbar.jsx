@@ -191,21 +191,49 @@ const Navbar = () => {
       </div>
 
       {/* Main Newspaper Masthead */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 text-center">
-        <div className="inline-block">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 text-center relative overflow-hidden">
+        {/* Visible Handcrafted Asian Floating Ink Clouds (Sumi-e Outline & Stroke) */}
+        <div className="absolute top-2 left-4 sm:left-12 opacity-60 select-none pointer-events-none">
+          <svg width="140" height="60" viewBox="0 0 140 60" fill="none">
+            <path
+              d="M15,42 Q25,20 48,26 Q65,10 88,18 Q105,8 120,22 Q132,16 135,35 Q140,48 125,54 Q110,60 90,52 Q70,62 50,52 Q30,58 15,42 Z"
+              stroke="#7a7062"
+              strokeWidth="1.2"
+              strokeDasharray="3,2"
+              fill="rgba(255,255,255,0.4)"
+            />
+            <path d="M30,40 Q45,28 65,32 Q80,22 95,30" stroke="#7a7062" strokeWidth="0.8" />
+          </svg>
+        </div>
+
+        <div className="absolute bottom-2 right-4 sm:right-16 opacity-60 select-none pointer-events-none">
+          <svg width="160" height="70" viewBox="0 0 160 70" fill="none">
+            <path
+              d="M20,48 Q35,22 62,30 Q82,12 108,22 Q128,10 142,26 Q155,20 156,42 Q158,58 138,62 Q118,70 95,60 Q72,72 48,60 Q28,68 20,48 Z"
+              stroke="#7a7062"
+              strokeWidth="1.4"
+              fill="rgba(255,255,255,0.45)"
+            />
+            <path d="M40,46 Q60,32 85,38 Q105,26 125,36" stroke="#7a7062" strokeWidth="0.9" strokeDasharray="4,2" />
+          </svg>
+        </div>
+
+        <div className="inline-block relative z-10">
           <Link to="/" className="group inline-block">
             <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-[#141414] transition-colors group-hover:text-[#2e2e2e]">
               MixHub Dispatch
             </h1>
           </Link>
-          <div className="mt-2 text-xs sm:text-sm font-serif italic text-[#5e5a54] tracking-wide">
-            {t("tagline")}
+          <div className="mt-2 text-xs sm:text-sm font-serif italic text-[#5e5a54] tracking-wide flex items-center justify-center gap-3">
+            <span className="w-12 border-t border-[#b8af9f]" />
+            <span>{t("tagline")}</span>
+            <span className="w-12 border-t border-[#b8af9f]" />
           </div>
         </div>
       </div>
 
       {/* Primary Newspaper Navigation Strip with Double Border & Clarity */}
-      <div className="border-t border-b border-[#141414] bg-[#faf8f5]">
+      <div className="border-t border-b border-[#141414] bg-[#f7f4ee]/90 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
             {/* Desktop Navigation Links with Clear Tooltip Subtext */}

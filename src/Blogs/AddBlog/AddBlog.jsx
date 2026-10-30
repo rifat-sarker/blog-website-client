@@ -64,7 +64,10 @@ const AddBlog = () => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="border border-[#141414] bg-[#ffffff] p-6 sm:p-10 space-y-8">
+      <form onSubmit={handleSubmit} className="washi-card p-6 sm:p-10 space-y-8 relative overflow-hidden">
+        {/* Subtle handcrafted scratch / sketch corner motif */}
+        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#eae4d6]/40 to-transparent pointer-events-none" />
+        
         {/* Title */}
         <div className="space-y-2">
           <label className="block font-mono text-xs uppercase tracking-wider text-[#141414] font-bold">
@@ -76,7 +79,7 @@ const AddBlog = () => {
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. On the Quiet Elegance of Provable Systems"
             required
-            className="w-full bg-[#faf8f5] border border-[#141414] p-3 text-xl font-serif text-[#141414] placeholder-[#8c867c] focus:outline-none"
+            className="w-full bg-[#fdfbf7] border border-[#141414] p-3 text-xl font-serif text-[#141414] placeholder-[#8c867c] focus:outline-none shadow-inner"
           />
         </div>
 
