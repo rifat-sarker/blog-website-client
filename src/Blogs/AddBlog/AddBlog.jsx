@@ -4,7 +4,17 @@ import { editorialService } from "../../services/api";
 import { AuthContext } from "../../providers/AuthProvider";
 import { Image as ImageIcon, Send, UploadCloud, X, Loader2, Link2 } from "lucide-react";
 
-const CATEGORIES = ["Technology", "Architecture", "Philosophy", "Engineering", "Culture", "Design"];
+const CATEGORIES = [
+  "Technology",
+  "Programming",
+  "Architecture",
+  "Engineering",
+  "Design",
+  "Philosophy",
+  "Culture",
+  "Science",
+  "Other",
+];
 
 const AddBlog = () => {
   const navigate = useNavigate();

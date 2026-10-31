@@ -8,12 +8,14 @@ import { Bookmark } from "lucide-react";
 const TOPICS = [
   "For you",
   "Technology",
-  "Architecture",
-  "Philosophy",
-  "Engineering",
   "Programming",
-  "Culture",
+  "Architecture",
+  "Engineering",
   "Design",
+  "Philosophy",
+  "Culture",
+  "Science",
+  "Other",
 ];
 
 const Home = () => {
@@ -239,7 +241,7 @@ const Home = () => {
           <div className="space-y-3 pt-6 border-t border-[#f2f2f2]">
             <h3 className="text-sm font-semibold text-[#242424]">Recommended topics</h3>
             <div className="flex flex-wrap gap-2">
-              {["Technology", "Architecture", "Design", "Writing", "AI & NLP", "Philosophy"].map(
+              {["Technology", "Programming", "Architecture", "Engineering", "Design", "Philosophy", "Culture", "Science", "Other"].map(
                 (tag) => (
                   <button
                     key={tag}

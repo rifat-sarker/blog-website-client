@@ -8,11 +8,14 @@ import { Search, X, Bookmark } from "lucide-react";
 const SECTIONS = [
   "All Stories",
   "Technology",
+  "Programming",
   "Architecture",
-  "Philosophy",
   "Engineering",
-  "Culture",
   "Design",
+  "Philosophy",
+  "Culture",
+  "Science",
+  "Other",
 ];
 
 const AllBlog = () => {
