@@ -20,6 +20,8 @@ const Navbar = () => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const searchContainerRef = useRef(null);
+  const userDropdownRef = useRef(null);
+  const langDropdownRef = useRef(null);
   const navigate = useNavigate();
 
   // Instant Real-Time Search As You Type
@@ -48,6 +50,12 @@ const Navbar = () => {
     const handleClickOutside = (e) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
         setLiveResults([]);
+      }
+      if (userDropdownRef.current && !userDropdownRef.current.contains(e.target)) {
+        setUserDropdownOpen(false);
+      }
+      if (langDropdownRef.current && !langDropdownRef.current.contains(e.target)) {
+        setLangDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -150,7 +158,7 @@ const Navbar = () => {
             </Link>
 
             {/* Language Switcher */}
-            <div className="relative">
+            <div className="relative" ref={langDropdownRef}>
               <button
                 onClick={() => setLangDropdownOpen(!langDropdownOpen)}
                 className="flex items-center gap-1 text-xs text-[#6b6b6b] hover:text-[#242424] py-1 px-1.5 rounded transition-colors"
@@ -187,14 +195,14 @@ const Navbar = () => {
 
             {/* User Profile */}
             {user ? (
-              <div className="relative">
+              <div className="relative" ref={userDropdownRef}>
                 <button
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                   className="flex items-center gap-2 focus:outline-none"
                 >
                   <img
-                    src={user.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"}
-                    alt={user.displayName}
+                    src={user.avatar || user.photoURL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"}
+                    alt={user.displayName || user.name || "User"}
                     className="w-8 h-8 rounded-full object-cover border border-[#e6e6e6]"
                   />
                 </button>
@@ -202,7 +210,7 @@ const Navbar = () => {
                 {userDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-56 bg-[#ffffff] border border-[#f2f2f2] rounded-md shadow-xl z-50 p-2 divide-y divide-[#f2f2f2] text-sm text-[#242424]">
                     <div className="px-3 py-2">
-                      <div className="font-medium truncate">{user.displayName}</div>
+                      <div className="font-medium truncate">{user.displayName || user.name || "MixHub Reader"}</div>
                       <div className="text-xs text-[#6b6b6b] truncate">{user.email}</div>
                     </div>
 

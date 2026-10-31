@@ -1,24 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { editorialService, getLocalized } from "../services/api";
 import { useLanguage } from "../context/LanguageContext";
+import { AuthContext } from "../providers/AuthProvider";
 import { Trash2, BookOpen } from "lucide-react";
 
 const Wishlist = () => {
   const { currentLang } = useLanguage();
+  const { user } = useContext(AuthContext);
   const [savedItems, setSavedItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const loadShelf = async () => {
     setIsLoading(true);
-    const data = await editorialService.getSavedArticles();
+    const data = await editorialService.getSavedArticles(user?.email);
     setSavedItems(data || []);
     setIsLoading(false);
   };
 
   useEffect(() => {
     loadShelf();
-  }, []);
+  }, [user?.email]);
 
   const handleRemove = async (id) => {
     await editorialService.removeSavedArticle(id);

@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import Root from "../Layout/Root";
 import Home from "../Pages/Home/Home/Home";
 import AddBlog from "../Blogs/AddBlog/AddBlog";
@@ -52,6 +52,14 @@ const router = createBrowserRouter([
       {
         path: "login",
         element: <Login />,
+      },
+      {
+        path: "signup",
+        element: <Navigate to="/login" replace />,
+      },
+      {
+        path: "write",
+        element: <Navigate to="/addBlog" replace />,
       },
     ],
   },

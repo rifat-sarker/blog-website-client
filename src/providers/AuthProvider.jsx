@@ -3,11 +3,31 @@ import { editorialService } from "../services/api";
 
 export const AuthContext = createContext(null);
 
+const formatUser = (rawUser) => {
+  if (!rawUser) return null;
+  const name =
+    rawUser.displayName ||
+    rawUser.name ||
+    rawUser.email?.split("@")[0] ||
+    "MixHub Reader";
+  const avatar =
+    rawUser.avatar ||
+    rawUser.photoURL ||
+    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80";
+  return {
+    ...rawUser,
+    displayName: name,
+    name: name,
+    avatar: avatar,
+    photoURL: avatar,
+  };
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
       const saved = localStorage.getItem("mixhub_editorial_user");
-      return saved ? JSON.parse(saved) : null;
+      return saved ? formatUser(JSON.parse(saved)) : null;
     } catch {
       return null;
     }
@@ -38,9 +58,10 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await editorialService.verifyEmailOTP(email, otp);
       if (data?.user) {
-        setUser(data.user);
+        const formatted = formatUser(data.user);
+        setUser(formatted);
         setToken(data.token);
-        localStorage.setItem("mixhub_editorial_user", JSON.stringify(data.user));
+        localStorage.setItem("mixhub_editorial_user", JSON.stringify(formatted));
         if (data.token) localStorage.setItem("mixhub_auth_token", data.token);
       }
       setLoading(false);
@@ -54,32 +75,35 @@ export const AuthProvider = ({ children }) => {
   // Google 1-Click Login (Client Identity -> Backend Verification)
   const googleLogIn = async (customProfile = null) => {
     setLoading(true);
-    try {
-      const payload = customProfile || {
-        email: "rifatswd@gmail.com",
-        name: "Rifat Sarker",
-        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
-        googleId: "gid-verified-2026",
-      };
+    const payload = customProfile || {
+      email: "rifatswd@gmail.com",
+      name: "Rifat Sarker",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
+      googleId: "gid-verified-2026",
+    };
 
+    try {
       const data = await editorialService.verifyGoogleLogin(payload);
       if (data?.user) {
-        setUser(data.user);
+        const formatted = formatUser({ ...payload, ...data.user });
+        setUser(formatted);
         setToken(data.token);
-        localStorage.setItem("mixhub_editorial_user", JSON.stringify(data.user));
+        localStorage.setItem("mixhub_editorial_user", JSON.stringify(formatted));
         if (data.token) localStorage.setItem("mixhub_auth_token", data.token);
+        setLoading(false);
+        return data;
       }
-      setLoading(false);
-      return data;
+      throw new Error("No user returned from server");
     } catch (err) {
-      // Fallback
-      const fallbackUser = {
-        displayName: "Rifat Sarker",
-        email: "rifatswd@gmail.com",
+      // Fallback with full identity preserved
+      const fallbackUser = formatUser({
+        displayName: payload.name || "Rifat Sarker",
+        name: payload.name || "Rifat Sarker",
+        email: payload.email || "rifatswd@gmail.com",
         role: "Lead Editor",
         location: "Dhaka Bureau",
-        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
-      };
+        avatar: payload.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
+      });
       setUser(fallbackUser);
       localStorage.setItem("mixhub_editorial_user", JSON.stringify(fallbackUser));
       setLoading(false);

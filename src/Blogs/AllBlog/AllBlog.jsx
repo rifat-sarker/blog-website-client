@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { editorialService, getLocalized } from "../../services/api";
 import { useLanguage } from "../../context/LanguageContext";
+import { AuthContext } from "../../providers/AuthProvider";
 import { Search, X, Bookmark } from "lucide-react";
 
 const SECTIONS = [
@@ -11,10 +12,12 @@ const SECTIONS = [
   "Philosophy",
   "Engineering",
   "Culture",
+  "Design",
 ];
 
 const AllBlog = () => {
   const { currentLang } = useLanguage();
+  const { user } = useContext(AuthContext);
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
 
@@ -28,7 +31,7 @@ const AllBlog = () => {
     let isMounted = true;
     Promise.all([
       editorialService.getArticles(),
-      editorialService.getSavedArticles(),
+      editorialService.getSavedArticles(user?.email),
     ]).then(([data, saved]) => {
       if (isMounted) {
         setArticles(data || []);
@@ -40,7 +43,7 @@ const AllBlog = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [user?.email]);
 
   useEffect(() => {
     const q = searchParams.get("q");
@@ -63,7 +66,7 @@ const AllBlog = () => {
     if (isCurrentlySaved) {
       await editorialService.removeSavedArticle(aId);
     } else {
-      await editorialService.saveArticle(article);
+      await editorialService.saveArticle(article, user?.email);
     }
   };
 

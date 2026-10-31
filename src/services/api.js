@@ -601,9 +601,10 @@ export const editorialService = {
     return newDoc;
   },
 
-  async getSavedArticles() {
+  async getSavedArticles(email = null) {
     try {
-      const res = await apiClient.get("/wishlist");
+      const url = email ? `/wishlist?email=${encodeURIComponent(email)}` : "/wishlist";
+      const res = await apiClient.get(url);
       if (Array.isArray(res.data) && res.data.length > 0) {
         return res.data;
       }
@@ -613,7 +614,7 @@ export const editorialService = {
     return JSON.parse(localStorage.getItem("mixhub_saved_reading_shelf") || "[]");
   },
 
-  async saveArticle(article) {
+  async saveArticle(article, userEmail = null) {
     const list = JSON.parse(localStorage.getItem("mixhub_saved_reading_shelf") || "[]");
     const articleId = article._id || article.id;
     if (!list.some((a) => (a._id || a.id) === articleId)) {
@@ -634,7 +635,7 @@ export const editorialService = {
         readTime: article.readTime,
         words: article.words,
         edition: article.edition,
-        email: "reader@mixhub.press",
+        email: userEmail || "reader@mixhub.press",
       });
     } catch {
       // Offline / Local save suffices
@@ -666,12 +667,12 @@ export const editorialService = {
   },
 
   // Dynamic Likes (Claps) & Comments
-  async clapStory(id) {
+  async clapStory(id, action = "like") {
     try {
-      const res = await apiClient.post(`/blogs/${id}/clap`);
+      const res = await apiClient.post(`/blogs/${id}/clap`, { action });
       return res.data;
     } catch {
-      return { claps: 1 };
+      return { claps: action === "unlike" ? 0 : 1 };
     }
   },
 

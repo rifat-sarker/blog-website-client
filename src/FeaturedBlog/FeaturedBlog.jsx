@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { editorialService, getLocalized } from "../services/api";
 import { useLanguage } from "../context/LanguageContext";
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, Heart } from "lucide-react";
 
 const FeaturedBlog = () => {
   const { currentLang } = useLanguage();
@@ -90,7 +90,10 @@ const FeaturedBlog = () => {
                   <div className="pt-1 flex items-center gap-3 text-xs text-[#6b6b6b]">
                     <span>{localizedReadTime}</span>
                     <span>•</span>
-                    <span>{item.claps || 0} claps</span>
+                    <span className="flex items-center gap-1">
+                      <Heart className="w-3.5 h-3.5 text-[#dc2626] fill-[#dc2626]" />
+                      <span>{item.claps || 0} {item.claps === 1 ? "like" : "likes"}</span>
+                    </span>
                   </div>
                 </div>
 

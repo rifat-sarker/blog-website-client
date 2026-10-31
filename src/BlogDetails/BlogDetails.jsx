@@ -73,14 +73,14 @@ const BlogDetails = () => {
 
   // Dynamic Live Like / Heart (Backend & LocalStorage Persisted)
   const handleLike = async () => {
-    const nextClaps = isLiked ? Math.max(0, claps - 1) : claps + 1;
-    setClaps(nextClaps);
     const nextLiked = !isLiked;
+    const nextClaps = nextLiked ? claps + 1 : Math.max(0, claps - 1);
+    setClaps(nextClaps);
     setIsLiked(nextLiked);
 
     try {
       const liked = JSON.parse(localStorage.getItem("mixhub_liked_articles") || "[]");
-      const targetIds = [id, article?._id].filter(Boolean);
+      const targetIds = [id, article?._id, article?.id].filter(Boolean);
       let nextList = [...liked];
       if (nextLiked) {
         targetIds.forEach((tId) => {
@@ -94,7 +94,7 @@ const BlogDetails = () => {
       console.error("Failed to update liked articles:", e);
     }
 
-    await editorialService.clapStory(id);
+    await editorialService.clapStory(id, nextLiked ? "like" : "unlike");
   };
 
   // Dynamic Bookmark (Backend & LocalStorage Synchronized)
@@ -104,7 +104,7 @@ const BlogDetails = () => {
       await editorialService.removeSavedArticle(id);
       setIsSaved(false);
     } else {
-      await editorialService.saveArticle(article);
+      await editorialService.saveArticle(article, user?.email);
       setIsSaved(true);
     }
   };

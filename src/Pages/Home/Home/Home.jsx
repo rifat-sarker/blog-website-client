@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { editorialService, getLocalized } from "../../../services/api";
 import { useLanguage } from "../../../context/LanguageContext";
+import { AuthContext } from "../../../providers/AuthProvider";
 import { Bookmark } from "lucide-react";
 
 const TOPICS = [
@@ -11,10 +12,13 @@ const TOPICS = [
   "Philosophy",
   "Engineering",
   "Programming",
+  "Culture",
+  "Design",
 ];
 
 const Home = () => {
   const { currentLang } = useLanguage();
+  const { user } = useContext(AuthContext);
   const [articles, setArticles] = useState([]);
   const [wireItems, setWireItems] = useState([]);
   const [savedIds, setSavedIds] = useState(new Set());
@@ -26,7 +30,7 @@ const Home = () => {
       const [arts, wires, saved] = await Promise.all([
         editorialService.getArticles(),
         editorialService.getLiveWire(),
-        editorialService.getSavedArticles(),
+        editorialService.getSavedArticles(user?.email),
       ]);
       setArticles(arts);
       setWireItems(wires);
@@ -39,7 +43,7 @@ const Home = () => {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [user?.email]);
 
   const handleToggleBookmark = async (article) => {
     const aId = article._id || article.id;
@@ -59,7 +63,7 @@ const Home = () => {
     if (isCurrentlySaved) {
       await editorialService.removeSavedArticle(aId);
     } else {
-      await editorialService.saveArticle(article);
+      await editorialService.saveArticle(article, user?.email);
     }
   };
 
