@@ -699,6 +699,21 @@ export const editorialService = {
     const res = await apiClient.post("/auth/google", payload);
     return res.data;
   },
+
+  // Image Upload from Local Computer to Cloudinary via Backend
+  async uploadImage(file) {
+    const toBase64 = (f) =>
+      new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(f);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      });
+
+    const base64Data = await toBase64(file);
+    const res = await apiClient.post("/upload", { image: base64Data });
+    return res.data;
+  },
 };
 
 export const blogService = editorialService;

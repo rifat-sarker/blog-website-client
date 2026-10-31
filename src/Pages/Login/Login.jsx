@@ -88,6 +88,7 @@ const Login = () => {
             shape: "rectangular",
             logo_alignment: "left",
             width: 380,
+            locale: "en",
           });
         } catch (e) {
           console.warn("Google button init deferred:", e);
