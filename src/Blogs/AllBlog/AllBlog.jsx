@@ -92,13 +92,13 @@ const AllBlog = () => {
   };
 
   return (
-    <div className="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+    <div className="max-w-[1000px] mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 md:py-12">
       {/* Header */}
-      <div className="pb-6 mb-8 border-b border-[#f2f2f2]">
-        <h1 className="font-serif text-3xl sm:text-4xl font-bold text-[#242424] mb-2 tracking-tight">
+      <div className="pb-4 sm:pb-6 mb-6 sm:mb-8 border-b border-[#f2f2f2]">
+        <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#242424] mb-1.5 sm:mb-2 tracking-tight">
           Explore Stories
         </h1>
-        <p className="text-sm text-[#6b6b6b]">
+        <p className="text-xs sm:text-sm text-[#6b6b6b]">
           Discover thoughtful essays, technical investigations, and independent ideas.
         </p>
       </div>
@@ -177,27 +177,27 @@ const AllBlog = () => {
             const category = getLocalized(item.category, currentLang) || "Essay";
 
             return (
-              <article key={articleId} className="py-7 first:pt-0">
-                <div className="flex flex-col sm:flex-row justify-between items-start gap-6">
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-2 text-xs text-[#6b6b6b]">
-                      <span className="text-[#242424] font-medium">{authorName}</span>
+              <article key={articleId} className="py-6 sm:py-7 first:pt-0">
+                <div className="flex flex-row justify-between items-start gap-3 sm:gap-6">
+                  <div className="flex-1 min-w-0 space-y-1.5 sm:space-y-2">
+                    <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-[#6b6b6b]">
+                      <span className="text-[#242424] font-medium truncate max-w-[120px] sm:max-w-none">{authorName}</span>
                       <span>•</span>
                       <span>{category}</span>
                     </div>
 
                     <Link to={`/blog/${articleId}`} className="group block">
-                      <h2 className="font-bold text-xl leading-snug text-[#242424] group-hover:text-[#6b6b6b] transition-colors">
+                      <h2 className="font-bold text-base sm:text-xl leading-snug text-[#242424] group-hover:text-[#6b6b6b] transition-colors line-clamp-2">
                         {title}
                       </h2>
                     </Link>
 
-                    <p className="font-serif text-sm text-[#6b6b6b] line-clamp-2 leading-relaxed">
+                    <p className="font-serif text-xs sm:text-sm text-[#6b6b6b] line-clamp-2 leading-relaxed">
                       {sdesc}
                     </p>
 
-                    <div className="pt-3 flex items-center justify-between text-xs text-[#6b6b6b]">
-                      <span>{readTime}</span>
+                    <div className="pt-2 sm:pt-3 flex items-center justify-between text-xs text-[#6b6b6b]">
+                      <span className="text-[11px] sm:text-xs">{readTime}</span>
                       <button
                         onClick={() => handleToggleBookmark(item)}
                         className={`p-1.5 rounded transition-all flex items-center gap-1 ${
@@ -206,9 +206,9 @@ const AllBlog = () => {
                         title={isSaved ? "Saved" : "Save story"}
                       >
                         <Bookmark
-                          className={`w-4 h-4 stroke-[1.8] ${isSaved ? "fill-[#1a8917] text-[#1a8917]" : ""}`}
+                          className={`w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[1.8] ${isSaved ? "fill-[#1a8917] text-[#1a8917]" : ""}`}
                         />
-                        {isSaved && <span className="text-[11px] font-medium">Saved</span>}
+                        {isSaved && <span className="text-[11px] font-medium hidden sm:inline">Saved</span>}
                       </button>
                     </div>
                   </div>
@@ -218,7 +218,7 @@ const AllBlog = () => {
                       <img
                         src={item.image}
                         alt={title}
-                        className="w-24 h-24 sm:w-32 sm:h-24 object-cover rounded-md"
+                        className="w-20 h-20 sm:w-32 sm:h-24 object-cover rounded-md"
                         loading="lazy"
                       />
                     </Link>

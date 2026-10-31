@@ -74,6 +74,7 @@ const Login = () => {
     const renderGoogleBtn = () => {
       if (window.google?.accounts?.id && googleBtnRef.current) {
         try {
+          const btnWidth = Math.min(380, Math.max(220, window.innerWidth - 64));
           window.google.accounts.id.initialize({
             client_id: googleClientId,
             callback: handleCredentialResponse,
@@ -87,7 +88,7 @@ const Login = () => {
             text: "continue_with",
             shape: "rectangular",
             logo_alignment: "left",
-            width: 380,
+            width: btnWidth,
             locale: "en",
           });
         } catch (e) {
@@ -162,17 +163,17 @@ const Login = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-16 sm:py-24">
-      <div className="border-2 border-[#141414] bg-[#ffffff] p-8 sm:p-12 shadow-xl space-y-8">
+    <div className="max-w-xl mx-auto px-3 sm:px-4 py-8 sm:py-16 md:py-24">
+      <div className="border-2 border-[#141414] bg-[#ffffff] p-5 sm:p-8 md:p-12 shadow-xl space-y-6 sm:space-y-8">
         {/* Masthead Header */}
-        <div className="text-center space-y-2 border-b border-[#141414] pb-6">
+        <div className="text-center space-y-1.5 sm:space-y-2 border-b border-[#141414] pb-5 sm:pb-6">
           <div className="w-8 h-8 mx-auto border border-[#b91c1c] text-[#b91c1c] font-serif font-bold flex items-center justify-center text-sm mb-2">
             M
           </div>
-          <span className="font-mono text-xs uppercase tracking-widest text-[#b91c1c] font-bold block">
+          <span className="font-mono text-[11px] sm:text-xs uppercase tracking-widest text-[#b91c1c] font-bold block">
             {currentLang === "bn" ? "লেখক পরিচয়পত্র ও প্রত্যয়ন ডেস্ক" : "Author Accreditation Desk"}
           </span>
-          <h1 className="font-serif text-3xl font-normal text-[#141414]">
+          <h1 className="font-serif text-2xl sm:text-3xl font-normal text-[#141414]">
             {t("signIn")}
           </h1>
           <p className="font-serif italic text-xs text-[#5e5a54] max-w-sm mx-auto">

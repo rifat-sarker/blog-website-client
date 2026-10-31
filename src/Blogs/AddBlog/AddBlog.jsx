@@ -108,17 +108,17 @@ const AddBlog = () => {
   };
 
   return (
-    <div className="max-w-[800px] mx-auto px-4 sm:px-6 py-10 min-h-[80vh]">
-      <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="max-w-[800px] mx-auto px-3 sm:px-6 py-6 sm:py-10 min-h-[80vh]">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
         {/* Top Action Bar */}
-        <div className="flex items-center justify-between pb-4 border-b border-[#f2f2f2]">
-          <div className="text-xs text-[#6b6b6b]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 sm:pb-4 border-b border-[#f2f2f2]">
+          <div className="text-xs text-[#6b6b6b] flex items-center justify-between sm:justify-start">
             <span>Draft in MixHub</span>
             <span className="mx-2">•</span>
             <span>{wordCount} words ({readMinutes} min read)</span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
@@ -150,7 +150,7 @@ const AddBlog = () => {
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Title"
             required
-            className="w-full font-serif text-3xl sm:text-4xl font-bold text-[#242424] placeholder-[#b3b3b1] border-none outline-none resize-none leading-tight bg-transparent"
+            className="w-full font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#242424] placeholder-[#b3b3b1] border-none outline-none resize-none leading-tight bg-transparent"
           />
         </div>
 
@@ -161,7 +161,7 @@ const AddBlog = () => {
             value={sdesc}
             onChange={(e) => setSdesc(e.target.value)}
             placeholder="Write a preview subtitle..."
-            className="w-full font-serif text-lg text-[#6b6b6b] placeholder-[#b3b3b1] border-none outline-none bg-transparent"
+            className="w-full font-serif text-base sm:text-lg text-[#6b6b6b] placeholder-[#b3b3b1] border-none outline-none bg-transparent"
           />
         </div>
 

@@ -74,17 +74,17 @@ const Home = () => {
   });
 
   return (
-    <div className="max-w-[1336px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+    <div className="max-w-[1336px] mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 md:py-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
         {/* Main Feed Column (Left / 8 cols) */}
         <main className="lg:col-span-8 lg:pr-8">
           {/* Topic Navigation Bar */}
-          <div className="flex items-center space-x-6 overflow-x-auto pb-4 mb-8 border-b border-[#f2f2f2] text-sm text-[#6b6b6b] no-scrollbar">
+          <div className="flex items-center space-x-4 sm:space-x-6 overflow-x-auto pb-3 sm:pb-4 mb-6 sm:mb-8 border-b border-[#f2f2f2] text-xs sm:text-sm text-[#6b6b6b] no-scrollbar">
             {TOPICS.map((topic) => (
               <button
                 key={topic}
                 onClick={() => setActiveTopic(topic)}
-                className={`flex-shrink-0 transition-colors pb-2 -mb-2 border-b ${
+                className={`flex-shrink-0 transition-colors pb-2 -mb-2 border-b whitespace-nowrap ${
                   activeTopic === topic
                     ? "border-[#242424] text-[#242424] font-medium"
                     : "border-transparent hover:text-[#242424]"
@@ -96,15 +96,15 @@ const Home = () => {
           </div>
 
           {isLoading ? (
-            <div className="space-y-10 animate-pulse">
+            <div className="space-y-8 animate-pulse">
               {[1, 2, 3].map((n) => (
-                <div key={n} className="flex justify-between gap-6 pb-8 border-b border-[#f2f2f2]">
-                  <div className="space-y-3 flex-1">
-                    <div className="h-4 w-32 bg-[#f0f0f0] rounded" />
+                <div key={n} className="flex justify-between gap-4 sm:gap-6 pb-6 sm:pb-8 border-b border-[#f2f2f2]">
+                  <div className="space-y-3 flex-1 min-w-0">
+                    <div className="h-4 w-28 bg-[#f0f0f0] rounded" />
                     <div className="h-6 w-3/4 bg-[#f0f0f0] rounded" />
                     <div className="h-4 w-full bg-[#f0f0f0] rounded" />
                   </div>
-                  <div className="w-28 h-20 bg-[#f0f0f0] rounded" />
+                  <div className="w-20 h-20 sm:w-36 sm:h-24 bg-[#f0f0f0] rounded flex-shrink-0" />
                 </div>
               ))}
             </div>
@@ -121,40 +121,41 @@ const Home = () => {
                 const isSaved = savedIds.has(articleId);
 
                 return (
-                  <article key={articleId} className="py-8 first:pt-0">
-                    <div className="flex flex-col sm:flex-row justify-between items-start gap-6 sm:gap-8">
+                  <article key={articleId} className="py-6 sm:py-8 first:pt-0">
+                    <div className="flex flex-row justify-between items-start gap-3 sm:gap-6 md:gap-8">
                       {/* Story Text */}
-                      <div className="flex-1 space-y-2">
+                      <div className="flex-1 min-w-0 space-y-1.5 sm:space-y-2">
                         {/* Author Info */}
-                        <div className="flex items-center gap-2 text-xs text-[#242424]">
+                        <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-[#242424]">
                           <img
                             src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
                             alt={authorName}
-                            className="w-5 h-5 rounded-full object-cover"
+                            className="w-4 h-4 sm:w-5 sm:h-5 rounded-full object-cover flex-shrink-0"
                           />
-                          <span className="font-medium">{authorName}</span>
+                          <span className="font-medium truncate max-w-[120px] sm:max-w-none">{authorName}</span>
                           <span className="text-[#6b6b6b]">•</span>
-                          <span className="text-[#6b6b6b]">{authorLoc}</span>
+                          <span className="text-[#6b6b6b] hidden sm:inline">{authorLoc}</span>
+                          <span className="text-[#6b6b6b] sm:hidden">{category}</span>
                         </div>
 
                         {/* Title */}
                         <Link to={`/blog/${articleId}`} className="group block">
-                          <h2 className="font-bold text-xl sm:text-[22px] leading-[1.3] text-[#242424] group-hover:text-[#6b6b6b] transition-colors">
+                          <h2 className="font-bold text-base sm:text-xl md:text-[22px] leading-snug sm:leading-[1.3] text-[#242424] group-hover:text-[#6b6b6b] transition-colors line-clamp-2">
                             {title}
                           </h2>
                         </Link>
 
                         {/* Subtitle */}
-                        <p className="font-serif text-sm sm:text-[15px] text-[#6b6b6b] line-clamp-2 leading-relaxed">
+                        <p className="font-serif text-xs sm:text-sm md:text-[15px] text-[#6b6b6b] line-clamp-2 leading-relaxed">
                           {sdesc}
                         </p>
 
                         {/* Footer Meta: Read Time, Tag, Dynamic Bookmark */}
-                        <div className="pt-3 flex items-center justify-between text-xs text-[#6b6b6b]">
-                          <div className="flex items-center gap-3">
+                        <div className="pt-2 sm:pt-3 flex items-center justify-between text-xs text-[#6b6b6b]">
+                          <div className="flex items-center gap-2 sm:gap-3 text-[11px] sm:text-xs">
                             <span>{readTime}</span>
-                            <span>•</span>
-                            <span className="bg-[#f2f2f2] px-2.5 py-1 rounded-full text-[#242424]">
+                            <span className="hidden sm:inline">•</span>
+                            <span className="hidden sm:inline bg-[#f2f2f2] px-2.5 py-1 rounded-full text-[#242424]">
                               {category}
                             </span>
                           </div>
@@ -170,7 +171,7 @@ const Home = () => {
                             title={isSaved ? "Saved to Reading List" : "Save story"}
                           >
                             <Bookmark
-                              className={`w-4 h-4 stroke-[1.8] ${
+                              className={`w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[1.8] ${
                                 isSaved ? "fill-[#1a8917] text-[#1a8917]" : ""
                               }`}
                             />
@@ -179,11 +180,11 @@ const Home = () => {
                         </div>
                       </div>
 
-                      {/* Story Thumbnail */}
+                      {/* Story Thumbnail (Medium-Style Responsive Ratio) */}
                       {article.image && (
                         <Link
                           to={`/blog/${articleId}`}
-                          className="flex-shrink-0 w-28 h-20 sm:w-40 sm:h-28 overflow-hidden rounded"
+                          className="flex-shrink-0 w-20 h-20 sm:w-32 sm:h-24 md:w-40 md:h-28 overflow-hidden rounded"
                         >
                           <img
                             src={article.image}

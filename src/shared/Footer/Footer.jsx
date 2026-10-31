@@ -18,8 +18,8 @@ const Footer = () => {
   };
 
   return (
-    <footer className="mt-16 border-t border-[#f2f2f2] bg-[#ffffff] text-[#242424]">
-      <div className="max-w-[1336px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <footer className="mt-12 sm:mt-16 border-t border-[#f2f2f2] bg-[#ffffff] text-[#242424]">
+      <div className="max-w-[1336px] mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8">
           {/* Masthead */}
           <div className="lg:col-span-5 space-y-3 lg:pr-8">

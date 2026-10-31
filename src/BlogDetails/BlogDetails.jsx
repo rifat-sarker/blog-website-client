@@ -188,57 +188,57 @@ const BlogDetails = () => {
     : "Oct 28, 2026";
 
   return (
-    <article className="max-w-[680px] mx-auto px-4 sm:px-6 py-10 sm:py-14">
+    <article className="max-w-[680px] mx-auto px-4 sm:px-6 py-6 sm:py-10 md:py-14">
       {/* Title */}
-      <h1 className="text-3xl sm:text-[40px] leading-[1.2] font-bold text-[#242424] tracking-tight">
+      <h1 className="text-2xl sm:text-3xl md:text-[40px] leading-tight sm:leading-[1.2] font-bold text-[#242424] tracking-tight break-words">
         {localizedTitle}
       </h1>
 
       {/* Subtitle */}
-      <p className="font-serif text-lg sm:text-[21px] text-[#6b6b6b] leading-snug mt-3 mb-8">
+      <p className="font-serif text-base sm:text-lg md:text-[21px] text-[#6b6b6b] leading-snug mt-2.5 sm:mt-3 mb-6 sm:mb-8 break-words">
         {localizedSdesc}
       </p>
 
       {/* Author Header Card */}
-      <div className="flex items-center justify-between pb-8 border-b border-[#f2f2f2]">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between pb-6 sm:pb-8 border-b border-[#f2f2f2] gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
           <img
             src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
             alt={localizedAuthorName}
-            className="w-11 h-11 rounded-full object-cover"
+            className="w-9 h-9 sm:w-11 sm:h-11 rounded-full object-cover flex-shrink-0"
           />
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="font-medium text-sm text-[#242424]">{localizedAuthorName}</span>
-              <button className="text-xs text-[#1a8917] font-medium hover:text-[#156d12]">
+              <span className="font-medium text-xs sm:text-sm text-[#242424] truncate">{localizedAuthorName}</span>
+              <button className="text-[11px] sm:text-xs text-[#1a8917] font-medium hover:text-[#156d12] flex-shrink-0">
                 Follow
               </button>
             </div>
-            <div className="flex items-center gap-2 text-xs text-[#6b6b6b] mt-0.5">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-[#6b6b6b] mt-0.5">
               <span>{localizedReadTime}</span>
               <span>•</span>
-              <span>{formattedDate}</span>
+              <span className="truncate">{formattedDate}</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
           <button
             onClick={handleSave}
-            className={`p-2 rounded-full transition-all flex items-center gap-1.5 ${
+            className={`p-1.5 sm:p-2 rounded-full transition-all flex items-center gap-1 sm:gap-1.5 ${
               isSaved ? "bg-[#f0fdf4] text-[#1a8917]" : "hover:bg-[#f9f9f9] text-[#6b6b6b]"
             }`}
             title="Save to Reading List"
           >
-            <Bookmark className={`w-5 h-5 stroke-[1.8] ${isSaved ? "fill-[#1a8917] text-[#1a8917]" : ""}`} />
+            <Bookmark className={`w-4 h-4 sm:w-5 sm:h-5 stroke-[1.8] ${isSaved ? "fill-[#1a8917] text-[#1a8917]" : ""}`} />
             {isSaved && <span className="text-xs font-medium text-[#1a8917] hidden sm:inline">Saved</span>}
           </button>
           <button
             onClick={handleShare}
-            className="p-2 rounded-full hover:bg-[#f9f9f9] text-[#6b6b6b] transition-colors"
+            className="p-1.5 sm:p-2 rounded-full hover:bg-[#f9f9f9] text-[#6b6b6b] transition-colors"
             title="Share story"
           >
-            {copied ? <Check className="w-5 h-5 text-[#1a8917]" /> : <Share2 className="w-5 h-5 stroke-[1.8]" />}
+            {copied ? <Check className="w-4 h-4 sm:w-5 sm:h-5 text-[#1a8917]" /> : <Share2 className="w-4 h-4 sm:w-5 sm:h-5 stroke-[1.8]" />}
           </button>
         </div>
       </div>
@@ -258,14 +258,14 @@ const BlogDetails = () => {
       )}
 
       {/* Story Body */}
-      <div className="font-medium-serif text-[#242424] text-[19px] sm:text-[21px] leading-[1.8] space-y-7">
+      <div className="font-medium-serif text-[#242424] text-base sm:text-[19px] md:text-[21px] leading-relaxed sm:leading-[1.8] space-y-6 sm:space-y-7">
         {localizedLdesc ? (
           localizedLdesc.split("\n\n").map((block, idx) => {
             if (block.startsWith("### ")) {
               return (
                 <h2
                   key={idx}
-                  className="font-sans font-bold text-2xl sm:text-[26px] text-[#242424] pt-4 tracking-tight"
+                  className="font-sans font-bold text-xl sm:text-2xl md:text-[26px] text-[#242424] pt-3 sm:pt-4 tracking-tight"
                 >
                   {block.replace("### ", "")}
                 </h2>
@@ -276,7 +276,7 @@ const BlogDetails = () => {
               return (
                 <pre
                   key={idx}
-                  className="p-4 bg-[#f9f9f9] border border-[#f2f2f2] rounded-md font-mono text-[13px] text-[#242424] overflow-x-auto leading-relaxed my-6"
+                  className="p-3 sm:p-4 bg-[#f9f9f9] border border-[#f2f2f2] rounded-md font-mono text-xs sm:text-[13px] text-[#242424] overflow-x-auto leading-relaxed my-4 sm:my-6"
                 >
                   <code>{codeLines}</code>
                 </pre>
@@ -294,20 +294,20 @@ const BlogDetails = () => {
       </div>
 
       {/* Dynamic Like (Heart/Clap) & Comment Bar */}
-      <div className="mt-14 py-4 border-y border-[#f2f2f2] flex items-center justify-between text-[#6b6b6b] text-sm">
-        <div className="flex items-center gap-6">
+      <div className="mt-10 sm:mt-14 py-3 sm:py-4 border-y border-[#f2f2f2] flex items-center justify-between text-[#6b6b6b] text-xs sm:text-sm">
+        <div className="flex items-center gap-4 sm:gap-6">
           {/* Real Heart / Like Button (Dynamic & Persisted) */}
           <button
             onClick={handleLike}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full transition-all ${
               isLiked
                 ? "text-[#dc2626] bg-[#fef2f2] font-semibold"
                 : "hover:text-[#dc2626] hover:bg-[#f9f9f9]"
             }`}
             title={isLiked ? "Unlike story" : "Like story"}
           >
-            <Heart className={`w-5 h-5 stroke-[1.8] ${isLiked ? "fill-[#dc2626] text-[#dc2626]" : ""}`} />
-            <span className="text-sm">{claps}</span>
+            <Heart className={`w-4 h-4 sm:w-5 sm:h-5 stroke-[1.8] ${isLiked ? "fill-[#dc2626] text-[#dc2626]" : ""}`} />
+            <span className="text-xs sm:text-sm">{claps}</span>
           </button>
 
           {/* Response Count */}

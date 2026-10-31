@@ -36,25 +36,25 @@ const LiveWire = () => {
         });
 
   return (
-    <div className="max-w-[860px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 min-h-[75vh]">
+    <div className="max-w-[860px] mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 md:py-12 min-h-[75vh]">
       {/* Header */}
-      <div className="pb-6 mb-8 border-b border-[#f2f2f2] flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+      <div className="pb-4 sm:pb-6 mb-6 sm:mb-8 border-b border-[#f2f2f2] flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#1a8917] animate-pulse" />
-            <span className="text-xs uppercase tracking-wider font-semibold text-[#1a8917]">
+            <span className="text-[11px] sm:text-xs uppercase tracking-wider font-semibold text-[#1a8917]">
               Real-Time Feed
             </span>
           </div>
-          <h1 className="font-serif text-3xl sm:text-4xl font-bold text-[#242424] mb-2 tracking-tight">
+          <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#242424] mb-1.5 sm:mb-2 tracking-tight">
             The Live Wire
           </h1>
-          <p className="text-sm text-[#6b6b6b]">
+          <p className="text-xs sm:text-sm text-[#6b6b6b]">
             24/7 continuous dispatches, research bulletins, and tech telemetry.
           </p>
         </div>
 
-        <div className="flex items-center gap-3 text-xs text-[#6b6b6b]">
+        <div className="flex items-center justify-between sm:justify-end gap-3 text-xs text-[#6b6b6b] pt-2 sm:pt-0 border-t sm:border-t-0 border-[#f2f2f2]">
           <span>Synced: {lastCheck.toLocaleTimeString()}</span>
           <button
             onClick={fetchWire}

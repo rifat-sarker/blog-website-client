@@ -28,13 +28,13 @@ const Wishlist = () => {
   };
 
   return (
-    <div className="max-w-[800px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 min-h-[70vh]">
+    <div className="max-w-[800px] mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 md:py-14 min-h-[70vh]">
       {/* Header */}
-      <div className="pb-6 mb-8 border-b border-[#f2f2f2]">
-        <h1 className="font-serif text-3xl sm:text-4xl font-bold text-[#242424] mb-2 tracking-tight">
+      <div className="pb-4 sm:pb-6 mb-6 sm:mb-8 border-b border-[#f2f2f2]">
+        <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#242424] mb-1.5 sm:mb-2 tracking-tight">
           Reading List
         </h1>
-        <p className="text-sm text-[#6b6b6b]">
+        <p className="text-xs sm:text-sm text-[#6b6b6b]">
           Stories and articles you have saved for later reading.
         </p>
       </div>
@@ -58,30 +58,30 @@ const Wishlist = () => {
             return (
               <div
                 key={itemId || idx}
-                className="py-6 flex flex-col sm:flex-row justify-between items-start gap-6 first:pt-0"
+                className="py-5 sm:py-6 flex flex-row justify-between items-start gap-3 sm:gap-6 first:pt-0"
               >
-                <div className="space-y-2 flex-1">
-                  <div className="flex items-center gap-2 text-xs text-[#6b6b6b]">
-                    <span className="font-medium text-[#242424]">{authorName}</span>
+                <div className="space-y-1.5 sm:space-y-2 flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-[#6b6b6b]">
+                    <span className="font-medium text-[#242424] truncate max-w-[120px] sm:max-w-none">{authorName}</span>
                     <span>•</span>
                     <span>{localizedCategory}</span>
                   </div>
 
                   <Link to={`/blog/${linkId}`} className="group block">
-                    <h3 className="font-bold text-xl leading-snug text-[#242424] group-hover:text-[#6b6b6b] transition-colors">
+                    <h3 className="font-bold text-base sm:text-xl leading-snug text-[#242424] group-hover:text-[#6b6b6b] transition-colors line-clamp-2">
                       {localizedTitle}
                     </h3>
                   </Link>
 
-                  <p className="font-serif text-sm text-[#6b6b6b] line-clamp-2 leading-relaxed">
+                  <p className="font-serif text-xs sm:text-sm text-[#6b6b6b] line-clamp-2 leading-relaxed">
                     {localizedSdesc}
                   </p>
 
-                  <div className="pt-2 flex items-center gap-4 text-xs text-[#6b6b6b]">
-                    <span>{localizedReadTime}</span>
+                  <div className="pt-2 flex items-center gap-3 sm:gap-4 text-xs text-[#6b6b6b]">
+                    <span className="text-[11px] sm:text-xs">{localizedReadTime}</span>
                     <button
                       onClick={() => handleRemove(itemId)}
-                      className="text-[#dc2626] hover:underline flex items-center gap-1 transition-colors"
+                      className="text-[#dc2626] hover:underline flex items-center gap-1 text-[11px] sm:text-xs transition-colors"
                       title="Remove from Reading List"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -95,7 +95,7 @@ const Wishlist = () => {
                     <img
                       src={item.image}
                       alt={localizedTitle}
-                      className="w-24 h-24 sm:w-28 sm:h-20 object-cover rounded-md"
+                      className="w-20 h-20 sm:w-28 sm:h-20 object-cover rounded-md"
                       loading="lazy"
                     />
                   </Link>
