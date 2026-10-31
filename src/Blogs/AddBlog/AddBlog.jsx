@@ -92,6 +92,8 @@ const AddBlog = () => {
       },
       readTime: `${readMinutes} min read`,
       words: wordCount,
+      claps: 0,
+      comments: [],
       edition: "2026",
     };
 
