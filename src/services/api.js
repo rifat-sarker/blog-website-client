@@ -657,12 +657,93 @@ export const editorialService = {
   },
 
   async getLiveWire() {
+    // 1. Live Global Tech & Engineering Telemetry from Hacker News Open Stream
+    try {
+      const response = await fetch("https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=25", {
+        headers: { Accept: "application/json" },
+      });
+      if (response.ok) {
+        const json = await response.json();
+        if (Array.isArray(json?.hits) && json.hits.length > 0) {
+          return json.hits.map((item, idx) => {
+            const rawUrl = item.url || `https://news.ycombinator.com/item?id=${item.objectID}`;
+            let domain = "GLOBAL WIRE";
+            try {
+              const parsed = new URL(rawUrl);
+              domain = parsed.hostname.replace(/^www\./, "").toUpperCase();
+            } catch {
+              domain = "GLOBAL WIRE";
+            }
+
+            // Intelligent Category Classifier
+            const titleLower = (item.title || "").toLowerCase();
+            let catEn = "COMPUTING";
+            let catBn = "কম্পিউটিং ও সিস্টেমস";
+
+            if (/(ai|llm|gpt|model|neural|vision|openai|anthropic|deepmind|agent|intelligence|reasoning)/.test(titleLower)) {
+              catEn = "AI & MACHINE LEARNING";
+              catBn = "এআই ও মেশিন লার্নিং";
+            } else if (/(github|open-source|linux|kernel|rust|python|release|git|foss|compiler)/.test(titleLower)) {
+              catEn = "OPEN SOURCE";
+              catBn = "ওপেন সোর্স";
+            } else if (/(web|html|css|browser|chrome|http|dns|wasm|react|typescript|javascript|api|frontend)/.test(titleLower)) {
+              catEn = "WEB STANDARDS";
+              catBn = "ওয়েব স্ট্যান্ডার্ডস";
+            } else if (/(network|5g|6g|fiber|cable|telecom|wireless|cellular|transponder)/.test(titleLower)) {
+              catEn = "TELECOMMUNICATIONS";
+              catBn = "টেলিকমিউনিকেশন";
+            } else if (/(space|nasa|starship|physics|astronomy|rocket|quantum|satellite)/.test(titleLower)) {
+              catEn = "AEROSPACE";
+              catBn = "মহাকাশ ও পদার্থবিজ্ঞান";
+            } else if (/(climate|energy|solar|battery|grid|carbon|nuclear|power)/.test(titleLower)) {
+              catEn = "ENERGY & CLIMATE";
+              catBn = "জ্বালানি ও জলবায়ু";
+            }
+
+            // Elapsed time calculation
+            const createdMs = item.created_at_i ? item.created_at_i * 1000 : new Date(item.created_at).getTime();
+            const diffMin = Math.max(1, Math.floor((Date.now() - createdMs) / 60000));
+            const timeStr = diffMin < 60 ? `${diffMin}m ago` : `${Math.floor(diffMin / 60)}h ago`;
+
+            return {
+              id: `hn-${item.objectID || idx}`,
+              edition: `WIRE 0${idx + 1}`,
+              timestamp: timeStr,
+              category: {
+                en: catEn,
+                bn: catBn,
+              },
+              location: domain,
+              headline: {
+                en: item.title,
+                bn: item.title,
+              },
+              report: {
+                en: `${domain} — ${item.title}. Live community telemetry logs ${item.points || 0} verification points and ${item.num_comments || 0} active engineer discussions on international dispatch channels. Dispatched by @${item.author || "researcher"}.`,
+                bn: `${domain} — ${item.title}। আন্তর্জাতিক ইঞ্জিনিয়ারিং ফোরামে এই টেক রিপোর্টে ${item.points || 0}টি সিগন্যাল পয়েন্ট ও ${item.num_comments || 0}টি সক্রিয় আলোচনা নিবন্ধিত হয়েছে। প্রেরক: @${item.author || "রিসার্চার"}।`,
+              },
+              url: rawUrl,
+              points: item.points || 0,
+              numComments: item.num_comments || 0,
+              author: item.author || "researcher",
+              urgent: (item.points || 0) >= 200,
+            };
+          });
+        }
+      }
+    } catch (e) {
+      console.warn("Real-time live wire fetch fallback to cached/local dispatches:", e);
+    }
+
+    // 2. Secondary fallback: backend API
     try {
       const res = await apiClient.get("/news/live");
       if (Array.isArray(res.data) && res.data.length > 0) return res.data;
     } catch {
       // Fallback
     }
+
+    // 3. Final fallback: curated dispatches
     return LIVE_WIRE_DISPATCHES;
   },
 

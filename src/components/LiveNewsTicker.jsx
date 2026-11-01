@@ -170,6 +170,21 @@ const LiveNewsTicker = () => {
                         {localizedReport}
                       </p>
                     )}
+
+                    {item.url && (
+                      <div className="pt-1 flex items-center justify-between text-xs font-mono text-[#5e5a54]">
+                        {item.points !== undefined ? <span>▲ {item.points} points • {item.numComments || 0} comments</span> : <span />}
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-[#b91c1c] hover:underline font-bold"
+                        >
+                          <span>{currentLang === "bn" ? "মূল সূত্র পড়ুন" : "Read Original Source"}</span>
+                          <ArrowUpRight className="w-3.5 h-3.5" />
+                        </a>
+                      </div>
+                    )}
                   </div>
                 );
               })}

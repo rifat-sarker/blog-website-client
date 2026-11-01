@@ -1,9 +1,18 @@
 import { useEffect, useState } from "react";
 import { editorialService, getLocalized } from "../../services/api";
 import { useLanguage } from "../../context/LanguageContext";
-import { RefreshCw, ChevronDown, ChevronUp, Radio } from "lucide-react";
+import { RefreshCw, ChevronDown, ChevronUp, Radio, ArrowUpRight, Flame } from "lucide-react";
 
-const CATEGORIES = ["ALL", "TELECOMMUNICATIONS", "COMPUTING", "ENERGY & CLIMATE", "WEB STANDARDS", "AEROSPACE", "OPEN SOURCE"];
+const CATEGORIES = [
+  "ALL",
+  "AI & MACHINE LEARNING",
+  "COMPUTING",
+  "OPEN SOURCE",
+  "WEB STANDARDS",
+  "TELECOMMUNICATIONS",
+  "ENERGY & CLIMATE",
+  "AEROSPACE",
+];
 
 const LiveWire = () => {
   const { currentLang } = useLanguage();
@@ -43,19 +52,19 @@ const LiveWire = () => {
           <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#1a8917] animate-pulse" />
             <span className="text-[11px] sm:text-xs uppercase tracking-wider font-semibold text-[#1a8917]">
-              Real-Time Feed
+              Real-Time Global Feed • Live Stream
             </span>
           </div>
           <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#242424] mb-1.5 sm:mb-2 tracking-tight">
             The Live Wire
           </h1>
           <p className="text-xs sm:text-sm text-[#6b6b6b]">
-            24/7 continuous dispatches, research bulletins, and tech telemetry.
+            Continuous live dispatches, research bulletins, and engineering telemetry from across the web.
           </p>
         </div>
 
         <div className="flex items-center justify-between sm:justify-end gap-3 text-xs text-[#6b6b6b] pt-2 sm:pt-0 border-t sm:border-t-0 border-[#f2f2f2]">
-          <span>Synced: {lastCheck.toLocaleTimeString()}</span>
+          <span className="font-mono">Synced: {lastCheck.toLocaleTimeString()}</span>
           <button
             onClick={fetchWire}
             disabled={isRefreshing}
@@ -100,26 +109,62 @@ const LiveWire = () => {
               onClick={() => setExpandedId(isExpanded ? null : wireId)}
             >
               <div className="flex items-center justify-between text-xs text-[#6b6b6b]">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  {wire.urgent && (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#fef2f2] text-[#b91c1c] border border-[#fecaca] animate-pulse">
+                      <Flame className="w-3 h-3 text-[#b91c1c]" />
+                      BREAKING
+                    </span>
+                  )}
                   <span className="font-medium text-[#1a8917]">{localizedCategory}</span>
                   <span>•</span>
-                  <span>{wire.location || "GLOBAL"}</span>
+                  <span className="font-mono text-[11px] uppercase text-[#6b6b6b]">{wire.location || "GLOBAL"}</span>
                 </div>
-                <span>{wire.timestamp || "LIVE"}</span>
+                <span className="font-mono text-[11px]">{wire.timestamp || "LIVE"}</span>
               </div>
 
               <div className="flex items-start justify-between gap-4">
                 <h3 className="font-bold text-lg sm:text-xl text-[#242424] group-hover:text-[#6b6b6b] transition-colors leading-snug">
                   {localizedHeadline}
                 </h3>
-                <div className="text-[#6b6b6b] pt-1">
+                <div className="text-[#6b6b6b] pt-1 flex-shrink-0">
                   {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </div>
               </div>
 
               {isExpanded && (
-                <div className="mt-3 p-4 bg-[#f9f9f9] rounded-lg border border-[#f2f2f2] text-sm text-[#404040] leading-relaxed">
-                  {localizedReport}
+                <div className="mt-3 p-4 bg-[#f9f9f9] rounded-lg border border-[#f2f2f2] text-sm text-[#404040] space-y-3">
+                  <p className="leading-relaxed font-serif text-[15px]">{localizedReport}</p>
+                  
+                  <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#e6e6e6] text-xs text-[#6b6b6b]">
+                    <div className="flex items-center gap-3">
+                      {wire.points !== undefined && (
+                        <span className="font-mono font-medium text-[#1a8917]">
+                          ▲ {wire.points} points
+                        </span>
+                      )}
+                      {wire.numComments !== undefined && (
+                        <span className="font-mono">
+                          💬 {wire.numComments} comments
+                        </span>
+                      )}
+                      {wire.author && (
+                        <span>by @{wire.author}</span>
+                      )}
+                    </div>
+                    {wire.url && (
+                      <a
+                        href={wire.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-1 font-medium text-[#1a8917] hover:text-[#156d12] underline underline-offset-2"
+                      >
+                        <span>Read original source</span>
+                        <ArrowUpRight className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
