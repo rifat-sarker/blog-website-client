@@ -19,9 +19,43 @@
     min-height: 100vh;
   }
 
+  /* High-Contrast Crystal-Clear Text Selection */
+  ::selection {
+    background-color: #a7f3d0 !important;
+    color: #09090b !important;
+    -webkit-text-fill-color: #09090b !important;
+  }
+  ::-moz-selection {
+    background-color: #a7f3d0 !important;
+    color: #09090b !important;
+  }
+
   /* Medium's signature editorial serif for reading */
   .font-medium-serif {
     font-family: "Source Serif 4", Charter, Georgia, Cambria, "Times New Roman", Times, serif;
+  }
+
+  /* Google Translate Headless Silent Integration */
+  .goog-te-banner-frame.skiptranslate,
+  .goog-te-banner-frame,
+  #goog-gt-tt,
+  .goog-te-balloon-frame,
+  .goog-tooltip,
+  .goog-tooltip:hover {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  body {
+    top: 0px !important;
+    position: static !important;
+  }
+  .goog-text-highlight {
+    background: none !important;
+    box-shadow: none !important;
+  }
+  #google_translate_element,
+  .skiptranslate iframe {
+    display: none !important;
   }
 
   /* Medium-style clean scrollbar */

@@ -420,10 +420,91 @@ export const TRANSLATIONS = {
 
 const LanguageContext = createContext();
 
+// Silent Headless Google Translate Loader for Dynamic Content
+const loadGoogleTranslateScript = (targetLang = null) => {
+  if (document.getElementById("google-translate-script")) {
+    if (targetLang) {
+      const select = document.querySelector(".goog-te-combo");
+      if (select) {
+        select.value = targetLang;
+        select.dispatchEvent(new Event("change"));
+      }
+    }
+    return;
+  }
+
+  window.googleTranslateElementInit = () => {
+    try {
+      new window.google.translate.TranslateElement(
+        {
+          pageLanguage: "en",
+          includedLanguages: "en,bn,ar,es,fr,de,tr,zh-CN,ja,hi",
+          autoDisplay: false,
+        },
+        "google_translate_element"
+      );
+
+      if (targetLang && targetLang !== "en") {
+        const checkCombo = setInterval(() => {
+          const select = document.querySelector(".goog-te-combo");
+          if (select) {
+            select.value = targetLang;
+            select.dispatchEvent(new Event("change"));
+            clearInterval(checkCombo);
+          }
+        }, 200);
+        setTimeout(() => clearInterval(checkCombo), 4000);
+      }
+    } catch (e) {
+      console.warn("Google translate element init:", e);
+    }
+  };
+
+  const script = document.createElement("script");
+  script.id = "google-translate-script";
+  script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+  script.async = true;
+  document.body.appendChild(script);
+};
+
 export const LanguageProvider = ({ children }) => {
-  const [currentLang, setCurrentLang] = useState(() => {
+  const [currentLang, setCurrentLangState] = useState(() => {
     return localStorage.getItem("mixhub_language") || "en";
   });
+
+  const applyDynamicTranslation = (langCode) => {
+    try {
+      const target = langCode === "zh" ? "zh-CN" : langCode;
+      
+      // Update cookies for both root and current host
+      const host = window.location.hostname;
+      const domain = host.includes(".") ? `.${host.split(".").slice(-2).join(".")}` : "";
+      
+      if (langCode === "en") {
+        document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain};`;
+        document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      } else {
+        document.cookie = `googtrans=/en/${target}; path=/; domain=${domain};`;
+        document.cookie = `googtrans=/en/${target}; path=/;`;
+      }
+
+      const select = document.querySelector(".goog-te-combo");
+      if (select) {
+        select.value = target;
+        select.dispatchEvent(new Event("change"));
+      } else if (langCode !== "en") {
+        loadGoogleTranslateScript(target);
+      }
+    } catch (err) {
+      console.warn("Language sync:", err);
+    }
+  };
+
+  const setCurrentLang = (langCode) => {
+    setCurrentLangState(langCode);
+    localStorage.setItem("mixhub_language", langCode);
+    applyDynamicTranslation(langCode);
+  };
 
   useEffect(() => {
     localStorage.setItem("mixhub_language", currentLang);
@@ -432,6 +513,10 @@ export const LanguageProvider = ({ children }) => {
       document.documentElement.setAttribute("dir", "rtl");
     } else {
       document.documentElement.setAttribute("dir", "ltr");
+    }
+
+    if (currentLang !== "en") {
+      applyDynamicTranslation(currentLang);
     }
   }, [currentLang]);
 

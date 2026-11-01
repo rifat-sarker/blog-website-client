@@ -7,7 +7,7 @@ import { Bookmark, MessageCircle, Share2, Check, Heart, User } from "lucide-reac
 
 const BlogDetails = () => {
   const { id } = useParams();
-  const { currentLang } = useLanguage();
+  const { currentLang, setCurrentLang } = useLanguage();
   const { user } = useContext(AuthContext);
   const [article, setArticle] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -223,6 +223,15 @@ const BlogDetails = () => {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+          <button
+            onClick={() => setCurrentLang(currentLang === "bn" ? "en" : "bn")}
+            className="px-2.5 sm:px-3 py-1 rounded-full text-xs font-medium border border-[#e6e6e6] hover:border-[#242424] bg-[#ffffff] hover:bg-[#fafafa] text-[#242424] transition-all flex items-center gap-1.5 font-sans shadow-sm"
+            title="Toggle article language"
+          >
+            <span>🌐</span>
+            <span>{currentLang === "bn" ? "English" : "বাংলায় পড়ুন"}</span>
+          </button>
+
           <button
             onClick={handleSave}
             className={`p-1.5 sm:p-2 rounded-full transition-all flex items-center gap-1 sm:gap-1.5 ${

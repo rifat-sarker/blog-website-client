@@ -4,7 +4,7 @@ import Footer from "../shared/Footer/Footer";
 
 const Root = () => {
   return (
-    <div className="min-h-screen flex flex-col font-sans selection:bg-[#141414] selection:text-[#faf8f5]">
+    <div className="min-h-screen flex flex-col font-sans">
       {/* Newspaper Masthead & Navigation (Single Unified Header) */}
       <Navbar />
       {/* Broadsheet Page Body */}
