@@ -63,8 +63,8 @@ const LiveWire = () => {
           </p>
         </div>
 
-        <div className="flex items-center justify-between sm:justify-end gap-3 text-xs text-[#6b6b6b] pt-2 sm:pt-0 border-t sm:border-t-0 border-[#f2f2f2]">
-          <span className="font-mono">Synced: {lastCheck.toLocaleTimeString()}</span>
+        <div className="flex items-center justify-between sm:justify-end gap-3 text-xs text-[#6b6b6b] pt-2 sm:pt-0 border-t sm:border-t-0 border-[#f2f2f2] font-sans">
+          <span>Synced: {lastCheck.toLocaleTimeString()}</span>
           <button
             onClick={fetchWire}
             disabled={isRefreshing}
@@ -108,19 +108,19 @@ const LiveWire = () => {
               className="py-6 first:pt-0 space-y-2 cursor-pointer group"
               onClick={() => setExpandedId(isExpanded ? null : wireId)}
             >
-              <div className="flex items-center justify-between text-xs text-[#6b6b6b]">
+              <div className="flex items-center justify-between text-xs text-[#6b6b6b] font-sans">
                 <div className="flex items-center gap-2 flex-wrap">
                   {wire.urgent && (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#fef2f2] text-[#b91c1c] border border-[#fecaca] animate-pulse">
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-sans font-bold bg-[#fef2f2] text-[#b91c1c] border border-[#fecaca] animate-pulse">
                       <Flame className="w-3 h-3 text-[#b91c1c]" />
                       BREAKING
                     </span>
                   )}
                   <span className="font-medium text-[#1a8917]">{localizedCategory}</span>
                   <span>•</span>
-                  <span className="font-mono text-[11px] uppercase text-[#6b6b6b]">{wire.location || "GLOBAL"}</span>
+                  <span className="text-[11px] uppercase font-medium text-[#6b6b6b]">{wire.location || "GLOBAL"}</span>
                 </div>
-                <span className="font-mono text-[11px]">{wire.timestamp || "LIVE"}</span>
+                <span className="text-[11px]">{wire.timestamp || "LIVE"}</span>
               </div>
 
               <div className="flex items-start justify-between gap-4">
@@ -133,18 +133,18 @@ const LiveWire = () => {
               </div>
 
               {isExpanded && (
-                <div className="mt-3 p-4 bg-[#f9f9f9] rounded-lg border border-[#f2f2f2] text-sm text-[#404040] space-y-3">
+                <div className="mt-3 p-4 bg-[#f9f9f9] rounded-lg border border-[#f2f2f2] text-sm text-[#404040] space-y-3 font-sans">
                   <p className="leading-relaxed font-serif text-[15px]">{localizedReport}</p>
                   
                   <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#e6e6e6] text-xs text-[#6b6b6b]">
                     <div className="flex items-center gap-3">
                       {wire.points !== undefined && (
-                        <span className="font-mono font-medium text-[#1a8917]">
+                        <span className="font-medium text-[#1a8917]">
                           ▲ {wire.points} points
                         </span>
                       )}
                       {wire.numComments !== undefined && (
-                        <span className="font-mono">
+                        <span>
                           💬 {wire.numComments} comments
                         </span>
                       )}

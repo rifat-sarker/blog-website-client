@@ -6,20 +6,20 @@ import { AuthContext } from "../../providers/AuthProvider";
 import { Search, X, Bookmark } from "lucide-react";
 
 const SECTIONS = [
-  "All Stories",
-  "Technology",
-  "Programming",
-  "Architecture",
-  "Engineering",
-  "Design",
-  "Philosophy",
-  "Culture",
-  "Science",
-  "Other",
+  { key: "allStories", label: "All Stories", filter: "All Stories" },
+  { key: "technology", label: "Technology", filter: "Technology" },
+  { key: "programming", label: "Programming", filter: "Programming" },
+  { key: "architecture", label: "Architecture", filter: "Architecture" },
+  { key: "engineering", label: "Engineering", filter: "Engineering" },
+  { key: "design", label: "Design", filter: "Design" },
+  { key: "philosophy", label: "Philosophy", filter: "Philosophy" },
+  { key: "culture", label: "Culture", filter: "Culture" },
+  { key: "science", label: "Science", filter: "Science" },
+  { key: "other", label: "Other", filter: "Other" },
 ];
 
 const AllBlog = () => {
-  const { currentLang } = useLanguage();
+  const { currentLang, t } = useLanguage();
   const { user } = useContext(AuthContext);
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
@@ -129,18 +129,18 @@ const AllBlog = () => {
         </div>
 
         {/* Section Chips */}
-        <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto no-scrollbar">
+        <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto no-scrollbar font-sans">
           {SECTIONS.map((sec) => (
             <button
-              key={sec}
-              onClick={() => setActiveSection(sec)}
-              className={`px-3.5 py-1.5 text-xs rounded-full whitespace-nowrap transition-colors ${
-                activeSection === sec
-                  ? "bg-[#242424] text-[#ffffff] font-medium"
+              key={sec.filter}
+              onClick={() => setActiveSection(sec.filter)}
+              className={`px-3.5 py-1.5 text-xs rounded-full whitespace-nowrap transition-colors font-medium ${
+                activeSection === sec.filter
+                  ? "bg-[#242424] text-[#ffffff]"
                   : "bg-[#f2f2f2] text-[#6b6b6b] hover:text-[#242424]"
               }`}
             >
-              {sec}
+              {t(sec.key) || sec.label}
             </button>
           ))}
         </div>

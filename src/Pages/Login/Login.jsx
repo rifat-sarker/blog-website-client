@@ -33,10 +33,19 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   const navigate = useNavigate();
   const location = useLocation();
   const from = location?.state || "/addBlog";
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
 
   const googleClientId =
     import.meta.env.VITE_GOOGLE_CLIENT_ID ||
@@ -123,6 +132,7 @@ const Login = () => {
     try {
       await sendOTP(email);
       setStep("otp");
+      setResendCooldown(60);
       setSuccessMsg(
         currentLang === "bn"
           ? `আপনার ${email} ঠিকানায় ৬ ডিজিটের ওটিপি পাঠানো হয়েছে!`
@@ -134,6 +144,33 @@ const Login = () => {
           (currentLang === "bn"
             ? "ওটিপি পাঠাতে সমস্যা হয়েছে। ইমেইল চেক করুন।"
             : "Failed to dispatch verification code.")
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Resend OTP handler with 60s cooldown
+  const handleResendOTP = async () => {
+    if (resendCooldown > 0 || isSubmitting || !email.trim()) return;
+    setIsSubmitting(true);
+    setErrorMsg("");
+    setSuccessMsg("");
+
+    try {
+      await sendOTP(email);
+      setResendCooldown(60);
+      setSuccessMsg(
+        currentLang === "bn"
+          ? `আপনার ${email} ঠিকানায় নতুন ওটিপি কোড পাঠানো হয়েছে!`
+          : `A fresh 6-digit code has been dispatched to ${email}`
+      );
+    } catch (err) {
+      setErrorMsg(
+        err?.response?.data?.error ||
+          (currentLang === "bn"
+            ? "ওটিপি পুনরায় পাঠাতে সমস্যা হয়েছে।"
+            : "Failed to resend verification code.")
       );
     } finally {
       setIsSubmitting(false);
@@ -171,7 +208,7 @@ const Login = () => {
           <div className="w-8 h-8 mx-auto border border-[#b91c1c] text-[#b91c1c] font-serif font-bold flex items-center justify-center text-sm mb-2">
             M
           </div>
-          <span className="font-mono text-[11px] sm:text-xs uppercase tracking-widest text-[#b91c1c] font-bold block">
+          <span className="font-sans text-[11px] sm:text-xs uppercase tracking-wider text-[#b91c1c] font-semibold block">
             {currentLang === "bn" ? "লেখক পরিচয়পত্র ও প্রত্যয়ন ডেস্ক" : "Author Accreditation Desk"}
           </span>
           <h1 className="font-serif text-2xl sm:text-3xl font-normal text-[#141414]">
@@ -186,12 +223,12 @@ const Login = () => {
 
         {/* Feedback Messages */}
         {errorMsg && (
-          <div className="p-3 bg-[#fef2f2] border border-[#b91c1c] text-[#b91c1c] text-xs font-mono">
+          <div className="p-3 bg-[#fef2f2] border border-[#b91c1c] text-[#b91c1c] text-xs font-sans font-medium">
             ⚠️ {errorMsg}
           </div>
         )}
         {successMsg && (
-          <div className="p-3 bg-[#f0fdf4] border border-[#15803d] text-[#15803d] text-xs font-mono flex items-center gap-2">
+          <div className="p-3 bg-[#f0fdf4] border border-[#15803d] text-[#15803d] text-xs font-sans font-medium flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
             <span>{successMsg}</span>
           </div>
@@ -203,7 +240,7 @@ const Login = () => {
             type="button"
             onClick={handleGoogleSignInClick}
             disabled={isSubmitting}
-            className="w-full py-2.5 px-4 border border-[#e6e6e6] hover:border-[#242424] bg-[#ffffff] hover:bg-[#fafafa] rounded-full text-xs sm:text-sm font-medium text-[#242424] flex items-center justify-center gap-3 transition-all shadow-sm active:scale-[0.99]"
+            className="w-full py-2.5 px-4 border border-[#e6e6e6] hover:border-[#242424] bg-[#ffffff] hover:bg-[#fafafa] rounded-full text-xs sm:text-sm font-medium text-[#242424] flex items-center justify-center gap-3 transition-all shadow-sm active:scale-[0.99] font-sans"
           >
             <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
               <path
@@ -223,14 +260,14 @@ const Login = () => {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
               />
             </svg>
-            <span>Continue with Google</span>
+            <span>{t("continueWithGoogle")}</span>
           </button>
         </div>
 
         {/* Divider */}
         <div className="relative flex items-center justify-center">
           <div className="border-t border-[#e8e4dc] w-full" />
-          <span className="bg-[#ffffff] px-3 font-mono text-[10px] text-[#5e5a54] uppercase tracking-widest relative">
+          <span className="bg-[#ffffff] px-3 font-sans font-medium text-[10px] text-[#5e5a54] uppercase tracking-wider relative">
             {currentLang === "bn" ? "অথবা ইমেইল ওটিপি কোড" : "OR EMAIL ACCESS CODE"}
           </span>
         </div>
@@ -239,8 +276,8 @@ const Login = () => {
         {step === "email" ? (
           <form onSubmit={handleRequestOTP} className="space-y-4">
             <div>
-              <label className="block font-mono text-xs uppercase tracking-wider text-[#141414] font-bold mb-1.5">
-                {currentLang === "bn" ? "আপনার ইমেইল ঠিকানা" : "Author Email Address"}
+              <label className="block font-sans text-xs uppercase tracking-wider text-[#141414] font-semibold mb-1.5">
+                {t("emailLabel")}
               </label>
               <div className="relative">
                 <input
@@ -249,7 +286,7 @@ const Login = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="editor@mixhub.press"
                   required
-                  className="w-full bg-[#faf8f5] border border-[#141414] p-3 pl-10 text-sm font-mono text-[#141414] placeholder-[#8c867c] focus:outline-none"
+                  className="w-full bg-[#faf8f5] border border-[#141414] p-3 pl-10 text-sm font-sans text-[#141414] placeholder-[#8c867c] focus:outline-none"
                 />
                 <Mail className="w-4 h-4 text-[#8c867c] absolute left-3 top-3.5" />
               </div>
@@ -258,27 +295,44 @@ const Login = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 px-4 border border-[#141414] bg-[#141414] text-[#faf8f5] text-xs font-mono uppercase tracking-widest font-bold hover:bg-transparent hover:text-[#141414] transition-all flex items-center justify-center gap-2"
+              className="w-full py-3 px-4 border border-[#141414] bg-[#141414] text-[#faf8f5] text-xs font-sans uppercase tracking-wider font-semibold hover:bg-transparent hover:text-[#141414] transition-all flex items-center justify-center gap-2"
             >
               <span>{isSubmitting ? "Dispatching..." : currentLang === "bn" ? "ওটিপি কোড পাঠান" : "Send Access Code"}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </form>
         ) : (
-          /* Step 2: OTP Verification Form */
+          /* Step 2: OTP Verification Form with Resend Feature */
           <form onSubmit={handleVerifyOTP} className="space-y-4">
             <div>
-              <div className="flex justify-between items-center mb-1.5">
-                <label className="block font-mono text-xs uppercase tracking-wider text-[#141414] font-bold">
-                  {currentLang === "bn" ? "৬ ডিজিটের ওটিপি কোড" : "6-Digit Access Code"}
+              <div className="flex justify-between items-center mb-1.5 font-sans">
+                <label className="block text-xs uppercase tracking-wider text-[#141414] font-semibold">
+                  {t("otpLabel")}
                 </label>
-                <button
-                  type="button"
-                  onClick={() => setStep("email")}
-                  className="font-mono text-[11px] text-[#b91c1c] underline hover:text-[#141414]"
-                >
-                  {currentLang === "bn" ? "ইমেইল পরিবর্তন" : "Change Email"}
-                </button>
+                <div className="flex items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={handleResendOTP}
+                    disabled={resendCooldown > 0 || isSubmitting}
+                    className={`text-xs font-medium transition-colors ${
+                      resendCooldown > 0
+                        ? "text-[#8c867c] cursor-not-allowed"
+                        : "text-[#1a8917] hover:underline"
+                    }`}
+                  >
+                    {resendCooldown > 0
+                      ? `${t("resendIn")} (${resendCooldown}s)`
+                      : t("resendOTP")}
+                  </button>
+                  <span className="text-[#d8d2c4]">•</span>
+                  <button
+                    type="button"
+                    onClick={() => setStep("email")}
+                    className="text-xs text-[#b91c1c] underline hover:text-[#141414]"
+                  >
+                    {t("changeEmail")}
+                  </button>
+                </div>
               </div>
               <div className="relative">
                 <input
@@ -289,7 +343,7 @@ const Login = () => {
                   placeholder="123456"
                   required
                   autoFocus
-                  className="w-full bg-[#faf8f5] border border-[#141414] p-3 pl-10 text-xl font-mono tracking-[0.3em] text-center text-[#141414] placeholder-[#8c867c] focus:outline-none"
+                  className="w-full bg-[#faf8f5] border border-[#141414] p-3 pl-10 text-xl font-sans tracking-[0.3em] text-center font-bold text-[#141414] placeholder-[#8c867c] focus:outline-none"
                 />
                 <KeyRound className="w-4 h-4 text-[#8c867c] absolute left-3 top-4" />
               </div>
@@ -298,9 +352,9 @@ const Login = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 px-4 border border-[#141414] bg-[#141414] text-[#faf8f5] text-xs font-mono uppercase tracking-widest font-bold hover:bg-transparent hover:text-[#141414] transition-all flex items-center justify-center gap-2"
+              className="w-full py-3 px-4 border border-[#141414] bg-[#141414] text-[#faf8f5] text-xs font-sans uppercase tracking-wider font-semibold hover:bg-transparent hover:text-[#141414] transition-all flex items-center justify-center gap-2"
             >
-              <span>{isSubmitting ? "Verifying..." : currentLang === "bn" ? "কোড যাচাই ও প্রবেশ" : "Verify & Enter"}</span>
+              <span>{isSubmitting ? "Verifying..." : t("verifyEnter")}</span>
               <ShieldCheck className="w-4 h-4" />
             </button>
           </form>

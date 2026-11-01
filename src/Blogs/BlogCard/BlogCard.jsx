@@ -89,9 +89,9 @@ const BlogCard = ({ blog }) => {
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-80" />
 
         {/* Top Badges */}
-        <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
+        <div className="absolute top-3 left-3 right-3 flex items-center justify-between font-sans">
           <span
-            className={`text-[11px] font-mono font-semibold uppercase px-2.5 py-1 rounded-full border backdrop-blur-md ${categoryBadgeClass}`}
+            className={`text-[11px] font-sans font-medium uppercase px-2.5 py-1 rounded-full border backdrop-blur-md ${categoryBadgeClass}`}
           >
             {category?.replace("_", " ") || "Article"}
           </span>
@@ -110,7 +110,7 @@ const BlogCard = ({ blog }) => {
         </div>
 
         {/* Read Time */}
-        <div className="absolute bottom-3 left-3 text-xs text-slate-300 flex items-center gap-1 font-mono">
+        <div className="absolute bottom-3 left-3 text-xs text-slate-300 flex items-center gap-1 font-sans font-medium">
           <Clock className="w-3.5 h-3.5 text-indigo-400" />
           <span>{calculatedReadTime}</span>
         </div>

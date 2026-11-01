@@ -54,13 +54,13 @@ const LiveNewsTicker = () => {
       <div className="w-full bg-[#f4f1ea] border-b border-[#e8e4dc] py-2 px-4 text-xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           {/* Wire Label with Vermilion Dot */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0 font-sans">
             <span className="w-2 h-2 rounded-full bg-[#b91c1c] animate-pulse" />
-            <span className="font-mono font-bold tracking-widest text-[#b91c1c] text-[11px] uppercase">
+            <span className="font-semibold tracking-wider text-[#b91c1c] text-[11px] uppercase">
               {t("theWire")}
             </span>
-            <span className="text-[#8c867c] hidden sm:inline font-mono">/</span>
-            <span className="font-mono text-[#5e5a54] text-[10px] uppercase hidden sm:inline">
+            <span className="text-[#8c867c] hidden sm:inline">/</span>
+            <span className="text-[#5e5a54] text-[11px] hidden sm:inline">
               {t("liveTelemetry")}
             </span>
           </div>
@@ -74,11 +74,11 @@ const LiveNewsTicker = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.25 }}
-                className="flex items-center gap-2 truncate cursor-pointer hover:underline text-[#141414]"
+                className="flex items-center gap-2 truncate cursor-pointer hover:underline text-[#141414] font-sans"
                 onClick={() => setModalOpen(true)}
               >
-                <span className="font-mono text-[10px] uppercase tracking-wider text-[#5e5a54] bg-[#e8e4dc] px-1.5 py-0.5 rounded-sm">
-                  {currentItem.location || "WIRE"} {currentItem.timestamp}
+                <span className="text-[10px] uppercase tracking-wider text-[#5e5a54] bg-[#e8e4dc] px-1.5 py-0.5 rounded-sm font-medium">
+                  {currentItem.location || "WIRE"} • {currentItem.timestamp}
                 </span>
                 <span className="font-serif italic text-sm text-[#141414] truncate font-medium">
                   {currentHeadline}
@@ -88,10 +88,10 @@ const LiveNewsTicker = () => {
           </div>
 
           {/* Action */}
-          <div className="flex-shrink-0 flex items-center gap-2">
+          <div className="flex-shrink-0 flex items-center gap-2 font-sans">
             <button
               onClick={() => setModalOpen(true)}
-              className="text-[11px] font-mono uppercase tracking-wider text-[#5e5a54] hover:text-[#141414] underline flex items-center gap-1 font-bold"
+              className="text-[11px] uppercase tracking-wider text-[#5e5a54] hover:text-[#141414] underline flex items-center gap-1 font-semibold"
             >
               <span>{currentLang === "bn" ? `সব দেখুন (${wireList.length})` : `View All (${wireList.length})`}</span>
             </button>
@@ -106,9 +106,9 @@ const LiveNewsTicker = () => {
             {/* Modal Header */}
             <div className="p-6 border-b border-[#141414] flex items-center justify-between bg-[#f4f1ea]">
               <div>
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2 mb-1 font-sans">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#b91c1c] animate-pulse" />
-                  <span className="font-mono text-xs uppercase tracking-widest font-bold text-[#b91c1c]">
+                  <span className="text-xs uppercase tracking-wider font-semibold text-[#b91c1c]">
                     {currentLang === "bn" ? "টেলিপ্রিন্টার লগ" : "Teleprinter Log"}
                   </span>
                 </div>
@@ -149,10 +149,10 @@ const LiveNewsTicker = () => {
 
                 return (
                   <div key={item.id || idx} className="pt-4 first:pt-0 space-y-2">
-                    <div className="flex items-center justify-between text-[11px] font-mono text-[#5e5a54]">
+                    <div className="flex items-center justify-between text-[11px] font-sans font-medium text-[#5e5a54]">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-[#141414]">[{item.edition || `WIRE 0${idx + 1}`}]</span>
-                        <span className="bg-[#e8e4dc] px-1 py-0.5 uppercase tracking-wider text-[10px] text-[#141414] font-bold">
+                        <span className="font-semibold text-[#141414]">[{item.edition || `WIRE 0${idx + 1}`}]</span>
+                        <span className="bg-[#e8e4dc] px-1.5 py-0.5 uppercase tracking-wider text-[10px] text-[#141414] font-medium rounded">
                           {item.location || "GLOBAL"}
                         </span>
                         <span>•</span>
@@ -172,13 +172,13 @@ const LiveNewsTicker = () => {
                     )}
 
                     {item.url && (
-                      <div className="pt-1 flex items-center justify-between text-xs font-mono text-[#5e5a54]">
+                      <div className="pt-1 flex items-center justify-between text-xs font-sans text-[#5e5a54]">
                         {item.points !== undefined ? <span>▲ {item.points} points • {item.numComments || 0} comments</span> : <span />}
                         <a
                           href={item.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-[#b91c1c] hover:underline font-bold"
+                          className="inline-flex items-center gap-1 text-[#b91c1c] hover:underline font-semibold"
                         >
                           <span>{currentLang === "bn" ? "মূল সূত্র পড়ুন" : "Read Original Source"}</span>
                           <ArrowUpRight className="w-3.5 h-3.5" />
@@ -191,11 +191,11 @@ const LiveNewsTicker = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 bg-[#f4f1ea] border-t border-[#141414] flex items-center justify-between text-xs font-mono text-[#5e5a54]">
+            <div className="p-4 bg-[#f4f1ea] border-t border-[#141414] flex items-center justify-between text-xs font-sans text-[#5e5a54]">
               <span>Verified Wire Stream • 2026 Telecommunications Edition</span>
               <button
                 onClick={() => setModalOpen(false)}
-                className="px-4 py-1.5 border border-[#141414] bg-[#141414] text-[#faf8f5] uppercase tracking-wider text-[11px] font-bold hover:bg-transparent hover:text-[#141414] transition-colors"
+                className="px-4 py-1.5 border border-[#141414] bg-[#141414] text-[#faf8f5] uppercase tracking-wider text-[11px] font-semibold hover:bg-transparent hover:text-[#141414] transition-colors"
               >
                 Close Wire
               </button>

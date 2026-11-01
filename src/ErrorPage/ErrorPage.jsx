@@ -5,7 +5,7 @@ const ErrorPage = () => {
   return (
     <div className="min-h-screen bg-[#faf8f5] text-[#141414] flex items-center justify-center p-6">
       <div className="max-w-md w-full text-center space-y-6 border-2 border-[#141414] p-10 bg-[#ffffff] shadow-xl">
-        <span className="font-mono text-xs uppercase tracking-widest text-[#b91c1c] font-bold block">
+        <span className="font-sans text-xs uppercase tracking-wider text-[#b91c1c] font-semibold block">
           Dispatch Notice • 404
         </span>
 
@@ -23,7 +23,7 @@ const ErrorPage = () => {
         <div className="pt-4 border-t border-[#e8e4dc]">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#141414] bg-[#141414] text-[#faf8f5] font-mono text-xs uppercase tracking-wider font-bold hover:bg-transparent hover:text-[#141414] transition-all"
+            className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#141414] bg-[#141414] text-[#faf8f5] font-sans text-xs uppercase tracking-wider font-semibold hover:bg-transparent hover:text-[#141414] transition-all"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Return to Front Page
           </Link>

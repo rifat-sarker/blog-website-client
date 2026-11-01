@@ -18,7 +18,7 @@ import {
 
 const Navbar = () => {
   const { user, logOut } = useContext(AuthContext);
-  const { currentLang, setCurrentLang, LANGUAGES } = useLanguage();
+  const { currentLang, setCurrentLang, LANGUAGES, t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [liveResults, setLiveResults] = useState([]);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -118,8 +118,8 @@ const Navbar = () => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search stories, ideas..."
-                  className="w-full bg-[#f9f9f9] border border-transparent focus:border-[#e6e6e6] focus:bg-[#ffffff] text-sm text-[#242424] placeholder-[#6b6b6b] rounded-full py-2 pl-9 pr-8 outline-none transition-all"
+                  placeholder={t("searchPlaceholder")}
+                  className="w-full bg-[#f9f9f9] border border-transparent focus:border-[#e6e6e6] focus:bg-[#ffffff] text-sm text-[#242424] placeholder-[#6b6b6b] rounded-full py-2 pl-9 pr-8 outline-none transition-all font-sans"
                 />
                 {searchQuery && (
                   <button
@@ -135,7 +135,7 @@ const Navbar = () => {
               {/* Desktop Autocomplete Dropdown anchored directly below input */}
               {liveResults.length > 0 && (
                 <div className="absolute top-[44px] left-0 w-80 sm:w-96 bg-[#ffffff] border border-[#f2f2f2] rounded-lg shadow-2xl z-50 overflow-hidden divide-y divide-[#f2f2f2]">
-                  <div className="p-2.5 text-[11px] font-mono uppercase tracking-wider text-[#6b6b6b] bg-[#fafafa]">
+                  <div className="p-2.5 text-[11px] font-sans font-medium uppercase tracking-wider text-[#6b6b6b] bg-[#fafafa]">
                     Stories Found ({liveResults.length})
                   </div>
                   {liveResults.map((story) => (
@@ -176,32 +176,32 @@ const Navbar = () => {
             {/* Write Story Button (Desktop & Tablet) */}
             <Link
               to="/addBlog"
-              className="hidden sm:flex items-center gap-1.5 text-xs sm:text-sm text-[#6b6b6b] hover:text-[#242424] transition-colors p-1.5 sm:p-0"
-              title="Write a story"
+              className="hidden sm:flex items-center gap-1.5 text-xs sm:text-sm text-[#6b6b6b] hover:text-[#242424] transition-colors p-1.5 sm:p-0 font-sans font-medium"
+              title={t("writeStory")}
             >
               <SquarePen className="w-4 h-4 sm:w-5 sm:h-5 stroke-[1.5]" />
-              <span>Write</span>
+              <span>{t("write")}</span>
             </Link>
 
             {/* The Live Wire (Tablet/Desktop) */}
             <Link
               to="/live-wire"
-              className="hidden md:flex items-center gap-1.5 text-xs text-[#6b6b6b] hover:text-[#242424] transition-colors"
+              className="hidden md:flex items-center gap-1.5 text-xs sm:text-sm text-[#6b6b6b] hover:text-[#242424] transition-colors font-sans font-medium"
               title="Continuous Live News Wire"
             >
               <span className="w-2 h-2 rounded-full bg-[#1a8917] animate-pulse" />
-              <span className="font-mono text-[11px] uppercase tracking-wider">The Wire</span>
+              <span>{t("wire")}</span>
             </Link>
 
             {/* Language Switcher */}
             <div className="relative" ref={langDropdownRef}>
               <button
                 onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-                className="flex items-center gap-1 text-xs text-[#6b6b6b] hover:text-[#242424] py-1 px-1.5 rounded transition-colors"
+                className="flex items-center gap-1.5 text-xs text-[#6b6b6b] hover:text-[#242424] py-1 px-1.5 rounded transition-colors font-sans font-medium"
                 title="Select language"
               >
                 <span>{currentLangObj.flag}</span>
-                <span className="hidden sm:inline text-xs uppercase font-mono">{currentLangObj.code}</span>
+                <span className="hidden sm:inline text-xs uppercase font-sans font-medium text-[#6b6b6b]">{currentLangObj.code}</span>
                 <ChevronDown className="w-3 h-3 text-[#6b6b6b]" />
               </button>
 
@@ -258,7 +258,7 @@ const Navbar = () => {
                         className="flex items-center gap-2.5 px-3 py-2 hover:bg-[#f9f9f9] rounded transition-colors text-xs text-[#6b6b6b]"
                       >
                         <Bookmark className="w-4 h-4" />
-                        <span>Reading list</span>
+                        <span>{t("readingList")}</span>
                       </Link>
                       <Link
                         to="/addBlog"
@@ -266,7 +266,7 @@ const Navbar = () => {
                         className="flex items-center gap-2.5 px-3 py-2 hover:bg-[#f9f9f9] rounded transition-colors text-xs text-[#6b6b6b]"
                       >
                         <SquarePen className="w-4 h-4" />
-                        <span>Write a story</span>
+                        <span>{t("writeStory")}</span>
                       </Link>
                     </div>
 
@@ -279,7 +279,7 @@ const Navbar = () => {
                         className="w-full text-left flex items-center gap-2.5 px-3 py-2 text-xs text-[#b91c1c] hover:bg-[#fef2f2] rounded transition-colors"
                       >
                         <LogOut className="w-4 h-4" />
-                        <span>Sign out</span>
+                        <span>{t("signOut")}</span>
                       </button>
                     </div>
                   </div>
@@ -289,15 +289,15 @@ const Navbar = () => {
               <div className="flex items-center gap-2 sm:gap-3">
                 <Link
                   to="/login"
-                  className="hidden md:inline text-xs sm:text-sm text-[#6b6b6b] hover:text-[#242424] transition-colors"
+                  className="hidden md:inline text-xs sm:text-sm text-[#6b6b6b] hover:text-[#242424] transition-colors font-medium font-sans"
                 >
-                  Sign in
+                  {t("signIn")}
                 </Link>
                 <Link
                   to="/login"
-                  className="text-xs sm:text-sm font-medium px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full medium-btn-green whitespace-nowrap"
+                  className="text-xs sm:text-sm font-medium px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full medium-btn-green whitespace-nowrap font-sans"
                 >
-                  Get started
+                  {t("getStarted")}
                 </Link>
               </div>
             )}
@@ -323,8 +323,8 @@ const Navbar = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search stories, ideas..."
-                className="w-full bg-[#f9f9f9] border border-[#e6e6e6] focus:border-[#242424] focus:bg-[#ffffff] text-xs text-[#242424] placeholder-[#6b6b6b] rounded-full py-2 pl-9 pr-8 outline-none"
+                placeholder={t("searchPlaceholder")}
+                className="w-full bg-[#f9f9f9] border border-[#e6e6e6] focus:border-[#242424] focus:bg-[#ffffff] text-xs text-[#242424] placeholder-[#6b6b6b] rounded-full py-2 pl-9 pr-8 outline-none font-sans"
               />
               {searchQuery && (
                 <button
@@ -340,7 +340,7 @@ const Navbar = () => {
             {/* Mobile Autocomplete Results */}
             {liveResults.length > 0 && (
               <div className="mt-2 bg-[#ffffff] border border-[#f2f2f2] rounded-lg shadow-xl overflow-hidden divide-y divide-[#f2f2f2]">
-                <div className="p-2 text-[10px] font-mono uppercase tracking-wider text-[#6b6b6b] bg-[#fafafa]">
+                <div className="p-2 text-[10px] font-sans font-medium uppercase tracking-wider text-[#6b6b6b] bg-[#fafafa]">
                   Stories Found ({liveResults.length})
                 </div>
                 {liveResults.map((story) => (
@@ -369,7 +369,7 @@ const Navbar = () => {
 
         {/* Mobile Navigation Dropdown Menu (< 768px) */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-[#f2f2f2] py-3 space-y-2">
+          <div className="md:hidden border-t border-[#f2f2f2] py-3 space-y-2 font-sans">
             <div className="grid grid-cols-2 gap-1.5 text-xs font-medium">
               <Link
                 to="/"
@@ -377,7 +377,7 @@ const Navbar = () => {
                 className="flex items-center gap-2 p-2 rounded-lg hover:bg-[#f9f9f9] text-[#242424]"
               >
                 <Compass className="w-4 h-4 text-[#1a8917]" />
-                <span>Front Page</span>
+                <span>{t("frontPage")}</span>
               </Link>
               <Link
                 to="/allBlog"
@@ -385,7 +385,7 @@ const Navbar = () => {
                 className="flex items-center gap-2 p-2 rounded-lg hover:bg-[#f9f9f9] text-[#242424]"
               >
                 <Search className="w-4 h-4 text-[#1a8917]" />
-                <span>All Stories</span>
+                <span>{t("allStories")}</span>
               </Link>
               <Link
                 to="/featuredBlog"
@@ -393,7 +393,7 @@ const Navbar = () => {
                 className="flex items-center gap-2 p-2 rounded-lg hover:bg-[#f9f9f9] text-[#242424]"
               >
                 <TrendingUp className="w-4 h-4 text-[#1a8917]" />
-                <span>Featured</span>
+                <span>{t("featured")}</span>
               </Link>
               <Link
                 to="/live-wire"
@@ -401,7 +401,7 @@ const Navbar = () => {
                 className="flex items-center gap-2 p-2 rounded-lg hover:bg-[#f9f9f9] text-[#242424]"
               >
                 <Radio className="w-4 h-4 text-[#1a8917]" />
-                <span>The Wire</span>
+                <span>{t("wire")}</span>
               </Link>
               <Link
                 to="/wishlist"
@@ -409,7 +409,7 @@ const Navbar = () => {
                 className="flex items-center gap-2 p-2 rounded-lg hover:bg-[#f9f9f9] text-[#242424]"
               >
                 <Bookmark className="w-4 h-4 text-[#1a8917]" />
-                <span>Reading List</span>
+                <span>{t("readingList")}</span>
               </Link>
               <Link
                 to="/addBlog"
@@ -417,7 +417,7 @@ const Navbar = () => {
                 className="flex items-center gap-2 p-2 rounded-lg hover:bg-[#f9f9f9] text-[#242424]"
               >
                 <SquarePen className="w-4 h-4 text-[#1a8917]" />
-                <span>Write Story</span>
+                <span>{t("writeStory")}</span>
               </Link>
             </div>
           </div>

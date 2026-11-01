@@ -6,20 +6,20 @@ import { AuthContext } from "../../../providers/AuthProvider";
 import { Bookmark } from "lucide-react";
 
 const TOPICS = [
-  "For you",
-  "Technology",
-  "Programming",
-  "Architecture",
-  "Engineering",
-  "Design",
-  "Philosophy",
-  "Culture",
-  "Science",
-  "Other",
+  { key: "forYou", label: "For you", filter: "For you" },
+  { key: "technology", label: "Technology", filter: "Technology" },
+  { key: "programming", label: "Programming", filter: "Programming" },
+  { key: "architecture", label: "Architecture", filter: "Architecture" },
+  { key: "engineering", label: "Engineering", filter: "Engineering" },
+  { key: "design", label: "Design", filter: "Design" },
+  { key: "philosophy", label: "Philosophy", filter: "Philosophy" },
+  { key: "culture", label: "Culture", filter: "Culture" },
+  { key: "science", label: "Science", filter: "Science" },
+  { key: "other", label: "Other", filter: "Other" },
 ];
 
 const Home = () => {
-  const { currentLang } = useLanguage();
+  const { currentLang, t } = useLanguage();
   const { user } = useContext(AuthContext);
   const [articles, setArticles] = useState([]);
   const [wireItems, setWireItems] = useState([]);
@@ -81,18 +81,18 @@ const Home = () => {
         {/* Main Feed Column (Left / 8 cols) */}
         <main className="lg:col-span-8 lg:pr-8">
           {/* Topic Navigation Bar */}
-          <div className="flex items-center space-x-4 sm:space-x-6 overflow-x-auto pb-3 sm:pb-4 mb-6 sm:mb-8 border-b border-[#f2f2f2] text-xs sm:text-sm text-[#6b6b6b] no-scrollbar">
+          <div className="flex items-center space-x-4 sm:space-x-6 overflow-x-auto pb-3 sm:pb-4 mb-6 sm:mb-8 border-b border-[#f2f2f2] text-xs sm:text-sm text-[#6b6b6b] no-scrollbar font-sans">
             {TOPICS.map((topic) => (
               <button
-                key={topic}
-                onClick={() => setActiveTopic(topic)}
-                className={`flex-shrink-0 transition-colors pb-2 -mb-2 border-b whitespace-nowrap ${
-                  activeTopic === topic
-                    ? "border-[#242424] text-[#242424] font-medium"
+                key={topic.filter}
+                onClick={() => setActiveTopic(topic.filter)}
+                className={`flex-shrink-0 transition-colors pb-2 -mb-2 border-b whitespace-nowrap font-medium ${
+                  activeTopic === topic.filter
+                    ? "border-[#242424] text-[#242424]"
                     : "border-transparent hover:text-[#242424]"
                 }`}
               >
-                {topic}
+                {t(topic.key) || topic.label}
               </button>
             ))}
           </div>
@@ -215,7 +215,7 @@ const Home = () => {
             <div className="space-y-4">
               {wireItems.slice(0, 4).map((wire, idx) => (
                 <div key={wire.id || idx} className="space-y-1">
-                  <div className="flex items-center justify-between text-[11px] text-[#6b6b6b] font-mono">
+                  <div className="flex items-center justify-between text-[11px] text-[#6b6b6b] font-sans font-medium">
                     <span className="font-semibold text-[#242424]">{wire.location}</span>
                     <span>{wire.timestamp}</span>
                   </div>
