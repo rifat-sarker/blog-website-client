@@ -96,16 +96,16 @@ const Navbar = () => {
   const currentLangObj = LANGUAGES.find((l) => l.code === currentLang) || LANGUAGES[0];
 
   return (
-    <header className="sticky top-0 z-50 bg-[#ffffff] border-b border-[#f2f2f2]" ref={mobileMenuRef}>
+    <header className="sticky top-0 z-50 bg-[#ffffff] border-b border-[#f2f2f2] notranslate" translate="no" ref={mobileMenuRef}>
       <div className="max-w-[1336px] mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-[57px] gap-2">
           {/* Left: MixHub Logo & Instant Live Search (Desktop) */}
           <div className="flex items-center gap-3 sm:gap-6 flex-shrink-0" ref={searchContainerRef}>
-            <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
-              <div className="w-8 h-8 rounded-lg bg-[#242424] text-[#ffffff] flex items-center justify-center font-serif text-lg font-bold group-hover:bg-[#1a8917] transition-colors flex-shrink-0">
+            <Link to="/" className="flex items-center gap-2 group flex-shrink-0 notranslate" translate="no">
+              <div className="w-8 h-8 rounded-lg bg-[#242424] text-[#ffffff] flex items-center justify-center font-serif text-lg font-bold group-hover:bg-[#1a8917] transition-colors flex-shrink-0 notranslate" translate="no">
                 M
               </div>
-              <span className="font-serif text-[19px] sm:text-[22px] font-bold tracking-tight text-[#242424] flex-shrink-0 select-none">
+              <span className="font-serif text-[19px] sm:text-[22px] font-bold tracking-tight text-[#242424] flex-shrink-0 select-none notranslate" translate="no">
                 MixHub
               </span>
             </Link>

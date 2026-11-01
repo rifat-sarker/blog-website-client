@@ -285,9 +285,10 @@ const BlogDetails = () => {
               return (
                 <pre
                   key={idx}
-                  className="p-3 sm:p-4 bg-[#f9f9f9] border border-[#f2f2f2] rounded-md font-mono text-xs sm:text-[13px] text-[#242424] overflow-x-auto leading-relaxed my-4 sm:my-6"
+                  translate="no"
+                  className="p-3 sm:p-4 bg-[#f9f9f9] border border-[#f2f2f2] rounded-md font-mono text-xs sm:text-[13px] text-[#242424] overflow-x-auto leading-relaxed my-4 sm:my-6 notranslate"
                 >
-                  <code>{codeLines}</code>
+                  <code translate="no" className="notranslate">{codeLines}</code>
                 </pre>
               );
             }
