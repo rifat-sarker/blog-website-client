@@ -130,7 +130,7 @@ const Home = () => {
                         {/* Author Info */}
                         <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-[#242424]">
                           <img
-                            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
+                            src={article.author?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80"}
                             alt={authorName}
                             className="w-4 h-4 sm:w-5 sm:h-5 rounded-full object-cover flex-shrink-0"
                           />

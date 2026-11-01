@@ -137,7 +137,7 @@ const BlogDetails = () => {
     const authorName = currentUserName || "Reader";
     const authorAvatar =
       currentUserAvatar ||
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80";
+      "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
 
     const commentPayload = {
       author: authorName,
@@ -203,7 +203,7 @@ const BlogDetails = () => {
       <div className="flex items-center justify-between pb-6 sm:pb-8 border-b border-[#f2f2f2] gap-3">
         <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
           <img
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
+            src={article?.author?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80"}
             alt={localizedAuthorName}
             className="w-9 h-9 sm:w-11 sm:h-11 rounded-full object-cover flex-shrink-0"
           />

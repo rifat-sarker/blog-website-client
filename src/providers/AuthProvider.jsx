@@ -13,7 +13,7 @@ const formatUser = (rawUser) => {
   const avatar =
     rawUser.avatar ||
     rawUser.photoURL ||
-    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80";
+    "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
   return {
     ...rawUser,
     displayName: name,
@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }) => {
     const payload = customProfile || {
       email: "rifatswd@gmail.com",
       name: "Rifat Sarker",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
+      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
       googleId: "gid-verified-2026",
     };
 
@@ -102,7 +102,7 @@ export const AuthProvider = ({ children }) => {
         email: payload.email || "rifatswd@gmail.com",
         role: "Lead Editor",
         location: "Dhaka Bureau",
-        avatar: payload.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
+        avatar: payload.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
       });
       setUser(fallbackUser);
       localStorage.setItem("mixhub_editorial_user", JSON.stringify(fallbackUser));

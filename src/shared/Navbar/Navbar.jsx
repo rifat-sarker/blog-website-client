@@ -100,12 +100,12 @@ const Navbar = () => {
       <div className="max-w-[1336px] mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-[57px] gap-2">
           {/* Left: MixHub Logo & Instant Live Search (Desktop) */}
-          <div className="flex items-center gap-3 sm:gap-6 flex-1 min-w-0" ref={searchContainerRef}>
+          <div className="flex items-center gap-3 sm:gap-6 flex-shrink-0" ref={searchContainerRef}>
             <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
-              <div className="w-8 h-8 rounded-lg bg-[#242424] text-[#ffffff] flex items-center justify-center font-serif text-lg font-bold group-hover:bg-[#1a8917] transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-[#242424] text-[#ffffff] flex items-center justify-center font-serif text-lg font-bold group-hover:bg-[#1a8917] transition-colors flex-shrink-0">
                 M
               </div>
-              <span className="font-serif text-[20px] sm:text-[22px] font-bold tracking-tight text-[#242424]">
+              <span className="font-serif text-[19px] sm:text-[22px] font-bold tracking-tight text-[#242424] flex-shrink-0 select-none">
                 MixHub
               </span>
             </Link>
@@ -162,24 +162,25 @@ const Navbar = () => {
           </div>
 
           {/* Right: Actions, Language, Profile & Mobile Toggles */}
-          <div className="flex items-center gap-2 sm:gap-4 md:gap-6 flex-shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-4 md:gap-6 flex-shrink-0">
             {/* Mobile Search Toggle Button (< 640px) */}
             <button
               onClick={toggleMobileSearch}
-              className="sm:hidden p-2 text-[#6b6b6b] hover:text-[#242424] rounded-full hover:bg-[#f9f9f9] transition-colors"
-              title="Search"
+              className="sm:hidden p-1.5 text-[#6b6b6b] hover:text-[#242424] rounded-full hover:bg-[#f9f9f9] transition-colors"
+              title="Search stories"
+              aria-label="Search"
             >
               <Search className="w-4 h-4" />
             </button>
 
-            {/* Write Story Button */}
+            {/* Write Story Button (Desktop & Tablet) */}
             <Link
               to="/addBlog"
-              className="flex items-center gap-1.5 text-xs sm:text-sm text-[#6b6b6b] hover:text-[#242424] transition-colors p-1.5 sm:p-0"
+              className="hidden sm:flex items-center gap-1.5 text-xs sm:text-sm text-[#6b6b6b] hover:text-[#242424] transition-colors p-1.5 sm:p-0"
               title="Write a story"
             >
               <SquarePen className="w-4 h-4 sm:w-5 sm:h-5 stroke-[1.5]" />
-              <span className="hidden sm:inline">Write</span>
+              <span>Write</span>
             </Link>
 
             {/* The Live Wire (Tablet/Desktop) */}
@@ -237,7 +238,7 @@ const Navbar = () => {
                   className="flex items-center gap-2 focus:outline-none"
                 >
                   <img
-                    src={user.avatar || user.photoURL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"}
+                    src={user.avatar || user.photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80"}
                     alt={user.displayName || user.name || "User"}
                     className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover border border-[#e6e6e6]"
                   />
@@ -294,7 +295,7 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/login"
-                  className="text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 sm:py-2 rounded-full medium-btn-green whitespace-nowrap"
+                  className="text-xs sm:text-sm font-medium px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full medium-btn-green whitespace-nowrap"
                 >
                   Get started
                 </Link>
