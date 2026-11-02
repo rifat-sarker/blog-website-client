@@ -11,8 +11,25 @@ export const apiClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 5000,
+  timeout: 15000,
 });
+
+// Attach Authorization Bearer token to requests if available
+apiClient.interceptors.request.use(
+  (config) => {
+    try {
+      const token = localStorage.getItem("mixhub_auth_token");
+      if (token) {
+        config.headers = config.headers || {};
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch {
+      // LocalStorage might be restricted
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 // Helper to extract localized text (defaults to English if specific lang is not found)
 export const getLocalized = (field, lang = "en") => {

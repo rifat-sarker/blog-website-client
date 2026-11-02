@@ -39,7 +39,7 @@ const TEAM_MEMBERS = [
     role: "Content Strategist",
     handle: "@rachelzoe",
     email: "rachel@mixhub.dev",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
+    avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80",
     specialty: "Editorial Narrative & Culture",
   },
   {
