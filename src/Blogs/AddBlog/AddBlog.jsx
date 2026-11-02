@@ -96,7 +96,8 @@ const AddBlog = () => {
       image: image.trim() || "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1400&q=80",
       date: new Date().toISOString(),
       author: {
-        name: user?.displayName || user?.name || "Rifat Sarker",
+        name: user?.displayName || user?.name || "MixHub Author",
+        avatar: user?.photoURL || user?.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
         location: "Dhaka Bureau",
         role: "Author",
       },

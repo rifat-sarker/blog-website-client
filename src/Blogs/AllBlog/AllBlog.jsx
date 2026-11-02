@@ -50,7 +50,7 @@ const AllBlog = () => {
 
   useEffect(() => {
     const q = searchParams.get("q");
-    if (q !== null && q !== searchQuery) {
+    if (q !== null) {
       setSearchQuery(q);
     }
   }, [searchParams]);

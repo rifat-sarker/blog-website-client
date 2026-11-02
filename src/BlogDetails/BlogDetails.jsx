@@ -215,6 +215,8 @@ const BlogDetails = () => {
               </button>
             </div>
             <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-[#6b6b6b] mt-0.5">
+              <span>{localizedAuthorLoc}</span>
+              <span>•</span>
               <span>{localizedReadTime}</span>
               <span>•</span>
               <span className="truncate">{formattedDate}</span>

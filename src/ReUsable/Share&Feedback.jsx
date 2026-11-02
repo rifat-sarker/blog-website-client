@@ -19,7 +19,7 @@ import { Checkbox, FormControlLabel, IconButton } from "@mui/material";
 import FeedbackIcon from "@mui/icons-material/Feedback";
 import { FeedbackDialog } from "mui-feedback-dialog";
 
-export default function ShareAndFeedback() {
+export default function ShareAndFeedback({ id }) {
   const [dialogVisible, setDialogVisible] = useState(false);
   const [noScreenshot, setNoScreenshot] = useState(false);
   const [showList] = useState(false);

@@ -86,7 +86,7 @@ const Footer = () => {
               Weekly Digest
             </h4>
             <p className="text-xs text-[#6b6b6b] leading-relaxed">
-              Receive the week's best stories and ideas directly in your inbox. No spam, ever.
+              Receive the week&apos;s best stories and ideas directly in your inbox. No spam, ever.
             </p>
 
             {subscribed ? (
