@@ -12,3 +12,4 @@ id = "database-connection-uri"
 description = "Detected Database Connection URI (PostgreSQL, MySQL, Redis) with credentials"
 regex = '''(?i)(postgres|postgresql|mysql|redis):\/\/[^\s"'`]+:[^\s"'`]+@[^\s"'`]+'''
 keywords = ["postgres", "postgresql", "mysql", "redis"]
+
