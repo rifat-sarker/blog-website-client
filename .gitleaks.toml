@@ -1,0 +1,14 @@
+[extend]
+useDefault = true
+
+[[rules]]
+id = "mongodb-connection-string"
+description = "Detected MongoDB Connection String / URI with credentials"
+regex = '''(?i)mongodb(\+srv)?:\/\/[^\s"'`]+:[^\s"'`]+@[^\s"'`]+'''
+keywords = ["mongodb", "mongodb+srv"]
+
+[[rules]]
+id = "database-connection-uri"
+description = "Detected Database Connection URI (PostgreSQL, MySQL, Redis) with credentials"
+regex = '''(?i)(postgres|postgresql|mysql|redis):\/\/[^\s"'`]+:[^\s"'`]+@[^\s"'`]+'''
+keywords = ["postgres", "postgresql", "mysql", "redis"]
