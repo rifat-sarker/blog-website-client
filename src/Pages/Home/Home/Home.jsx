@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { editorialService, getLocalized } from "../../../services/api";
 import { useLanguage } from "../../../context/LanguageContext";
@@ -27,7 +27,7 @@ const Home = () => {
   const [activeTopic, setActiveTopic] = useState("For you");
   const [isLoading, setIsLoading] = useState(true);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       const [arts, wires, saved] = await Promise.all([
         editorialService.getArticles(),
@@ -41,11 +41,11 @@ const Home = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user?.email]);
 
   useEffect(() => {
     loadData();
-  }, [user?.email]);
+  }, [loadData]);
 
   const handleToggleBookmark = async (article) => {
     const aId = article._id || article.id;

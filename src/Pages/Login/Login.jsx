@@ -1,5 +1,5 @@
-import { useContext, useState, useEffect, useRef } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useContext, useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../providers/AuthProvider";
 import { useLanguage } from "../../context/LanguageContext";
 import { Mail, ArrowRight, ShieldCheck, KeyRound, CheckCircle2 } from "lucide-react";
@@ -90,7 +90,7 @@ const Login = () => {
         console.warn("Google identity init:", e);
       }
     }
-  }, [googleClientId, from]);
+  }, [googleClientId, from, googleLogIn, navigate]);
 
   const handleGoogleSignInClick = async () => {
     setIsSubmitting(true);

@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { editorialService, getLocalized } from "../services/api";
 import { useLanguage } from "../context/LanguageContext";
@@ -11,16 +11,16 @@ const Wishlist = () => {
   const [savedItems, setSavedItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const loadShelf = async () => {
+  const loadShelf = useCallback(async () => {
     setIsLoading(true);
     const data = await editorialService.getSavedArticles(user?.email);
     setSavedItems(data || []);
     setIsLoading(false);
-  };
+  }, [user?.email]);
 
   useEffect(() => {
     loadShelf();
-  }, [user?.email]);
+  }, [loadShelf]);
 
   const handleRemove = async (id) => {
     await editorialService.removeSavedArticle(id);

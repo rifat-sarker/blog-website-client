@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState } from "react";
 import { editorialService } from "../services/api";
 
 export const AuthContext = createContext(null);

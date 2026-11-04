@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { editorialService, getLocalized } from "../../services/api";
 import { useLanguage } from "../../context/LanguageContext";
-import { RefreshCw, ChevronDown, ChevronUp, Radio, ArrowUpRight, Flame } from "lucide-react";
+import { RefreshCw, ChevronDown, ChevronUp, ArrowUpRight, Flame } from "lucide-react";
 
 const CATEGORIES = [
   "ALL",
