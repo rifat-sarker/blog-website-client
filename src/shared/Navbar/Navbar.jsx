@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../providers/AuthProvider";
 import { useLanguage } from "../../context/LanguageContext";
 import { editorialService, getLocalized } from "../../services/api";
+import { getArticleSlug } from "../../utils/slugify";
 import {
   Search,
   SquarePen,
@@ -141,7 +142,7 @@ const Navbar = () => {
                   {liveResults.map((story) => (
                     <Link
                       key={story._id || story.id}
-                      to={`/blog/${story._id || story.id}`}
+                      to={`/blog/${getArticleSlug(story)}`}
                       onClick={() => {
                         setLiveResults([]);
                         setSearchQuery("");
@@ -346,7 +347,7 @@ const Navbar = () => {
                 {liveResults.map((story) => (
                   <Link
                     key={story._id || story.id}
-                    to={`/blog/${story._id || story.id}`}
+                    to={`/blog/${getArticleSlug(story)}`}
                     onClick={() => {
                       setLiveResults([]);
                       setSearchQuery("");

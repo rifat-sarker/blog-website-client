@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { editorialService, getLocalized } from "../../services/api";
+import { getArticleSlug } from "../../utils/slugify";
 import { useLanguage } from "../../context/LanguageContext";
 import { AuthContext } from "../../providers/AuthProvider";
 import { Search, X, Bookmark } from "lucide-react";
@@ -172,6 +173,7 @@ const AllBlog = () => {
         <div className="divide-y divide-[#f2f2f2]">
           {filtered.map((item, idx) => {
             const articleId = item._id || item.id || idx;
+            const articleSlug = getArticleSlug(item);
             const isSaved = savedIds.has(articleId);
             const title = getLocalized(item.title, currentLang);
             const sdesc = getLocalized(item.sdesc, currentLang);
@@ -189,7 +191,7 @@ const AllBlog = () => {
                       <span>{category}</span>
                     </div>
 
-                    <Link to={`/blog/${articleId}`} className="group block">
+                    <Link to={`/blog/${articleSlug}`} className="group block">
                       <h2 className="font-bold text-base sm:text-xl leading-snug text-[#242424] group-hover:text-[#6b6b6b] transition-colors line-clamp-2">
                         {title}
                       </h2>
@@ -217,7 +219,7 @@ const AllBlog = () => {
                   </div>
 
                   {item.image && (
-                    <Link to={`/blog/${articleId}`} className="flex-shrink-0">
+                    <Link to={`/blog/${articleSlug}`} className="flex-shrink-0">
                       <img
                         src={item.image}
                         alt={title}

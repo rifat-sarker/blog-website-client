@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { editorialService, getLocalized } from "../../../services/api";
+import { getArticleSlug } from "../../../utils/slugify";
 import { useLanguage } from "../../../context/LanguageContext";
 import { AuthContext } from "../../../providers/AuthProvider";
 import { Bookmark } from "lucide-react";
@@ -114,6 +115,7 @@ const Home = () => {
             <div className="divide-y divide-[#f2f2f2]">
               {filteredArticles.map((article) => {
                 const articleId = article._id || article.id;
+                const articleSlug = getArticleSlug(article);
                 const title = getLocalized(article.title, currentLang);
                 const sdesc = getLocalized(article.sdesc, currentLang);
                 const category = getLocalized(article.category, currentLang) || "Essay";
@@ -141,7 +143,7 @@ const Home = () => {
                         </div>
 
                         {/* Title */}
-                        <Link to={`/blog/${articleId}`} className="group block">
+                        <Link to={`/blog/${articleSlug}`} className="group block">
                           <h2 className="font-bold text-base sm:text-xl md:text-[22px] leading-snug sm:leading-[1.3] text-[#242424] group-hover:text-[#6b6b6b] transition-colors line-clamp-2">
                             {title}
                           </h2>
@@ -185,7 +187,7 @@ const Home = () => {
                       {/* Story Thumbnail (Medium-Style Responsive Ratio) */}
                       {article.image && (
                         <Link
-                          to={`/blog/${articleId}`}
+                          to={`/blog/${articleSlug}`}
                           className="flex-shrink-0 w-20 h-20 sm:w-32 sm:h-24 md:w-40 md:h-28 overflow-hidden rounded"
                         >
                           <img

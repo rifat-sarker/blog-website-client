@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getArticleSlug } from "../utils/slugify";
 
 const BASE_URL =
   import.meta.env.VITE_API_URL ||
@@ -590,15 +591,26 @@ export const editorialService = {
     return [...local, ...EDITORIAL_ARTICLES];
   },
 
-  async getArticleById(id) {
+  async getArticleById(slugOrId) {
+    if (!slugOrId) return null;
+
+    // 1. Check loaded articles first by slug or ID
+    const all = await this.getArticles();
+    const matched = all.find((a) => {
+      const slug = getArticleSlug(a);
+      return slug === slugOrId || (a._id && a._id === slugOrId) || (a.id && a.id === slugOrId);
+    });
+    if (matched) return matched;
+
+    // 2. Query backend by id or slug
     try {
-      const res = await apiClient.get(`/blogs/${id}`);
+      const res = await apiClient.get(`/blogs/${slugOrId}`);
       if (res.data) return res.data;
     } catch {
       // Fallback
     }
-    const all = await this.getArticles();
-    return all.find((a) => (a._id || a.id) === id) || all[0];
+
+    return all[0];
   },
 
   async publishArticle(data) {

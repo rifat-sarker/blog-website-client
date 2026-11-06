@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { editorialService, getLocalized } from "../services/api";
+import { getArticleSlug } from "../utils/slugify";
 import { useLanguage } from "../context/LanguageContext";
 import { TrendingUp, Heart } from "lucide-react";
 
@@ -54,6 +55,7 @@ const FeaturedBlog = () => {
         <div className="divide-y divide-[#f2f2f2]">
           {ranked.map((item, index) => {
             const articleId = item._id || item.id || index;
+            const articleSlug = getArticleSlug(item);
             const localizedTitle = getLocalized(item.title, currentLang);
             const localizedCategory = getLocalized(item.category, currentLang) || "Story";
             const localizedSdesc = getLocalized(item.sdesc, currentLang);
@@ -77,7 +79,7 @@ const FeaturedBlog = () => {
                     <span>{localizedCategory}</span>
                   </div>
 
-                  <Link to={`/blog/${articleId}`} className="group block">
+                  <Link to={`/blog/${articleSlug}`} className="group block">
                     <h3 className="font-bold text-base sm:text-lg md:text-xl text-[#242424] group-hover:text-[#6b6b6b] leading-snug transition-colors line-clamp-2">
                       {localizedTitle}
                     </h3>
@@ -98,7 +100,7 @@ const FeaturedBlog = () => {
                 </div>
 
                 {item.image && (
-                  <Link to={`/blog/${articleId}`} className="flex-shrink-0">
+                  <Link to={`/blog/${articleSlug}`} className="flex-shrink-0">
                     <img
                       src={item.image}
                       alt={localizedTitle}

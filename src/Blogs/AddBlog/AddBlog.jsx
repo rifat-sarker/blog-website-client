@@ -1,6 +1,7 @@
 import { useState, useContext, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { editorialService } from "../../services/api";
+import { getArticleSlug } from "../../utils/slugify";
 import { AuthContext } from "../../providers/AuthProvider";
 import { Image as ImageIcon, Send, UploadCloud, X, Loader2, Link2 } from "lucide-react";
 
@@ -111,7 +112,7 @@ const AddBlog = () => {
     try {
       const created = await editorialService.publishArticle(newDoc);
       setIsSubmitting(false);
-      navigate(`/blog/${created._id || created.id}`);
+      navigate(`/blog/${getArticleSlug(created)}`);
     } catch (err) {
       console.error("Failed to publish story:", err);
       setIsSubmitting(false);

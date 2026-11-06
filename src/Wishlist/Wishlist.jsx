@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { editorialService, getLocalized } from "../services/api";
+import { getArticleSlug } from "../utils/slugify";
 import { useLanguage } from "../context/LanguageContext";
 import { AuthContext } from "../providers/AuthProvider";
 import { Trash2, BookOpen } from "lucide-react";
@@ -48,7 +49,7 @@ const Wishlist = () => {
         <div className="divide-y divide-[#f2f2f2]">
           {savedItems.map((item, idx) => {
             const itemId = item._id || item.id || item.blogId;
-            const linkId = item.blogId || itemId;
+            const articleSlug = getArticleSlug(item) || item.blogId || itemId;
             const localizedTitle = getLocalized(item.title, currentLang);
             const localizedSdesc = getLocalized(item.sdesc, currentLang);
             const localizedCategory = getLocalized(item.category, currentLang) || "Story";
@@ -67,7 +68,7 @@ const Wishlist = () => {
                     <span>{localizedCategory}</span>
                   </div>
 
-                  <Link to={`/blog/${linkId}`} className="group block">
+                  <Link to={`/blog/${articleSlug}`} className="group block">
                     <h3 className="font-bold text-base sm:text-xl leading-snug text-[#242424] group-hover:text-[#6b6b6b] transition-colors line-clamp-2">
                       {localizedTitle}
                     </h3>
@@ -91,7 +92,7 @@ const Wishlist = () => {
                 </div>
 
                 {item.image && (
-                  <Link to={`/blog/${linkId}`} className="flex-shrink-0">
+                  <Link to={`/blog/${articleSlug}`} className="flex-shrink-0">
                     <img
                       src={item.image}
                       alt={localizedTitle}

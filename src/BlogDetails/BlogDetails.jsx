@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import { editorialService, getLocalized } from "../services/api";
+import { getArticleSlug } from "../utils/slugify";
 import { useLanguage } from "../context/LanguageContext";
 import { AuthContext } from "../providers/AuthProvider";
 import { Bookmark, MessageCircle, Share2, Check, Heart, User } from "lucide-react";
@@ -50,9 +51,15 @@ const BlogDetails = () => {
         setResponses(data.comments || []);
         setIsLoading(false);
 
+        // Replace raw backend ID in browser address bar with clean human-readable title slug
+        const targetSlug = getArticleSlug(data);
+        if (targetSlug && id !== targetSlug) {
+          window.history.replaceState(null, "", `/blog/${targetSlug}`);
+        }
+
         try {
           const liked = JSON.parse(localStorage.getItem("mixhub_liked_articles") || "[]");
-          if (liked.includes(id) || (data._id && liked.includes(data._id))) {
+          if (liked.includes(id) || (data._id && liked.includes(data._id)) || (targetSlug && liked.includes(targetSlug))) {
             setIsLiked(true);
           }
         } catch {
@@ -62,7 +69,7 @@ const BlogDetails = () => {
     });
 
     editorialService.getSavedArticles().then((savedList) => {
-      const exists = savedList.some((s) => (s._id || s.id || s.blogId) === id);
+      const exists = savedList.some((s) => (s._id || s.id || s.blogId) === id || s.slug === id);
       if (isMounted) setIsSaved(exists);
     });
 
@@ -78,9 +85,11 @@ const BlogDetails = () => {
     setClaps(nextClaps);
     setIsLiked(nextLiked);
 
+    const articleSlug = getArticleSlug(article);
+    const targetIds = [id, article?._id, article?.id, articleSlug].filter(Boolean);
+
     try {
       const liked = JSON.parse(localStorage.getItem("mixhub_liked_articles") || "[]");
-      const targetIds = [id, article?._id, article?.id].filter(Boolean);
       let nextList = [...liked];
       if (nextLiked) {
         targetIds.forEach((tId) => {
@@ -94,14 +103,16 @@ const BlogDetails = () => {
       console.error("Failed to update liked articles:", e);
     }
 
-    await editorialService.clapStory(id, nextLiked ? "like" : "unlike");
+    const backendId = article?._id || article?.id || id;
+    await editorialService.clapStory(backendId, nextLiked ? "like" : "unlike");
   };
 
   // Dynamic Bookmark (Backend & LocalStorage Synchronized)
   const handleSave = async () => {
     if (!article) return;
+    const backendId = article?._id || article?.id || id;
     if (isSaved) {
-      await editorialService.removeSavedArticle(id);
+      await editorialService.removeSavedArticle(backendId);
       setIsSaved(false);
     } else {
       await editorialService.saveArticle(article, user?.email);
@@ -146,7 +157,8 @@ const BlogDetails = () => {
     };
 
     try {
-      const updatedList = await editorialService.addComment(id, commentPayload);
+      const backendId = article?._id || article?.id || id;
+      const updatedList = await editorialService.addComment(backendId, commentPayload);
       if (Array.isArray(updatedList) && updatedList.length > 0) {
         setResponses(updatedList);
       } else {
