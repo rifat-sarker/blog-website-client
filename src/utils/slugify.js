@@ -16,3 +16,4 @@ export const getArticleSlug = (article) => {
   const slug = slugify(title);
   return slug || article._id || article.id || "";
 };
+
